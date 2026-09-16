@@ -19,7 +19,7 @@
   max-width: 100%;
 }
 .hero-copy {
-  flex: 1 1 22rem;
+  flex: 1 1 16rem;
   padding-bottom: 0.25rem;
 }
 .hero-art {
@@ -27,6 +27,7 @@
   aspect-ratio: 1672 / 941;
   overflow: hidden;
   background: var(--stone);
+  border-radius: 0 0 var(--radius-hero) var(--radius-hero);
 }
 .hero-painting,
 .hero-cutout {

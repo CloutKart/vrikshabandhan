@@ -76,6 +76,8 @@
   --move-reveal: 12px;
   --move-reveal-lg: 24px;
   --scale-press: 0.98;
+  --page-max: 1800px;
+  --radius-hero: 1.5rem;
   --thread-x: 28px;
   --thread-gutter: 64px;
   --header-h: 72px;
