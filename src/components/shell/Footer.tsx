@@ -18,7 +18,7 @@ export function Footer() {
       <div className="mt-10 grid gap-10 min-[820px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
         <div>
           <div className="flex items-start gap-4">
-            <Mark size={40} />
+            <Mark size={64} />
             <div>
               <p className="font-serif text-[clamp(1.6rem,2.4vw,2.5rem)] leading-tight text-ink min-[820px]:whitespace-nowrap">{b("name")}</p>
               <p lang={other} className="font-serif text-xl text-ink-2">

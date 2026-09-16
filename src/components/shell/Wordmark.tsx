@@ -1,21 +1,10 @@
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
-/** The rakhi medallion as the mark. Same drawing as the scroll knot, at wordmark size. */
-export function Mark({ size = 28 }: { size?: number }) {
-  return (
-    <svg data-mark width={size} height={size} viewBox="0 0 28 28" aria-hidden="true" className="shrink-0">
-      <circle cx="14" cy="14" r="12" fill="var(--gold)" />
-      <circle cx="14" cy="14" r="8" fill="var(--sutra)" />
-      <circle cx="14" cy="14" r="3" fill="var(--paper)" />
-      <g fill="var(--paper)">
-        <circle cx="14" cy="3.8" r="1.2" />
-        <circle cx="24.2" cy="14" r="1.2" />
-        <circle cx="14" cy="24.2" r="1.2" />
-        <circle cx="3.8" cy="14" r="1.2" />
-      </g>
-    </svg>
-  );
+/** The Abhiyan's logo: the tree held in two hands. Decorative next to the name, which carries the meaning. */
+export function Mark({ size = 44 }: { size?: number }) {
+  return <Image data-mark src="/images/logo.png" alt="" width={size} height={size} className="shrink-0" priority={size <= 48} />;
 }
 
 export function Wordmark() {

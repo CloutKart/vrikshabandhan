@@ -48,17 +48,17 @@ export default async function StoryPage({ params }: Props) {
   return (
     <main id="content" className="page pb-24 pt-10 min-[820px]:pt-16">
       <PaperSheet>
+        {cover ? (
+          <div data-flip-id={post.slug} className="-mx-[clamp(1.25rem,5vw,4rem)] -mt-[clamp(1.25rem,5vw,4rem)] mb-8 overflow-hidden rounded-t-[var(--radius-panel)]">
+            <StoryCover media={cover} locale={locale} />
+          </div>
+        ) : null}
         <div data-letterhead className="mb-8 flex items-center justify-between gap-4 border-b-2 border-sutra pb-4 font-sans text-sm">
           <Link href="/stories" className="inline-flex min-h-11 items-center text-paper-ink">
             <span className="u-thread">{t("back")}</span>
           </Link>
           <span className="text-paper-ink-2">{t("title")}</span>
         </div>
-        {cover ? (
-          <div data-flip-id={post.slug} className="-mx-[clamp(1.25rem,5vw,4rem)] -mt-[clamp(1.25rem,5vw,4rem)] mb-10">
-            <StoryCover media={cover} locale={locale} />
-          </div>
-        ) : null}
         <p className="font-sans text-sm text-paper-ink-2">
           <time dateTime={post.date} className="block text-base text-paper-ink">
             {formatStoryDate(post.date, locale)}
