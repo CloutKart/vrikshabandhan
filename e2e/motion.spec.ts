@@ -42,6 +42,7 @@ test.describe("full motion", () => {
 
   test("the knot follows the scroll", async ({ page }) => {
     await page.goto("/en/stories");
+    await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "", { timeout: 5000 });
     const knot = page.locator("[data-knot]");
     const before = await knot.evaluate((el) => getComputedStyle(el).transform);
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
@@ -50,7 +51,9 @@ test.describe("full motion", () => {
 
   test("the knot slides to the story row under the pointer", async ({ page }) => {
     await page.goto("/en/stories");
+    await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "", { timeout: 5000 });
     const dot = page.locator("[data-knot-dot]");
+    await page.mouse.move(5, 5);
     await page.locator("[data-story-row]").nth(2).hover();
     await expect.poll(async () => dot.evaluate((el) => getComputedStyle(el).transform), { timeout: 3000 }).not.toBe("none");
   });

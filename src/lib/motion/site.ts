@@ -31,7 +31,12 @@ export function mount(pathname: string): Cleanup {
   const full = html.dataset.motion === "full";
   const cleanups: Cleanup[] = [revealObserver()];
   if (full) cleanups.push(heroSequence(), titleReveal(), knot(), flipMorph(pathname));
-  return () => cleanups.forEach((c) => c());
+  // Lets tests (and anything else) know the listeners exist for this route.
+  html.dataset.motionReady = "";
+  return () => {
+    delete html.dataset.motionReady;
+    cleanups.forEach((c) => c());
+  };
 }
 
 /* Reveals: mark elements once they enter the viewport; CSS does the rest. */
