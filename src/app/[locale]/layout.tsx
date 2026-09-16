@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { routing } from "@/i18n/routing";
@@ -33,6 +33,9 @@ export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  // Only the nav namespace is read by client components (LocaleSwitch, ThemeToggle);
+  // sending the whole catalogue would inline every page's copy a second time.
+  const { nav } = await getMessages();
 
   return (
     <html
@@ -46,7 +49,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <script dangerouslySetInnerHTML={{ __html: THEME_HEAD_SCRIPT }} />
       </head>
       <body className="min-h-dvh">
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={{ nav }}>
           <SkipLink />
           <Thread />
           <Header />
