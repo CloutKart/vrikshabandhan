@@ -18,3 +18,4 @@ playwright-report/
 e2e/__screenshots__/**/*-actual.png
 .vercel
 .DS_Store
+e2e/__screenshots__/

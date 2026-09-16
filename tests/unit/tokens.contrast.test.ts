@@ -30,6 +30,7 @@ const pairs: Array<[string, string, number, string]> = [
   ["paper-ink", "paper", 7, "reading sheet text"],
   ["sutra", "paper", 3, "underlines on paper"],
   ["moss", "ground", 3, "rules and borders"],
+  ["stone-ink", "stone", 3, "hero headline on the painting (large text)"],
 ];
 
 describe.each(Object.entries(themes))("%s theme contrast", (_name, t) => {

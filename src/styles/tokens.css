@@ -15,6 +15,8 @@
   --paper: #F3EEE2;
   --paper-ink: #1D231E;
   --paper-ink-2: #4B5449;
+  --stone: #8B8A86;
+  --stone-ink: #1D231E;
   color-scheme: dark;
 }
 
@@ -29,6 +31,8 @@
   --paper: #F7F4EA;
   --paper-ink: #10231A;
   --paper-ink-2: #3E4F45;
+  --stone: #8B8A86;
+  --stone-ink: #1D231E;
   color-scheme: light;
 }
 
@@ -44,7 +48,11 @@
   --color-paper: var(--paper);
   --color-paper-ink: var(--paper-ink);
   --color-paper-ink-2: var(--paper-ink-2);
+  --color-stone: var(--stone);
+  --color-stone-ink: var(--stone-ink);
   --color-white: #ffffff;
+
+  --radius-sm: 2px;
   --color-transparent: transparent;
 
   --font-serif: var(--font-tiro), "Tiro Devanagari Hindi", Georgia, serif;

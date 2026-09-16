@@ -1,15 +1,16 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
+import { Hero } from "@/components/hero/Hero";
+import type { Locale } from "@/i18n/routing";
+import "@/components/hero/hero.css";
 
 type Props = { params: Promise<{ locale: string }> };
 
 export default async function HomePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("hero");
   return (
-    <main id="content" className="page py-24">
-      <h1 className="text-5xl">{t("title")}</h1>
-      <p className="mt-6 max-w-prose">{t("lede")}</p>
+    <main id="content" className="pb-24">
+      <Hero locale={locale as Locale} />
     </main>
   );
 }
