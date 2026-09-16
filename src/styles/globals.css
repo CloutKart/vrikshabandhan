@@ -7,6 +7,15 @@
     scroll-behavior: smooth;
     background: var(--ground);
   }
+  /* The rakhi is the scroll indicator where it is shown; the native bar is hidden there. Scrolling itself is unchanged. */
+  @media (min-width: 820px) {
+    html {
+      scrollbar-width: none;
+    }
+    html::-webkit-scrollbar {
+      display: none;
+    }
+  }
   body {
     background: var(--ground);
     color: var(--ink);

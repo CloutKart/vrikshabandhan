@@ -73,6 +73,16 @@ test.describe("layout shell", () => {
     await expect(page.locator("[data-knot-dot] circle").first()).toBeVisible();
   });
 
+  test("the native scrollbar is hidden where the rakhi is shown, and the page still scrolls", async ({ page }) => {
+    await page.goto("/en/stories");
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollbarWidth)).toBe("none");
+    expect(await page.evaluate(() => window.innerWidth - document.documentElement.clientWidth)).toBe(0);
+    await page.evaluate(() => window.scrollTo(0, 400));
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(300);
+    await page.setViewportSize({ width: 390, height: 800 });
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollbarWidth)).not.toBe("none");
+  });
+
   test("no link uses a bare hash href", async ({ page }) => {
     await page.goto("/en");
     expect(await page.locator('a[href="#"]').count()).toBe(0);
