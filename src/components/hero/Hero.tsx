@@ -26,6 +26,8 @@ export async function Hero({ locale }: { locale: Locale }) {
             width={1672}
             height={941}
             priority
+            fetchPriority="high"
+            quality={55}
             sizes="(min-width: 820px) min(100vw, 153vh), 100vw"
             className="hero-painting"
           />
@@ -34,7 +36,8 @@ export async function Hero({ locale }: { locale: Locale }) {
             alt=""
             width={1672}
             height={941}
-            priority
+            quality={70}
+            loading="lazy"
             sizes="(min-width: 820px) min(100vw, 153vh), 100vw"
             className="hero-cutout"
           />

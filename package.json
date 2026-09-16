@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "e2e": "next build && playwright test",
-    "e2e:quick": "playwright test"
+    "e2e:quick": "playwright test",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

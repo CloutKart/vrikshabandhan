@@ -23,6 +23,7 @@
 }
 .hero-cutout {
   z-index: 2;
+  display: none;
 }
 .hero-title {
   margin: 1.5rem 1.25rem 0;
@@ -35,6 +36,9 @@
   line-height: 1.3;
 }
 @media (min-width: 820px) {
+  .hero-cutout {
+    display: block;
+  }
   .hero-title {
     position: absolute;
     z-index: 1;

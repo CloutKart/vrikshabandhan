@@ -16,8 +16,8 @@ export function NavLinks({ orientation }: { orientation: "row" | "column" }) {
     <ul className={orientation === "row" ? "flex items-center gap-7" : "flex flex-col gap-5 text-2xl"}>
       {items.map((item) => (
         <li key={item.key}>
-          <Link href={item.href} className="u-thread font-sans">
-            {t(item.key)}
+          <Link href={item.href} className="inline-flex min-h-11 items-center font-sans">
+            <span className="u-thread">{t(item.key)}</span>
           </Link>
         </li>
       ))}

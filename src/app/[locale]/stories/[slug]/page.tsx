@@ -48,8 +48,8 @@ export default async function StoryPage({ params }: Props) {
   return (
     <main id="content" className="page pb-24 pt-10 min-[820px]:pt-16">
       <p className="mb-8 font-sans">
-        <Link href="/stories" className="u-thread">
-          {t("back")}
+        <Link href="/stories" className="inline-flex min-h-11 items-center">
+          <span className="u-thread">{t("back")}</span>
         </Link>
       </p>
       <PaperSheet>

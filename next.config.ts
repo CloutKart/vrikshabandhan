@@ -15,6 +15,8 @@ const supabaseHost = (() => {
 
 const nextConfig: NextConfig = {
   images: {
+    // Next 16 serves only listed qualities; the hero uses 62 (painting) and 70 (cut-out).
+    qualities: [55, 62, 70, 75],
     remotePatterns: supabaseHost
       ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/public/**" }]
       : [],

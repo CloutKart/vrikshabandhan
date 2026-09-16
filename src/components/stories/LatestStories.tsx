@@ -16,8 +16,8 @@ export async function LatestStories({ locale }: { locale: Locale }) {
     <section className="page mt-24" aria-labelledby="latest-title">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <BilingualHeading as="h2" {...pair} className="text-[2.25rem] leading-tight" secondaryClassName="text-ink-2" riseSecondary />
-        <Link href="/stories" className="u-thread font-sans">
-          {t("allStories")}
+        <Link href="/stories" className="inline-flex min-h-11 items-center font-sans">
+          <span className="u-thread">{t("allStories")}</span>
         </Link>
       </div>
       <div className="mt-6">

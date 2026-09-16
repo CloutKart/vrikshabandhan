@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/Toast";
-import { mukta, tiro } from "@/lib/fonts";
+import { mukta, muktaDevanagari, tiro, tiroItalic } from "@/lib/fonts";
 import { publicSupabaseEnv } from "@/lib/supabase/env";
 import { DEFAULT_THEME, THEME_COLORS } from "@/lib/theme/constants";
 import { THEME_HEAD_SCRIPT } from "@/lib/theme/head-script";
@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Editor", robots: { index: false, fol
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const configured = Boolean(publicSupabaseEnv());
   return (
-    <html lang="en" data-theme={DEFAULT_THEME} className={`${tiro.variable} ${mukta.variable}`} suppressHydrationWarning>
+    <html lang="en" data-theme={DEFAULT_THEME} className={`${tiro.variable} ${tiroItalic.variable} ${mukta.variable} ${muktaDevanagari.variable}`} suppressHydrationWarning>
       <head>
         <meta name="theme-color" content={THEME_COLORS[DEFAULT_THEME]} />
         <script dangerouslySetInnerHTML={{ __html: THEME_HEAD_SCRIPT }} />

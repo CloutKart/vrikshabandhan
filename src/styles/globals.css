@@ -29,6 +29,13 @@
   [id] {
     scroll-margin-top: calc(var(--header-h) + 1rem);
   }
+  /* The italic is a separate face (no synthesis), loaded only when a page uses it. */
+  em,
+  i,
+  cite {
+    font-family: var(--font-serif-italic);
+    font-style: normal;
+  }
   ::selection {
     background: var(--sutra);
     color: #fff;
@@ -116,12 +123,12 @@
   html {
     scroll-behavior: auto;
   }
+  /* No transitions or animations at all: every element renders its final state directly. */
   *,
   ::before,
   ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    animation: none !important;
+    transition: none !important;
     scroll-behavior: auto !important;
   }
 }
@@ -153,13 +160,15 @@
   line-height: 1.2;
 }
 .paper .prose blockquote {
-  font-style: italic;
+  font-family: var(--font-serif-italic);
+  font-style: normal;
   font-weight: 400;
 }
 .paper .prose blockquote cite {
   display: block;
   margin-top: 0.5em;
   font-family: var(--font-sans);
+  font-style: normal;
   font-size: 0.8em;
   font-style: normal;
   color: var(--paper-ink-2);

@@ -19,7 +19,7 @@ export function LocaleSwitch() {
     <Link
       href={pathname}
       locale={target}
-      aria-label={t("switchLocaleLabel")}
+      aria-label={`${t("switchLocale")} (${t("switchLocaleLabel")})`}
       className="u-thread font-sans"
       onClick={(e) => {
         if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;

@@ -56,7 +56,8 @@
   --color-transparent: transparent;
 
   --font-serif: var(--font-tiro), "Tiro Devanagari Hindi", Georgia, serif;
-  --font-sans: var(--font-mukta), "Mukta", system-ui, sans-serif;
+  --font-serif-italic: var(--font-tiro-italic), var(--font-tiro), "Tiro Devanagari Hindi", Georgia, serif;
+  --font-sans: var(--font-mukta), var(--font-mukta-dev), "Mukta", system-ui, sans-serif;
 
   --ease-enter: cubic-bezier(0, 0, 0.2, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
