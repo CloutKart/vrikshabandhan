@@ -29,7 +29,7 @@ test.describe("stories index", () => {
   test("the home page shows the three latest stories", async ({ page }) => {
     await page.goto("/en");
     await expect(page.getByRole("heading", { name: "Latest stories" })).toBeVisible();
-    await expect(page.locator("[data-story-list] a[href^='/en/stories/']")).toHaveCount(3);
+    await expect(page.locator("[data-story-list]:visible a[href^='/en/stories/']")).toHaveCount(3);
   });
 });
 

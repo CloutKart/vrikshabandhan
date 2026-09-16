@@ -77,7 +77,7 @@ test.describe("layout shell", () => {
     await page.goto("/en/stories");
     expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollbarWidth)).toBe("none");
     expect(await page.evaluate(() => window.innerWidth - document.documentElement.clientWidth)).toBe(0);
-    await page.evaluate(() => window.scrollTo(0, 400));
+    await page.evaluate(() => window.scrollTo({ top: 400, behavior: "instant" }));
     expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(300);
     await page.setViewportSize({ width: 390, height: 800 });
     expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollbarWidth)).not.toBe("none");

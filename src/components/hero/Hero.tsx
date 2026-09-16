@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { BilingualHeading } from "@/components/typography/BilingualHeading";
 import { Button } from "@/components/ui/Button";
+import type { ReactNode } from "react";
 import { otherLocale, type Locale } from "@/i18n/routing";
 
 /**
@@ -10,7 +11,7 @@ import { otherLocale, type Locale } from "@/i18n/routing";
  * container units so the overlap is the same at every width. On phones the
  * painting is shown whole and the headline follows it.
  */
-export async function Hero({ locale }: { locale: Locale }) {
+export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNode }) {
   const other = otherLocale(locale);
   const t = await getTranslations({ locale, namespace: "hero" });
   const tOther = await getTranslations({ locale: other, namespace: "hero" });
@@ -62,6 +63,7 @@ export async function Hero({ locale }: { locale: Locale }) {
           </Button>
         </div>
       </div>
+      {aside}
       </div>
       {credit ? (
         <p data-credit className="mt-4 font-sans text-sm text-ink-2">

@@ -54,3 +54,28 @@ test.describe("wide, short screens", () => {
     await expect(page.getByText(/Since 2005 we have planted/)).toBeInViewport();
   });
 });
+
+test.describe("latest stories in the hero", () => {
+  test("on wide screens the right column holds the three latest stories, once", async ({ page }) => {
+    await page.setViewportSize({ width: 2000, height: 960 });
+    await page.goto("/en");
+    const aside = page.locator(".hero-aside");
+    await expect(aside).toBeVisible();
+    await expect(aside.locator("[data-story-list] a[href^='/en/stories/']")).toHaveCount(3);
+    const art = await page.locator(".hero-art").boundingBox();
+    const box = await aside.boundingBox();
+    expect(box!.x).toBeGreaterThanOrEqual(art!.x + art!.width);
+    expect(Math.abs(box!.y + box!.height - (art!.y + art!.height))).toBeLessThanOrEqual(8);
+    await expect(page.locator("[data-story-list]:visible")).toHaveCount(1);
+  });
+
+  test("on narrower screens the list sits below the hero, once", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/en");
+    await expect(page.locator(".hero-aside")).toBeHidden();
+    await expect(page.locator("[data-story-list]:visible")).toHaveCount(1);
+    const art = await page.locator(".hero-art").boundingBox();
+    const list = await page.locator("[data-story-list]:visible").boundingBox();
+    expect(list!.y).toBeGreaterThan(art!.y + art!.height);
+  });
+});

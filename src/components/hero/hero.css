@@ -22,6 +22,33 @@
   flex: 1 1 16rem;
   padding-bottom: 0.25rem;
 }
+/* The compact latest-stories column exists only on wide screens; below that the full section shows instead. */
+.hero-aside {
+  display: none;
+}
+@media (min-width: 1600px) {
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, calc(78vh * 1.777)) minmax(20rem, 1fr);
+    grid-template-rows: auto 1fr;
+    align-items: stretch;
+  }
+  .hero-canvas {
+    grid-row: 1 / 3;
+  }
+  .hero-copy {
+    grid-column: 2;
+    align-self: start;
+  }
+  .hero-aside {
+    display: block;
+    grid-column: 2;
+    align-self: end;
+  }
+  .hero-latest-fallback {
+    display: none;
+  }
+}
 .hero-art {
   position: relative;
   aspect-ratio: 1672 / 941;
