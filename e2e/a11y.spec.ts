@@ -1,7 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const routes = ["/en", "/hi"];
+const pages = ["", "/stories", "/stories?tag=Open%20letter", "/stories/silkyara-open-letter", "/founder", "/thread", "/get-involved"];
+const routes = ["en", "hi"].flatMap((l) => pages.map((p) => `/${l}${p}`));
 const themes = ["dark", "light"] as const;
 
 for (const route of routes) {

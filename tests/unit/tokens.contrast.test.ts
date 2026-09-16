@@ -25,7 +25,7 @@ const pairs: Array<[string, string, number, string]> = [
   ["ink", "ground", 7, "body text on the page ground"],
   ["ink", "ground-2", 4.5, "text on raised surfaces"],
   ["ink-2", "ground", 4.5, "secondary text"],
-  ["gold", "ground", 3, "focus ring and large numerals"],
+  ["gold", "ground", 4.5, "dates and numerals, also the focus ring"],
   ["sutra", "ground", 3, "thread, underlines, display red"],
   ["paper-ink", "paper", 7, "reading sheet text"],
   ["sutra", "paper", 3, "underlines on paper"],

@@ -95,6 +95,47 @@
   .u-thread[aria-current]::after {
     transform: scaleX(1);
   }
+  /* The reading sheet: paper on the ground, with the prose palette bound to the paper tokens. */
+  .paper {
+    background: var(--paper);
+    color: var(--paper-ink);
+    padding: clamp(1.25rem, 5vw, 4rem);
+  }
+  .paper .prose {
+    --tw-prose-body: var(--paper-ink);
+    --tw-prose-headings: var(--paper-ink);
+    --tw-prose-lead: var(--paper-ink-2);
+    --tw-prose-links: var(--paper-ink);
+    --tw-prose-bold: var(--paper-ink);
+    --tw-prose-counters: var(--paper-ink-2);
+    --tw-prose-bullets: var(--paper-ink-2);
+    --tw-prose-hr: var(--moss);
+    --tw-prose-quotes: var(--paper-ink);
+    --tw-prose-quote-borders: var(--sutra);
+    --tw-prose-captions: var(--paper-ink-2);
+    font-family: var(--font-serif);
+  }
+  .paper .prose h2 {
+    font-weight: 400;
+    font-size: 1.6em;
+    line-height: 1.2;
+  }
+  .paper .prose blockquote {
+    font-style: italic;
+    font-weight: 400;
+  }
+  .paper .prose blockquote cite {
+    display: block;
+    margin-top: 0.5em;
+    font-family: var(--font-sans);
+    font-size: 0.8em;
+    font-style: normal;
+    color: var(--paper-ink-2);
+  }
+  .paper .prose blockquote p:first-of-type::before,
+  .paper .prose blockquote p:last-of-type::after {
+    content: none;
+  }
   /* Full-screen sheet for the phone menu. */
   .sheet {
     width: 100vw;
