@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { PaintingDetail } from "@/components/painting/PaintingDetail";
 import { StoryList } from "@/components/stories/StoryList";
 import { TagFilter } from "@/components/stories/TagFilter";
 import { PageHeader } from "@/components/typography/PageHeader";
@@ -29,10 +30,12 @@ export default async function StoriesPage({ params, searchParams }: Props) {
     bilingual(locale, "stories", "title"),
     getTranslations({ locale, namespace: "stories" }),
   ]);
+  const home = await getTranslations({ locale, namespace: "home" });
   return (
     <main id="content" className="pb-24">
       <PageHeader pair={pair} lede={t("lede")} />
       <div className="page">
+        <PaintingDetail crop="canopy" ratio="3/1" alt={home("canopyAlt")} sizes="100vw" className="mb-12" />
         <TagFilter tags={tags} active={tag} locale={locale} />
         <div className="mt-6">
           <StoryList posts={posts} locale={locale} />

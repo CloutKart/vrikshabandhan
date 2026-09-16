@@ -59,6 +59,7 @@
   --color-white: #ffffff;
 
   --radius-sm: 2px;
+  --radius-panel: 1.5rem;
   --color-transparent: transparent;
 
   --font-serif: var(--font-tiro), "Tiro Devanagari Hindi", Georgia, serif;
@@ -84,6 +85,8 @@
   --scale-press: 0.98;
   /* The layout fills the window; gutters scale with it. */
   --page-max: 100vw;
+  --section: clamp(5rem, 10vh, 8rem);
+  --radius-panel: 1.5rem;
   --radius-hero: 1.5rem;
   --thread-x: 28px;
   --thread-gutter: 64px;

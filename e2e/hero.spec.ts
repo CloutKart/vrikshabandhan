@@ -16,20 +16,21 @@ test("the Hindi home page leads with the Hindi line", async ({ page }) => {
 
 test("the painting is the priority image and describes itself", async ({ page }) => {
   await page.goto("/en");
-  const painting = page.locator('img[src*="tree-painting"]');
+  const painting = page.locator('img.hero-painting');
   // next/image "priority": never lazy, and either a preload link or fetchpriority=high.
   expect(await painting.getAttribute("loading")).not.toBe("lazy");
   const preloads = await page.locator('link[rel="preload"][as="image"][imagesrcset*="tree-painting"]').count();
   const fetchPriority = await painting.getAttribute("fetchpriority");
   expect(preloads > 0 || fetchPriority === "high").toBe(true);
   await expect(painting).toHaveAttribute("alt", /raksha sutra/);
-  await expect(page.locator('img[src*="tree-cutout"]')).toHaveAttribute("alt", "");
+  await expect(page.locator('img.hero-cutout')).toHaveAttribute("alt", "");
 });
 
 test("the hero calls to action are real links", async ({ page }) => {
   await page.goto("/en");
-  await expect(page.getByRole("link", { name: "Read the stories" })).toHaveAttribute("href", "/en/stories");
-  await expect(page.getByRole("link", { name: "Tie a thread with us" })).toHaveAttribute("href", "/en/get-involved");
+  const hero = page.locator(".hero");
+  await expect(hero.getByRole("link", { name: "Read the stories" })).toHaveAttribute("href", "/en/stories");
+  await expect(hero.getByRole("link", { name: "Tie a thread with us" })).toHaveAttribute("href", "/en/get-involved");
 });
 
 test("no painting credit is shown while the credit is empty", async ({ page }) => {

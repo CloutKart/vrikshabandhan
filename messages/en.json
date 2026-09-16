@@ -34,7 +34,15 @@
     "allStories": "All stories",
     "whyTitle": "Why a thread",
     "whyText": "On Raksha Bandhan a sister ties a thread and a brother promises protection. We tie the same thread round a tree and make the same promise: to keep it alive through its first three monsoons, when most planted saplings in India die for want of water.",
-    "whyLink": "Read about the thread"
+    "whyLink": "Read about the thread",
+    "promise": "A tree counts when it is still alive three monsoons later.",
+    "promiseLead": "That is the whole method. Plant a native tree, tie a thread round it, come back to water it, and count only what survives.",
+    "lineageCta": "Why a thread, why a tree",
+    "founderLead": "Sainik Shiromani Manoj Dhyani has spoken for the Himalaya for three decades, from the statehood movement of the 1990s to open letters to the Chief Minister.",
+    "founderCta": "About the founder",
+    "involveCta": "See how to help",
+    "knotAlt": "Detail of the painting: the red thread knotted round the white trunk",
+    "canopyAlt": "Detail of the painting: the canopy of green, blue and gold leaves"
   },
   "stories": {
     "title": "Stories from the field",
@@ -57,13 +65,35 @@
     "p3": "Our founder says it at every gathering: the success of a plantation is the number of trees alive three monsoons later.",
     "lineageTitle": "The line we stand in",
     "lineage": [
-      { "year": "1730", "place": "Khejarli, Rajasthan", "title": "363 Bishnois", "text": "Died embracing khejri trees to stop a royal felling. India's Forest Martyrs Day is dated to it." },
-      { "year": "1973", "place": "Chamoli, Uttarakhand", "title": "Chipko", "text": "Gaura Devi and the women of Reni held the trees. A fifteen-year Himalayan logging ban followed." },
-      { "year": "1994", "place": "Tehri, Uttarakhand", "title": "Raksha Sutra Andolan", "text": "Villagers tied sacred thread on 2,500 trees marked for the axe. The trees stood." },
-      { "year": "2005", "place": "Dehradun", "title": "Vrikshabandhan Abhiyan", "text": "Registered, and working since then on the care of the Himalaya and the trees people vow to keep." }
+      {
+        "year": "1730",
+        "place": "Khejarli, Rajasthan",
+        "title": "363 Bishnois",
+        "text": "Died embracing khejri trees to stop a royal felling. India's Forest Martyrs Day is dated to it."
+      },
+      {
+        "year": "1973",
+        "place": "Chamoli, Uttarakhand",
+        "title": "Chipko",
+        "text": "Gaura Devi and the women of Reni held the trees. A fifteen-year Himalayan logging ban followed."
+      },
+      {
+        "year": "1994",
+        "place": "Tehri, Uttarakhand",
+        "title": "Raksha Sutra Andolan",
+        "text": "Villagers tied sacred thread on 2,500 trees marked for the axe. The trees stood."
+      },
+      {
+        "year": "2005",
+        "place": "Dehradun",
+        "title": "Vrikshabandhan Abhiyan",
+        "text": "Registered, and working since then on the care of the Himalaya and the trees people vow to keep."
+      }
     ],
     "numbersTitle": "What we have planted",
-    "numbersPending": "Programme numbers will appear here once the Abhiyan has counted them."
+    "numbersPending": "Programme numbers will appear here once the Abhiyan has counted them.",
+    "quoteCite": "Manoj Dhyani, at every gathering",
+    "quote": "The success of a plantation is the number of trees alive three monsoons later."
   },
   "founder": {
     "title": "The founder",
@@ -75,12 +105,29 @@
     "p2": "He was a leading soldier of the Shriyantra Island movement on the Alaknanda at Srinagar Garhwal, and writes at One Himalaya, the Abhiyan's blog, on Himalayan thought and philosophy. On World Mountain Day 2023 he sent the Chief Minister an open letter reading the Silkyara tunnel collapse as the mountain's own message: be careful in time.",
     "timelineTitle": "Thirty years",
     "timeline": [
-      { "year": "1994", "text": "Rampur Tiraha, 2 October. The movement's turning point. He pays tribute to its martyrs every year." },
-      { "year": "1995", "text": "Shriyantra Island, Srinagar Garhwal. The 36-day fast, the 10 November action, the search for the missing along the Alaknanda." },
-      { "year": "1996", "text": "The Blueprint of Uttarakhand presented at the Ministry of Home Affairs, New Delhi." },
-      { "year": "2005", "text": "Vrikshabandhan Abhiyan registered in Dehradun." },
-      { "year": "2023", "text": "Open letter to the Chief Minister: the pain of the Himalayas is hidden in Silkyara." }
-    ]
+      {
+        "year": "1994",
+        "text": "Rampur Tiraha, 2 October. The movement's turning point. He pays tribute to its martyrs every year."
+      },
+      {
+        "year": "1995",
+        "text": "Shriyantra Island, Srinagar Garhwal. The 36-day fast, the 10 November action, the search for the missing along the Alaknanda."
+      },
+      {
+        "year": "1996",
+        "text": "The Blueprint of Uttarakhand presented at the Ministry of Home Affairs, New Delhi."
+      },
+      {
+        "year": "2005",
+        "text": "Vrikshabandhan Abhiyan registered in Dehradun."
+      },
+      {
+        "year": "2023",
+        "text": "Open letter to the Chief Minister: the pain of the Himalayas is hidden in Silkyara."
+      }
+    ],
+    "quote": "The Himalayas have a clear message for all of us: be careful in time.",
+    "quoteCite": "Open letter to the Chief Minister, World Mountain Day 2023"
   },
   "involve": {
     "title": "Tie a thread with us",
@@ -103,7 +150,11 @@
     "contactNote": "Contact details as published on the One Himalaya blog.",
     "followTitle": "Follow",
     "facebook": "Vrikshabandhan Abhiyan on Facebook",
-    "blog": "One Himalaya, the Abhiyan's blog on Himalayan thought and philosophy"
+    "blog": "One Himalaya, the Abhiyan's blog on Himalayan thought and philosophy",
+    "adoptSubject": "Register a tree",
+    "hostSubject": "Invite the Abhiyan to our event",
+    "supportSubject": "Account details for supporting the work",
+    "letterTitle": "Write to the Abhiyan"
   },
   "footer": {
     "rights": "Vrikshabandhan Abhiyan (Regd.), Dehradun"

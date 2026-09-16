@@ -19,36 +19,40 @@ export default async function GetInvolvedPage({ params }: { params: Promise<{ lo
   const locale = l as Locale;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "involve" });
-  const [pair, contactPair] = await Promise.all([bilingual(locale, "involve", "title"), bilingual(locale, "involve", "contactTitle")]);
+  const [pair, contactPair] = await Promise.all([bilingual(locale, "involve", "title"), bilingual(locale, "involve", "letterTitle")]);
   const tel = (s: string) => `tel:${s.replace(/\s+/g, "")}`;
+  const mail = (subject: string) => `mailto:${t("email")}?subject=${encodeURIComponent(subject)}`;
   const link = "u-thread";
 
   return (
-    <main id="content" className="pb-24">
+    <main id="content" className="pb-12">
       <PageHeader pair={pair} lede={t("lede")} />
       <div className="page">
-        <ol className="divide-y divide-moss/40">
+        <ol className="grid gap-12 min-[1024px]:grid-cols-3 min-[1024px]:gap-10">
           {ways.map((w) => (
-            <li key={w} className="grid gap-4 py-10 min-[820px]:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] min-[820px]:gap-16">
-              <h2 className="text-[2rem] leading-tight">{t(`${w}Title`)}</h2>
-              <div>
-                <p className="max-w-[56ch]">{t(`${w}Text`)}</p>
-                <div className="mt-6">
-                  <Button href="/get-involved#contact" variant="line">
-                    {t(`${w}Cta`)}
-                  </Button>
-                </div>
+            <li key={w} className="flex flex-col">
+              <hr className="thread-rule" />
+              <h2 className="mt-6 text-[2rem] leading-tight">{t(`${w}Title`)}</h2>
+              <p className="mt-4 max-w-[44ch] flex-1 text-ink-2">{t(`${w}Text`)}</p>
+              <div className="mt-8">
+                <Button href={mail(t(`${w}Subject`))} variant={w === "adopt" ? "solid" : "line"}>
+                  {t(`${w}Cta`)}
+                </Button>
               </div>
             </li>
           ))}
         </ol>
-        <section id="contact" className="mt-16 border-t-2 border-sutra pt-10">
-          <BilingualHeading as="h2" {...contactPair} className="text-[2rem] leading-tight" secondaryClassName="text-ink-2" riseSecondary />
+      </div>
+      <section id="contact" className="page section" aria-labelledby="contact-title">
+        <div data-letter className="paper mx-auto max-w-[60rem] rounded-[var(--radius-panel)]">
+          <div className="border-b-2 border-sutra pb-6">
+            <BilingualHeading as="h2" {...contactPair} className="text-[clamp(2rem,3vw,2.75rem)] leading-tight" secondaryClassName="text-paper-ink-2" />
+          </div>
           <div className="mt-8 grid gap-10 min-[820px]:grid-cols-2">
             <address className="not-italic">
               <p>{t("org")}</p>
               <p>{t("city")}</p>
-              <p className="mt-4">
+              <p className="mt-6">
                 <a className={link} href={`mailto:${t("email")}`}>
                   {t("email")}
                 </a>
@@ -63,10 +67,10 @@ export default async function GetInvolvedPage({ params }: { params: Promise<{ lo
                   {t("phone2")}
                 </a>
               </p>
-              <p className="mt-4 font-sans text-sm text-ink-2">{t("contactNote")}</p>
+              <p className="mt-6 font-sans text-sm text-paper-ink-2">{t("contactNote")}</p>
             </address>
             <div>
-              <p className="font-sans text-ink-2">{t("followTitle")}</p>
+              <p className="font-sans text-paper-ink-2">{t("followTitle")}</p>
               <p className="mt-3">
                 <a className={link} href="https://www.facebook.com/VrikshabandhanAbhiyan/" rel="noopener" target="_blank">
                   {t("facebook")}
@@ -75,8 +79,8 @@ export default async function GetInvolvedPage({ params }: { params: Promise<{ lo
               <p className="mt-3">{t("blog")}</p>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </main>
   );
 }

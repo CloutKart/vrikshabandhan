@@ -1,21 +1,21 @@
 type Entry = { year: string; place: string; title: string; text: string };
 
-/** The movements this one stands in, as a description list: year and name, then place and what happened. */
+/** The movements this one stands in, as a vertical timeline with the years at display size. */
 export function Lineage({ entries }: { entries: Entry[] }) {
   return (
-    <dl data-lineage className="mt-8 grid gap-10 min-[820px]:grid-cols-2">
+    <ol data-lineage className="mt-10 border-l-2 border-sutra">
       {entries.map((e) => (
-        <div key={e.year} className="border-t border-moss pt-5">
-          <dt className="text-[1.6rem] leading-tight">
-            <time dateTime={e.year} className="mr-3 font-sans text-base text-gold">
-              {e.year}
-            </time>
-            {e.title}
-          </dt>
-          <dd className="mt-1 font-sans text-sm text-ink-2">{e.place}</dd>
-          <dd className="mt-3 max-w-[48ch]">{e.text}</dd>
-        </div>
+        <li key={e.year} className="grid gap-2 py-8 pl-8 min-[820px]:grid-cols-[10rem_1fr] min-[820px]:gap-10">
+          <time dateTime={e.year} className="numeral-xl">
+            {e.year}
+          </time>
+          <div>
+            <p className="text-[1.75rem] leading-tight">{e.title}</p>
+            <p className="mt-1 font-sans text-sm text-ink-2">{e.place}</p>
+            <p className="mt-3 max-w-[52ch]">{e.text}</p>
+          </div>
+        </li>
       ))}
-    </dl>
+    </ol>
   );
 }

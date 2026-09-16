@@ -111,6 +111,28 @@
   .u-thread[aria-current]::after {
     transform: scaleX(1);
   }
+  /* Section rhythm and the red thread as a rule that marks where a section begins. */
+  .section {
+    padding-block: var(--section);
+  }
+  .thread-rule {
+    border: 0;
+    height: 2px;
+    background: var(--sutra);
+    margin: 0;
+  }
+  .display-xl {
+    font-size: clamp(2.5rem, 5vw, 4.75rem);
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+  }
+  .numeral-xl {
+    font-family: var(--font-serif);
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 0.95;
+    color: var(--gold);
+    font-variant-numeric: lining-nums;
+  }
   /* Full-screen sheet for the phone menu. */
   .sheet {
     width: 100vw;

@@ -1,5 +1,9 @@
 import { setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/hero/Hero";
+import { FounderTeaser } from "@/components/home/FounderTeaser";
+import { InvolveTeaser } from "@/components/home/InvolveTeaser";
+import { LineageStrip } from "@/components/home/LineageStrip";
+import { PromiseSection } from "@/components/home/PromiseSection";
 import { LatestStories } from "@/components/stories/LatestStories";
 import type { Locale } from "@/i18n/routing";
 import { getPosts } from "@/lib/content/posts";
@@ -15,9 +19,13 @@ export default async function HomePage({ params }: Props) {
   const l = locale as Locale;
   const latest = await getPosts({ limit: 3 });
   return (
-    <main id="content" className="pb-24">
+    <main id="content" className="pb-12">
       <Hero locale={l} aside={<LatestStories locale={l} posts={latest} variant="compact" />} />
+      <PromiseSection locale={l} />
+      <LineageStrip locale={l} />
       <LatestStories locale={l} posts={latest} />
+      <FounderTeaser locale={l} />
+      <InvolveTeaser locale={l} />
     </main>
   );
 }

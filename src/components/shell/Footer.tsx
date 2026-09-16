@@ -1,16 +1,35 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { otherLocale, type Locale } from "@/i18n/routing";
+import { Mark } from "./Wordmark";
 
 export function Footer() {
+  const locale = useLocale() as Locale;
   const t = useTranslations("involve");
   const f = useTranslations("footer");
+  const b = useTranslations("brand");
   const tel = (s: string) => `tel:${s.replace(/\s+/g, "")}`;
-  const link = "inline-block py-2 underline decoration-transparent decoration-2 underline-offset-4 transition-colors duration-200 ease-enter hover:decoration-sutra focus-visible:decoration-sutra";
+  const link =
+    "inline-block py-2 underline decoration-transparent decoration-2 underline-offset-4 transition-colors duration-200 ease-enter hover:decoration-sutra focus-visible:decoration-sutra";
+  const other = otherLocale(locale);
+  const otherName = other === "hi" ? "वृक्षबंधन अभियान" : "Vrikshabandhan Abhiyan";
   return (
-    <footer className="page mt-24 border-t border-moss py-12 font-sans text-sm text-ink-2">
-      <div className="grid gap-10 min-[820px]:grid-cols-3">
+    <footer className="page mt-[var(--section)] pb-12 font-sans text-sm text-ink-2">
+      <hr className="thread-rule" />
+      <div className="mt-10 grid gap-10 min-[820px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
+        <div>
+          <div className="flex items-start gap-4">
+            <Mark size={40} />
+            <div>
+              <p className="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-tight text-ink">{b("name")}</p>
+              <p lang={other} className="font-serif text-xl text-ink-2">
+                {otherName}
+              </p>
+            </div>
+          </div>
+          <p className="mt-6 max-w-[40ch]">{t("org")}, {t("city")}</p>
+        </div>
         <address className="not-italic">
-          <p className="text-ink">{t("org")}</p>
-          <p>{t("city")}</p>
+          <p className="text-ink">{t("contactTitle")}</p>
           <p className="mt-1">
             <a className={link} href={`mailto:${t("email")}`}>
               {t("email")}
@@ -29,14 +48,14 @@ export function Footer() {
         </address>
         <div>
           <p className="text-ink">{t("followTitle")}</p>
-          <p className="mt-3">
+          <p className="mt-1">
             <a className={link} href="https://www.facebook.com/VrikshabandhanAbhiyan/" rel="noopener" target="_blank">
               {t("facebook")}
             </a>
           </p>
           <p className="mt-2">{t("blog")}</p>
+          <p className="mt-6">{f("rights")}</p>
         </div>
-        <p className="min-[820px]:text-right">{f("rights")}</p>
       </div>
     </footer>
   );

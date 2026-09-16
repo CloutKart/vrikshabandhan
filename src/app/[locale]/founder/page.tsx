@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Timeline } from "@/components/founder/Timeline";
+import { PullQuote } from "@/components/story/PullQuote";
 import { BilingualHeading } from "@/components/typography/BilingualHeading";
 import { PageHeader } from "@/components/typography/PageHeader";
 import type { Locale } from "@/i18n/routing";
@@ -26,7 +27,7 @@ export default async function FounderPage({ params }: { params: Promise<{ locale
       <PageHeader pair={pair} />
       <div className="page grid gap-12 min-[820px]:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] min-[820px]:gap-16">
         <div>
-          <div data-reveal="mask">
+          <div data-reveal="mask" className="overflow-hidden rounded-[var(--radius-panel)]">
           <Image
             src="/images/founder.jpg"
             alt={t("portraitAlt")}
@@ -46,6 +47,7 @@ export default async function FounderPage({ params }: { params: Promise<{ locale
             <p>{t("p1")}</p>
             <p>{t("p2")}</p>
           </div>
+          <PullQuote quote={t("quote")} cite={t("quoteCite")} lang={locale} className="mt-10" />
           <BilingualHeading as="h2" {...years} className="mt-16 text-[2rem] leading-tight" secondaryClassName="text-ink-2" riseSecondary />
           <Timeline items={timeline} />
         </div>

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { PaintingDetail } from "@/components/painting/PaintingDetail";
+import { PullQuote } from "@/components/story/PullQuote";
 import { Lineage } from "@/components/thread-page/Lineage";
 import { NumbersBlock } from "@/components/thread-page/NumbersBlock";
-import { BilingualHeading } from "@/components/typography/BilingualHeading";
 import { PageHeader } from "@/components/typography/PageHeader";
+import { SectionHeading } from "@/components/typography/SectionHeading";
 import type { Locale } from "@/i18n/routing";
 import { bilingual } from "@/lib/i18n/bilingual";
 
@@ -17,20 +19,30 @@ export default async function ThreadPage({ params }: { params: Promise<{ locale:
   const { locale: l } = await params;
   const locale = l as Locale;
   setRequestLocale(locale);
-  const t = await getTranslations({ locale, namespace: "thread" });
-  const [pair, lineageTitle] = await Promise.all([bilingual(locale, "thread", "title"), bilingual(locale, "thread", "lineageTitle")]);
+  const [t, home, pair, lineageTitle] = await Promise.all([
+    getTranslations({ locale, namespace: "thread" }),
+    getTranslations({ locale, namespace: "home" }),
+    bilingual(locale, "thread", "title"),
+    bilingual(locale, "thread", "lineageTitle"),
+  ]);
   const entries = t.raw("lineage") as { year: string; place: string; title: string; text: string }[];
 
   return (
-    <main id="content" className="pb-24">
+    <main id="content" className="pb-12">
       <PageHeader pair={pair} />
-      <div className="page">
-        <div className="max-w-[60ch] space-y-6 text-xl leading-relaxed">
-          <p>{t("p1")}</p>
+      <div className="page grid gap-12 min-[1024px]:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] min-[1024px]:gap-16">
+        <div className="max-w-[60ch] space-y-7 text-xl leading-relaxed">
+          <p className="first-letter:float-left first-letter:mr-3 first-letter:text-[4.2rem] first-letter:leading-[0.85] first-letter:text-gold">{t("p1")}</p>
           <p>{t("p2")}</p>
           <p>{t("p3")}</p>
         </div>
-        <BilingualHeading as="h2" {...lineageTitle} className="mt-20 text-[2rem] leading-tight" secondaryClassName="text-ink-2" riseSecondary />
+        <aside data-aside className="space-y-8 min-[1024px]:sticky min-[1024px]:top-24 min-[1024px]:self-start">
+          <PullQuote quote={t("quote")} cite={t("quoteCite")} lang={locale} />
+          <PaintingDetail crop="canopy" ratio="4/5" alt={home("canopyAlt")} sizes="(min-width: 1024px) 34vw, 100vw" />
+        </aside>
+      </div>
+      <div className="page section">
+        <SectionHeading pair={lineageTitle} />
         <Lineage entries={entries} />
         <NumbersBlock
           title={t("numbersTitle")}
