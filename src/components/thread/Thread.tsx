@@ -10,7 +10,7 @@ export function Thread() {
     <div
       data-thread
       aria-hidden="true"
-      className="pointer-events-none fixed inset-y-0 left-[var(--thread-x)] z-30 hidden w-[2px] min-[820px]:block"
+      className="pointer-events-none fixed inset-y-0 left-[max(var(--thread-x),calc((100vw-1440px)/2+var(--thread-x)))] z-30 hidden w-[2px] min-[820px]:block"
     >
       <svg className="h-full w-[2px] overflow-visible" viewBox="0 0 2 100" preserveAspectRatio="none">
         <line x1="1" y1="0" x2="1" y2="100" pathLength={1} stroke="var(--sutra)" strokeWidth="2" vectorEffect="non-scaling-stroke" />

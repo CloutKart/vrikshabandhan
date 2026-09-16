@@ -36,3 +36,19 @@ test("no painting credit is shown while the credit is empty", async ({ page }) =
   await page.goto("/en");
   await expect(page.locator("[data-credit]")).toHaveCount(0);
 });
+
+test.describe("wide, short screens", () => {
+  test.use({ viewport: { width: 2000, height: 960 } });
+
+  test("the painting, the brand and the thread share one column, and the lede is in the first screen", async ({ page }) => {
+    await page.goto("/en");
+    const painting = await page.locator(".hero-art").boundingBox();
+    const brand = await page.getByRole("link", { name: /Vrikshabandhan Abhiyan/ }).first().boundingBox();
+    const thread = await page.locator("[data-thread]").boundingBox();
+    expect(painting && brand && thread).toBeTruthy();
+    expect(Math.abs(painting!.x - brand!.x), "painting aligns with the brand").toBeLessThanOrEqual(1);
+    expect(painting!.x + painting!.width, "painting stays inside the column").toBeLessThanOrEqual((2000 - 1440) / 2 + 1440 + 1);
+    expect(Math.abs(thread!.x - ((2000 - 1440) / 2 + 28)), "thread hugs the column, not the window").toBeLessThanOrEqual(2);
+    await expect(page.getByText(/Since 2005 we have planted/)).toBeInViewport();
+  });
+});

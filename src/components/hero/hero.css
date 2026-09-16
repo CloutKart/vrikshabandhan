@@ -1,9 +1,26 @@
 /* Hero layering. Kept as plain CSS: container units and z-order are easier to read here than as utilities. */
+/*
+  The hero shares the page column with everything else, so the painting's left
+  edge lines up with the brand and the lede. The painting is shown whole and
+  capped by height; when that cap leaves room beside it (wide, short screens)
+  the copy sits to its right, otherwise the copy drops below it.
+*/
+.hero-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 2rem 2.5rem;
+}
 .hero-canvas {
   position: relative;
   container-type: inline-size;
-  width: min(100%, calc(86vh * 1.777));
-  margin-inline: auto;
+  flex: 0 1 calc(78vh * 1.777);
+  min-width: 0;
+  max-width: 100%;
+}
+.hero-copy {
+  flex: 1 1 22rem;
+  padding-bottom: 0.25rem;
 }
 .hero-art {
   position: relative;

@@ -17,7 +17,8 @@ export async function Hero({ locale }: { locale: Locale }) {
   const credit = t("credit");
 
   return (
-    <section className="hero" aria-labelledby="hero-title">
+    <section className="hero page" aria-labelledby="hero-title">
+      <div className="hero-grid">
       <div className="hero-canvas">
         <div className="hero-art">
           <Image
@@ -52,17 +53,18 @@ export async function Hero({ locale }: { locale: Locale }) {
           reveal="hero"
         />
       </div>
-      <div className="page mt-8 flex flex-col gap-6 min-[820px]:mt-10 min-[820px]:flex-row min-[820px]:items-end min-[820px]:justify-between">
+      <div className="hero-copy">
         <p className="max-w-[52ch] text-xl leading-relaxed">{t("lede")}</p>
-        <div className="flex flex-wrap gap-3">
+        <div className="mt-6 flex flex-wrap gap-3">
           <Button href="/stories">{t("readStories")}</Button>
           <Button href="/get-involved" variant="line">
             {t("tieThread")}
           </Button>
         </div>
       </div>
+      </div>
       {credit ? (
-        <p data-credit className="page mt-4 font-sans text-sm text-ink-2">
+        <p data-credit className="mt-4 font-sans text-sm text-ink-2">
           {credit}
         </p>
       ) : null}
