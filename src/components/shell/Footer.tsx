@@ -20,7 +20,7 @@ export function Footer() {
           <div className="flex items-start gap-4">
             <Mark size={40} />
             <div>
-              <p className="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-tight text-ink">{b("name")}</p>
+              <p className="font-serif text-[clamp(1.6rem,2.4vw,2.5rem)] leading-tight text-ink min-[820px]:whitespace-nowrap">{b("name")}</p>
               <p lang={other} className="font-serif text-xl text-ink-2">
                 {otherName}
               </p>

@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { SectionAction } from "@/components/typography/SectionAction";
 import { SectionHeading } from "@/components/typography/SectionHeading";
-import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { bilingual } from "@/lib/i18n/bilingual";
 
@@ -18,11 +18,7 @@ export async function LineageStrip({ locale }: { locale: Locale }) {
     <section data-section="lineage" className="page section" aria-labelledby="lineage-title">
       <SectionHeading
         pair={pair}
-        action={
-          <Link href="/thread" className="inline-flex min-h-11 items-center font-sans">
-            <span className="u-thread">{home("lineageCta")}</span>
-          </Link>
-        }
+        action={<SectionAction href="/thread">{home("lineageCta")}</SectionAction>}
       />
       <ol className="mt-12 grid gap-x-8 gap-y-12 min-[640px]:grid-cols-2 min-[1024px]:grid-cols-4">
         {entries.map((e) => (

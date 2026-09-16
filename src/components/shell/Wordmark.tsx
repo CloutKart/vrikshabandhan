@@ -21,7 +21,7 @@ export function Mark({ size = 28 }: { size?: number }) {
 export function Wordmark() {
   const t = useTranslations("brand");
   return (
-    <Link href="/" className="flex items-center gap-3">
+    <Link href="/" className="flex items-center gap-3 whitespace-nowrap">
       <Mark />
       <span className="flex flex-col leading-tight">
         <span className="text-xl">{t("name")}</span>

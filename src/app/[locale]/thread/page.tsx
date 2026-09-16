@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PaintingDetail } from "@/components/painting/PaintingDetail";
-import { PullQuote } from "@/components/story/PullQuote";
 import { Lineage } from "@/components/thread-page/Lineage";
 import { NumbersBlock } from "@/components/thread-page/NumbersBlock";
 import { PageHeader } from "@/components/typography/PageHeader";
@@ -31,14 +30,13 @@ export default async function ThreadPage({ params }: { params: Promise<{ locale:
     <main id="content" className="pb-12">
       <PageHeader pair={pair} />
       <div className="page grid gap-12 min-[1024px]:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] min-[1024px]:gap-16">
-        <div className="max-w-[60ch] space-y-7 text-xl leading-relaxed">
+        <div data-prose className="max-w-[60ch] space-y-7 text-xl leading-relaxed">
           <p className="first-letter:float-left first-letter:mr-3 first-letter:text-[4.2rem] first-letter:leading-[0.85] first-letter:text-gold">{t("p1")}</p>
           <p>{t("p2")}</p>
           <p>{t("p3")}</p>
         </div>
-        <aside data-aside className="space-y-8 min-[1024px]:sticky min-[1024px]:top-24 min-[1024px]:self-start">
-          <PullQuote quote={t("quote")} cite={t("quoteCite")} lang={locale} />
-          <PaintingDetail crop="canopy" ratio="4/5" alt={home("canopyAlt")} sizes="(min-width: 1024px) 34vw, 100vw" />
+        <aside data-aside className="min-[1024px]:self-start">
+          <PaintingDetail crop="knot" ratio="4/3" alt={home("knotAlt")} sizes="(min-width: 1024px) 34vw, 100vw" />
         </aside>
       </div>
       <div className="page section">

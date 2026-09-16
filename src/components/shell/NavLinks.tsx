@@ -13,7 +13,7 @@ const items = [
 export function NavLinks({ orientation }: { orientation: "row" | "column" }) {
   const t = useTranslations("nav");
   return (
-    <ul className={orientation === "row" ? "flex items-center gap-7" : "flex flex-col gap-5 text-2xl"}>
+    <ul className={orientation === "row" ? "flex items-center gap-4 min-[1200px]:gap-7" : "flex flex-col gap-5 text-2xl"}>
       {items.map((item) => (
         <li key={item.key}>
           <Link href={item.href} className="inline-flex min-h-11 items-center font-sans">

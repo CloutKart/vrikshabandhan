@@ -28,13 +28,70 @@ test("get involved: three ways with their own mail links, and a letter-style con
   expect(new Set(hrefs).size).toBe(3);
 });
 
-test("thread page: prose with a sticky aside beside it on desktop", async ({ page }) => {
+test("thread page: the aside sits beside the prose and does not hang far below it", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/en/thread");
-  const prose = await page.locator("main p").first().boundingBox();
+  const prose = await page.locator("[data-prose]").boundingBox();
   const aside = await page.locator("[data-aside]").boundingBox();
   expect(aside!.x).toBeGreaterThan(prose!.x + prose!.width - 1);
-  await expect(page.locator("[data-aside] [data-pull-quote]")).toHaveCount(1);
-  await expect(page.locator("[data-aside] [data-painting-detail]")).toHaveCount(1);
+  // The aside shows the knot, and never repeats the sentence printed beside it.
+  await expect(page.locator("[data-aside] [data-painting-detail='knot']")).toHaveCount(1);
+  await expect(page.locator("[data-aside] [data-pull-quote]")).toHaveCount(0);
+  expect(aside!.y + aside!.height).toBeLessThan(prose!.y + prose!.height + 160);
+});
+
+test("founder page: the pull quote sits under the portrait and the timeline spans the page", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/en/founder");
+  const portrait = await page.locator('img[alt*="Manoj Dhyani"]').boundingBox();
+  const quote = await page.locator("[data-pull-quote]").boundingBox();
+  expect(Math.abs(quote!.x - portrait!.x)).toBeLessThan(2);
+  expect(quote!.y).toBeGreaterThan(portrait!.y + portrait!.height);
+  const timeline = await page.locator("ol[data-timeline]").boundingBox();
+  expect(Math.abs(timeline!.x - portrait!.x)).toBeLessThan(2);
+  expect(timeline!.width).toBeGreaterThan(portrait!.width * 1.8);
+});
+
+test("header: no nav label wraps onto two lines at 1024", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 900 });
+  for (const locale of ["en", "hi"]) {
+    await page.goto(`/${locale}`);
+    const boxes = await page.locator("header nav a").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height));
+    for (const h of boxes) expect(h, `${locale} nav link height`).toBeLessThan(50);
+    const mark = await page.locator("header a[href='/" + locale + "'] > span").first().boundingBox();
+    expect(mark!.height).toBeLessThan(50);
+  }
+});
+
+test("get involved on a phone: the e-mail stays inside the letter panel", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/en/get-involved");
+  const panel = await page.locator("[data-letter]").boundingBox();
+  const mail = await page.locator("[data-letter] a[href^='mailto:']").boundingBox();
+  expect(mail!.x + mail!.width).toBeLessThanOrEqual(panel!.x + panel!.width);
+});
+
+test("chapter actions read at text size, not as captions", async ({ page }) => {
+  await page.goto("/en");
+  const size = await page
+    .locator('[data-section="lineage"] a[href="/en/thread"]')
+    .evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+  expect(size).toBeGreaterThanOrEqual(18);
+});
+
+test("stories index: the first story starts inside the first screen at 1440", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/en/stories");
+  const first = await page.locator("[data-story-list] [data-story-row]").first().boundingBox();
+  expect(first!.y).toBeLessThan(880);
+  await expect(page.locator("main [data-painting-detail]")).toHaveCount(1);
+});
+
+test("home promise panel never outgrows the screen at 1920", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 960 });
+  await page.goto("/en");
+  const panel = await page.locator('[data-section="promise"] [data-painting-detail="knot"]').boundingBox();
+  expect(panel!.height).toBeLessThanOrEqual(960 * 0.8);
 });
 
 test("home: the chapters exist in both locales, each with an action", async ({ page }) => {

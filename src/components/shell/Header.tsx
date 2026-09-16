@@ -9,9 +9,9 @@ export function Header() {
   const nav = useTranslations("nav");
   return (
     <header className="sticky top-0 z-40 bg-ground">
-      <div className="page flex min-h-[var(--header-h)] items-center justify-between gap-6">
+      <div className="page flex min-h-[var(--header-h)] items-center justify-between gap-4 min-[1200px]:gap-6">
         <Wordmark />
-        <nav aria-label="Primary" className="hidden items-center gap-7 min-[820px]:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-4 whitespace-nowrap min-[820px]:flex min-[1200px]:gap-7">
           <NavLinks orientation="row" />
           <LocaleSwitch />
           <ThemeToggle />

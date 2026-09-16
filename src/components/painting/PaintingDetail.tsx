@@ -1,10 +1,10 @@
 import Image from "next/image";
 
 type Crop = "knot" | "canopy" | "trunk";
-type Ratio = "4/5" | "16/9" | "3/1" | "1/1";
+type Ratio = "4/5" | "4/3" | "16/9" | "3/1" | "1/1";
 
 const POSITION: Record<Crop, string> = { knot: "74% 86%", canopy: "22% 28%", trunk: "80% 58%" };
-const RATIO: Record<Ratio, string> = { "4/5": "4 / 5", "16/9": "16 / 9", "3/1": "3 / 1", "1/1": "1 / 1" };
+const RATIO: Record<Ratio, string> = { "4/5": "4 / 5", "4/3": "4 / 3", "16/9": "16 / 9", "3/1": "3 / 1", "1/1": "1 / 1" };
 
 /**
  * A detail of the painting, cropped by CSS alone. The site has no event

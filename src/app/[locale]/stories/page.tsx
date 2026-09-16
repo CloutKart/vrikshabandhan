@@ -33,9 +33,12 @@ export default async function StoriesPage({ params, searchParams }: Props) {
   const home = await getTranslations({ locale, namespace: "home" });
   return (
     <main id="content" className="pb-24">
-      <PageHeader pair={pair} lede={t("lede")} />
+      <PageHeader
+        pair={pair}
+        lede={t("lede")}
+        aside={<PaintingDetail crop="canopy" ratio="16/9" alt={home("canopyAlt")} sizes="(min-width: 1024px) 38vw, 100vw" />}
+      />
       <div className="page">
-        <PaintingDetail crop="canopy" ratio="3/1" alt={home("canopyAlt")} sizes="100vw" className="mb-12" />
         <TagFilter tags={tags} active={tag} locale={locale} />
         <div className="mt-6">
           <StoryList posts={posts} locale={locale} />

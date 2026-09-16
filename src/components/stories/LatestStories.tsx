@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { BilingualHeading } from "@/components/typography/BilingualHeading";
+import { SectionAction } from "@/components/typography/SectionAction";
 import { SectionHeading } from "@/components/typography/SectionHeading";
 import { Link } from "@/i18n/navigation";
 import { otherLocale, type Locale } from "@/i18n/routing";
@@ -53,9 +54,7 @@ export async function LatestStories({ locale, posts, variant = "section" }: Prop
           })}
         </ol>
         <p className="mt-4">
-          <Link href="/stories" className="inline-flex min-h-11 items-center font-sans">
-            <span className="u-thread">{t("allStories")}</span>
-          </Link>
+          <SectionAction href="/stories">{t("allStories")}</SectionAction>
         </p>
       </section>
     );
@@ -65,11 +64,7 @@ export async function LatestStories({ locale, posts, variant = "section" }: Prop
     <section className="page hero-latest-fallback section" aria-labelledby={id}>
       <SectionHeading
         pair={pair}
-        action={
-          <Link href="/stories" className="inline-flex min-h-11 items-center font-sans">
-            <span className="u-thread">{t("allStories")}</span>
-          </Link>
-        }
+        action={<SectionAction href="/stories">{t("allStories")}</SectionAction>}
       />
       <div className="mt-6">
         <StoryList posts={list} locale={locale} />
