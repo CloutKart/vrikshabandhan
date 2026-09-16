@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "title": "Vrikshabandhan Abhiyan",
+    "description": "A Himalayan movement that ties a thread round a tree and keeps the promise to protect it. Dehradun, Uttarakhand, since 2005."
+  },
+  "brand": {
+    "name": "Vrikshabandhan Abhiyan",
+    "place": "Dehradun, Uttarakhand"
+  },
+  "nav": {
+    "stories": "Stories",
+    "thread": "Why a thread",
+    "founder": "Founder",
+    "involve": "Get involved",
+    "contact": "Contact",
+    "menu": "Menu",
+    "close": "Close",
+    "skip": "Skip to content",
+    "switchLocale": "हिंदी में पढ़ें",
+    "switchLocaleLabel": "Read this page in Hindi",
+    "themeToLight": "Switch to the light theme",
+    "themeToDark": "Switch to the dark theme"
+  },
+  "hero": {
+    "title": "A thread tied to a tree",
+    "lede": "Since 2005 we have planted fruit and shade trees across Uttarakhand, tied a thread round each one, and gone back to water them.",
+    "readStories": "Read the stories",
+    "tieThread": "Tie a thread with us",
+    "paintingAlt": "Painting of a white tree with a canopy of green, blue and gold leaves, and a red raksha sutra knotted round its trunk",
+    "credit": ""
+  },
+  "home": {
+    "latest": "Latest stories",
+    "allStories": "All stories",
+    "whyTitle": "Why a thread",
+    "whyText": "On Raksha Bandhan a sister ties a thread and a brother promises protection. We tie the same thread round a tree and make the same promise: to keep it alive through its first three monsoons, when most planted saplings in India die for want of water.",
+    "whyLink": "Read about the thread"
+  },
+  "stories": {
+    "title": "Stories from the field",
+    "lede": "Events, open letters and reports from the Himalaya, mostly in pictures.",
+    "all": "All",
+    "filterLabel": "Filter stories by tag",
+    "empty": "No stories yet.",
+    "draft": "Draft",
+    "photoPending": "Photo to come",
+    "read": "Read",
+    "onlyEnglish": "This story is available in English only for now.",
+    "back": "All stories",
+    "gallery": "More photos",
+    "video": "Video"
+  },
+  "thread": {
+    "title": "Why a thread, why a tree",
+    "p1": "On Raksha Bandhan a sister ties a thread and a brother promises protection. Vrikshabandhan turns that vow toward the tree. The thread goes round the trunk, and the promise is to keep the tree alive through its vulnerable early years, when most planted saplings in India die for want of water and watching.",
+    "p2": "This is not a new idea in Uttarakhand. The state invented it. The Abhiyan stands in a line that runs from the Bishnoi villagers of Khejarli, through the women of Chipko, to the raksha sutra tied on trees marked for felling in the Bhilangana valley in 1994.",
+    "p3": "Our founder says it at every gathering: the success of a plantation is the number of trees alive three monsoons later.",
+    "lineageTitle": "The line we stand in",
+    "lineage": [
+      { "year": "1730", "place": "Khejarli, Rajasthan", "title": "363 Bishnois", "text": "Died embracing khejri trees to stop a royal felling. India's Forest Martyrs Day is dated to it." },
+      { "year": "1973", "place": "Chamoli, Uttarakhand", "title": "Chipko", "text": "Gaura Devi and the women of Reni held the trees. A fifteen-year Himalayan logging ban followed." },
+      { "year": "1994", "place": "Tehri, Uttarakhand", "title": "Raksha Sutra Andolan", "text": "Villagers tied sacred thread on 2,500 trees marked for the axe. The trees stood." },
+      { "year": "2005", "place": "Dehradun", "title": "Vrikshabandhan Abhiyan", "text": "Registered, and working since then on the care of the Himalaya and the trees people vow to keep." }
+    ],
+    "numbersTitle": "What we have planted",
+    "numbersPending": "Programme numbers will appear here once the Abhiyan has counted them."
+  },
+  "founder": {
+    "title": "The founder",
+    "honorific": "Sainik Shiromani",
+    "name": "Manoj Dhyani",
+    "alias": "Mukund Krishna Das",
+    "portraitAlt": "Manoj Dhyani, white-haired and in white, seated in front of a railing hung with red chunris in a deodar forest",
+    "p1": "Soldier by honorific, devotee by name, and for three decades an agitator for the Himalaya. In 1996 he led a student and youth delegation to North Block to present the Blueprint of Uttarakhand, a case for statehood that put the mountain's ecology at the centre of every development model and asked for a Himalayan resource centre and a Green Bonus for the people who keep the forests.",
+    "p2": "He was a leading soldier of the Shriyantra Island movement on the Alaknanda at Srinagar Garhwal, and writes at One Himalaya, the Abhiyan's blog, on Himalayan thought and philosophy. On World Mountain Day 2023 he sent the Chief Minister an open letter reading the Silkyara tunnel collapse as the mountain's own message: be careful in time.",
+    "timelineTitle": "Thirty years",
+    "timeline": [
+      { "year": "1994", "text": "Rampur Tiraha, 2 October. The movement's turning point. He pays tribute to its martyrs every year." },
+      { "year": "1995", "text": "Shriyantra Island, Srinagar Garhwal. The 36-day fast, the 10 November action, the search for the missing along the Alaknanda." },
+      { "year": "1996", "text": "The Blueprint of Uttarakhand presented at the Ministry of Home Affairs, New Delhi." },
+      { "year": "2005", "text": "Vrikshabandhan Abhiyan registered in Dehradun." },
+      { "year": "2023", "text": "Open letter to the Chief Minister: the pain of the Himalayas is hidden in Silkyara." }
+    ]
+  },
+  "involve": {
+    "title": "Tie a thread with us",
+    "lede": "Three ways to help.",
+    "adoptTitle": "Adopt a tree",
+    "adoptText": "Plant a native fruit or shade tree, such as mahua, neem, banyan or peepal. Tie a cotton thread round it and send us a photo every monsoon for three years. We keep the record.",
+    "adoptCta": "Register a tree",
+    "hostTitle": "Host an event",
+    "hostText": "Schools, mohallas, units and offices. We bring the threads, the pledge and the saplings for Raksha Bandhan, Harela or Van Mahotsav week.",
+    "hostCta": "Invite us",
+    "supportTitle": "Support the work",
+    "supportText": "Saplings, transport to the villages, and the volunteers who go back to water. Ask us for the account details. We publish what we spend.",
+    "supportCta": "Ask for account details",
+    "contactTitle": "Write to the Abhiyan",
+    "org": "Vrikshabandhan Abhiyan (Regd.)",
+    "city": "Dehradun, Uttarakhand",
+    "email": "UKRajyaNirmanSenaniSangh@gmail.com",
+    "phone1": "+91 97562 01936",
+    "phone2": "+91 94121 45589",
+    "contactNote": "Contact details as published on the One Himalaya blog.",
+    "followTitle": "Follow",
+    "facebook": "Vrikshabandhan Abhiyan on Facebook",
+    "blog": "One Himalaya, the Abhiyan's blog on Himalayan thought and philosophy"
+  },
+  "footer": {
+    "rights": "Vrikshabandhan Abhiyan (Regd.), Dehradun"
+  },
+  "notFound": {
+    "title": "This page does not exist",
+    "text": "The address may have changed. Start again from the home page."
+  },
+  "common": {
+    "home": "Home",
+    "loading": "Loading"
+  }
+}

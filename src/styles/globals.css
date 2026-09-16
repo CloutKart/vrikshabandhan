@@ -1,0 +1,74 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@import "./tokens.css";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background: var(--ground);
+  }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    line-height: 1.7;
+    font-synthesis: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Devanagari needs more leading for matras; applied per fragment via lang, never by class. */
+  :lang(hi) {
+    line-height: 1.8;
+  }
+  :focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  [id] {
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+  }
+  ::selection {
+    background: var(--sutra);
+    color: #fff;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  /* Grain: the cheapest honest texture. Sits above everything, never intercepts input. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    background: url("/images/grain.svg") repeat;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

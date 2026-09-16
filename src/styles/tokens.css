@@ -1,0 +1,73 @@
+/*
+  Colour tokens. Two primitive sets (dark is the default), one semantic layer
+  exposed to Tailwind through @theme. Components use the utilities (bg-ground,
+  text-ink, border-moss ...) and never a raw hex. tests/unit/tokens.contrast.test.ts
+  parses this file and fails the build if a pair drops below its WCAG minimum.
+*/
+:root {
+  --ground: #12211A;
+  --ground-2: #1A221D;
+  --ink: #EDEFE8;
+  --ink-2: #AAB2AB;
+  --sutra: #C8322B;
+  --gold: #E0B347;
+  --moss: #5C6E62;
+  --paper: #F3EEE2;
+  --paper-ink: #1D231E;
+  --paper-ink-2: #4B5449;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --ground: #E4EAE1;
+  --ground-2: #D5DDD1;
+  --ink: #10231A;
+  --ink-2: #3E4F45;
+  --sutra: #B4231D;
+  --gold: #9C7414;
+  --moss: #6F7F74;
+  --paper: #F7F4EA;
+  --paper-ink: #10231A;
+  --paper-ink-2: #3E4F45;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-*: initial;
+  --color-ground: var(--ground);
+  --color-ground-2: var(--ground-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-sutra: var(--sutra);
+  --color-gold: var(--gold);
+  --color-moss: var(--moss);
+  --color-paper: var(--paper);
+  --color-paper-ink: var(--paper-ink);
+  --color-paper-ink-2: var(--paper-ink-2);
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+
+  --font-serif: var(--font-tiro), "Tiro Devanagari Hindi", Georgia, serif;
+  --font-sans: var(--font-mukta), "Mukta", system-ui, sans-serif;
+
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-move: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Motion tokens for hand-written CSS and for the GSAP layer (src/lib/motion/tokens.ts mirrors them). */
+:root {
+  --motion-press: 100ms;
+  --motion-hover: 150ms;
+  --motion-state: 200ms;
+  --motion-enter: 300ms;
+  --motion-reveal: 500ms;
+  --motion-orchestrated: 900ms;
+  --move-lift: 4px;
+  --move-reveal: 12px;
+  --move-reveal-lg: 24px;
+  --scale-press: 0.98;
+  --thread-x: 28px;
+  --thread-gutter: 64px;
+  --header-h: 72px;
+}
