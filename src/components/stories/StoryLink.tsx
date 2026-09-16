@@ -49,7 +49,7 @@ export async function StoryLink({ post, locale }: { post: Post; locale: Locale }
         ) : null}
       </div>
       {cover ? (
-        <div className="relative aspect-[4/3] overflow-hidden bg-ground-2 min-[820px]:mt-1">
+        <div data-reveal="mask" data-flip-id={post.slug} className="relative aspect-[4/3] overflow-hidden bg-ground-2 min-[820px]:mt-1">
           <Image src={mediaUrl(cover)} alt={coverAlt ?? ""} fill sizes="(min-width: 820px) 11rem, 100vw" className="object-cover" />
         </div>
       ) : null}

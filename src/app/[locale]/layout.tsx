@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { routing } from "@/i18n/routing";
+import { MotionRoot } from "@/components/motion/MotionRoot";
 import { Footer } from "@/components/shell/Footer";
 import { Header } from "@/components/shell/Header";
 import { SkipLink } from "@/components/shell/SkipLink";
@@ -51,6 +52,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <Header />
           {children}
           <Footer />
+          <MotionRoot />
         </NextIntlClientProvider>
       </body>
     </html>

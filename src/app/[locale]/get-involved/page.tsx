@@ -43,7 +43,7 @@ export default async function GetInvolvedPage({ params }: { params: Promise<{ lo
           ))}
         </ol>
         <section id="contact" className="mt-16 border-t-2 border-sutra pt-10">
-          <BilingualHeading as="h2" {...contactPair} className="text-[2rem] leading-tight" secondaryClassName="text-ink-2" />
+          <BilingualHeading as="h2" {...contactPair} className="text-[2rem] leading-tight" secondaryClassName="text-ink-2" riseSecondary />
           <div className="mt-8 grid gap-10 min-[820px]:grid-cols-2">
             <address className="not-italic">
               <p>{t("org")}</p>

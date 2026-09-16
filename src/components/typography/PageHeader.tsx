@@ -10,6 +10,8 @@ export function PageHeader({ pair, lede }: { pair: Pair; lede?: string }) {
         {...pair}
         className="max-w-[18ch] text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.05] tracking-[-0.02em]"
         secondaryClassName="mt-3 text-ink-2"
+        reveal="title"
+        riseSecondary
       />
       {lede ? <p className="mt-8 max-w-[52ch] text-xl leading-relaxed text-ink-2">{lede}</p> : null}
     </header>

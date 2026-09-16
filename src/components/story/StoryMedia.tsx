@@ -12,7 +12,7 @@ export function StoryCover({ media, locale }: { media: MediaItem; locale: Locale
   const url = mediaUrl(media);
   if (media.type === "video") return <video src={url} controls playsInline className="w-full" />;
   return (
-    <div className="relative aspect-[16/10] w-full overflow-hidden bg-ground-2">
+    <div data-reveal="mask" className="relative aspect-[16/10] w-full overflow-hidden bg-ground-2">
       <Image src={url} alt={altFor(media, locale)} fill sizes="(min-width: 820px) 72ch, 100vw" className="object-cover" priority />
     </div>
   );
@@ -27,7 +27,7 @@ export function StoryGallery({ items, locale, title }: { items: MediaItem[]; loc
           {m.type === "video" ? (
             <video src={mediaUrl(m)} controls playsInline className="w-full" />
           ) : (
-            <div className="relative aspect-[4/3] overflow-hidden bg-ground-2">
+            <div data-reveal="mask" className="relative aspect-[4/3] overflow-hidden bg-ground-2">
               <Image src={mediaUrl(m)} alt={altFor(m, locale)} fill sizes="(min-width: 820px) 36ch, 100vw" className="object-cover" />
             </div>
           )}

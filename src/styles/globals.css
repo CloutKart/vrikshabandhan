@@ -95,47 +95,6 @@
   .u-thread[aria-current]::after {
     transform: scaleX(1);
   }
-  /* The reading sheet: paper on the ground, with the prose palette bound to the paper tokens. */
-  .paper {
-    background: var(--paper);
-    color: var(--paper-ink);
-    padding: clamp(1.25rem, 5vw, 4rem);
-  }
-  .paper .prose {
-    --tw-prose-body: var(--paper-ink);
-    --tw-prose-headings: var(--paper-ink);
-    --tw-prose-lead: var(--paper-ink-2);
-    --tw-prose-links: var(--paper-ink);
-    --tw-prose-bold: var(--paper-ink);
-    --tw-prose-counters: var(--paper-ink-2);
-    --tw-prose-bullets: var(--paper-ink-2);
-    --tw-prose-hr: var(--moss);
-    --tw-prose-quotes: var(--paper-ink);
-    --tw-prose-quote-borders: var(--sutra);
-    --tw-prose-captions: var(--paper-ink-2);
-    font-family: var(--font-serif);
-  }
-  .paper .prose h2 {
-    font-weight: 400;
-    font-size: 1.6em;
-    line-height: 1.2;
-  }
-  .paper .prose blockquote {
-    font-style: italic;
-    font-weight: 400;
-  }
-  .paper .prose blockquote cite {
-    display: block;
-    margin-top: 0.5em;
-    font-family: var(--font-sans);
-    font-size: 0.8em;
-    font-style: normal;
-    color: var(--paper-ink-2);
-  }
-  .paper .prose blockquote p:first-of-type::before,
-  .paper .prose blockquote p:last-of-type::after {
-    content: none;
-  }
   /* Full-screen sheet for the phone menu. */
   .sheet {
     width: 100vw;
@@ -165,4 +124,105 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Unlayered so it wins over the typography plugin's utilities. */
+/* The reading sheet: paper on the ground, with the prose palette bound to the paper tokens. */
+.paper {
+  background: var(--paper);
+  color: var(--paper-ink);
+  padding: clamp(1.25rem, 5vw, 4rem);
+}
+.paper .prose {
+  --tw-prose-body: var(--paper-ink);
+  --tw-prose-headings: var(--paper-ink);
+  --tw-prose-lead: var(--paper-ink-2);
+  --tw-prose-links: var(--paper-ink);
+  --tw-prose-bold: var(--paper-ink);
+  --tw-prose-counters: var(--paper-ink-2);
+  --tw-prose-bullets: var(--paper-ink-2);
+  --tw-prose-hr: var(--moss);
+  --tw-prose-quotes: var(--paper-ink);
+  --tw-prose-quote-borders: var(--sutra);
+  --tw-prose-captions: var(--paper-ink-2);
+  font-family: var(--font-serif);
+}
+.paper .prose h2 {
+  font-weight: 400;
+  font-size: 1.6em;
+  line-height: 1.2;
+}
+.paper .prose blockquote {
+  font-style: italic;
+  font-weight: 400;
+}
+.paper .prose blockquote cite {
+  display: block;
+  margin-top: 0.5em;
+  font-family: var(--font-sans);
+  font-size: 0.8em;
+  font-style: normal;
+  color: var(--paper-ink-2);
+}
+
+/*
+  Motion. Initial hidden states exist only when the head script declared
+  html[data-motion="full"]; a zero-duration delayed animation forces the final
+  state if the motion chunk never runs, so nothing can stay hidden.
+*/
+@keyframes force-visible {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes force-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+html[data-motion="full"][data-hero="pending"] .hero-cutout,
+html[data-motion="full"][data-hero="pending"] [data-hero-title] {
+  opacity: 0;
+  animation: force-visible 0s 1.6s forwards;
+}
+html[data-motion="full"][data-hero="pending"] [data-thread] line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: force-draw 0s 1.6s forwards;
+}
+html[data-motion="full"] [data-title-reveal]:not([data-title-done]) {
+  opacity: 0;
+  animation: force-visible 0s 1.2s forwards;
+}
+html[data-motion="full"] [data-reveal] {
+  transition:
+    clip-path var(--motion-orchestrated) var(--ease-enter),
+    opacity var(--motion-reveal) var(--ease-enter),
+    transform var(--motion-reveal) var(--ease-enter);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+html[data-motion="full"] [data-reveal="mask"] {
+  clip-path: inset(0 0 0 0);
+}
+html[data-motion="full"] [data-reveal="mask"]:not([data-revealed]) {
+  clip-path: inset(0 0 100% 0);
+}
+html[data-motion="full"] [data-reveal="rise"]:not([data-revealed]) {
+  opacity: 0;
+  transform: translateY(var(--move-reveal));
+}
+html[data-motion="full"] main {
+  animation: page-in var(--motion-state) var(--ease-enter);
+}
+html[data-motion="full"] main[data-switching] {
+  opacity: 0;
+  transition: opacity var(--motion-hover) var(--ease-exit);
 }

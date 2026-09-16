@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Locale } from "@/i18n/routing";
 
 type Props = {
@@ -8,6 +9,10 @@ type Props = {
   secondaryLang?: Locale;
   className?: string;
   secondaryClassName?: string;
+  /** "hero": the home hero owns this heading's entrance. "title": arrives as words on page load. */
+  reveal?: "hero" | "title";
+  /** The second-language line rises into place once it is in view. */
+  riseSecondary?: boolean;
 };
 
 /**
@@ -23,14 +28,19 @@ export function BilingualHeading({
   secondaryLang,
   className = "",
   secondaryClassName = "",
+  reveal,
+  riseSecondary = false,
 }: Props) {
+  const tagAttrs = reveal === "hero" ? { "data-hero-title": "" } : {};
+  const primaryAttrs = reveal === "title" ? { "data-title-reveal": "" } : {};
+  const secondaryAttrs = riseSecondary ? { "data-reveal": "rise", style: { "--i": 1.5 } as CSSProperties } : {};
   return (
-    <Tag className={className}>
-      <span lang={primaryLang} className="block text-balance">
+    <Tag className={className} {...tagAttrs}>
+      <span lang={primaryLang} className="block text-balance" {...primaryAttrs}>
         {primary}
       </span>
       {secondary && secondaryLang ? (
-        <span lang={secondaryLang} className={`block text-balance text-[0.55em] ${secondaryClassName}`}>
+        <span lang={secondaryLang} className={`block text-balance text-[0.55em] ${secondaryClassName}`} {...secondaryAttrs}>
           {secondary}
         </span>
       ) : null}

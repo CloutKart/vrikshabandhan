@@ -30,7 +30,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ locale:
           <p>{t("p2")}</p>
           <p>{t("p3")}</p>
         </div>
-        <BilingualHeading as="h2" {...lineageTitle} className="mt-20 text-[2rem] leading-tight" secondaryClassName="text-ink-2" />
+        <BilingualHeading as="h2" {...lineageTitle} className="mt-20 text-[2rem] leading-tight" secondaryClassName="text-ink-2" riseSecondary />
         <Lineage entries={entries} />
         <NumbersBlock
           title={t("numbersTitle")}

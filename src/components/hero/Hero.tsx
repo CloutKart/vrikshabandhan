@@ -46,6 +46,7 @@ export async function Hero({ locale }: { locale: Locale }) {
           secondary={tOther("title")}
           secondaryLang={other}
           className="hero-title"
+          reveal="hero"
         />
       </div>
       <div className="page mt-8 flex flex-col gap-6 min-[820px]:mt-10 min-[820px]:flex-row min-[820px]:items-end min-[820px]:justify-between">

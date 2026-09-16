@@ -54,7 +54,7 @@ export default async function StoryPage({ params }: Props) {
       </p>
       <PaperSheet>
         {cover ? (
-          <div className="-mx-[clamp(1.25rem,5vw,4rem)] -mt-[clamp(1.25rem,5vw,4rem)] mb-10">
+          <div data-flip-id={post.slug} className="-mx-[clamp(1.25rem,5vw,4rem)] -mt-[clamp(1.25rem,5vw,4rem)] mb-10">
             <StoryCover media={cover} locale={locale} />
           </div>
         ) : null}
@@ -72,6 +72,8 @@ export default async function StoryPage({ params }: Props) {
           secondaryLang={other}
           className="mt-6 text-[clamp(2rem,5vw,3.5rem)] leading-[1.1] tracking-[-0.015em]"
           secondaryClassName="mt-3 text-paper-ink-2"
+          reveal="title"
+          riseSecondary
         />
         {locale === "hi" && body.lang === "en" ? (
           <p lang="hi" className="mt-6 font-sans text-sm text-paper-ink-2">

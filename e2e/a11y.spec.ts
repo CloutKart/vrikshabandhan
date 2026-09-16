@@ -3,6 +3,9 @@ import { expect, test } from "@playwright/test";
 
 const pages = ["", "/stories", "/stories?tag=Open%20letter", "/stories/silkyara-open-letter", "/founder", "/thread", "/get-involved"];
 const routes = ["en", "hi"].flatMap((l) => pages.map((p) => `/${l}${p}`));
+
+// The audit measures the settled page: with motion on, axe would sample colours mid-fade.
+test.use({ contextOptions: { reducedMotion: "reduce" } });
 const themes = ["dark", "light"] as const;
 
 for (const route of routes) {
