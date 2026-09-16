@@ -4,6 +4,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { routing } from "@/i18n/routing";
+import { Footer } from "@/components/shell/Footer";
+import { Header } from "@/components/shell/Header";
+import { SkipLink } from "@/components/shell/SkipLink";
+import { Thread } from "@/components/thread/Thread";
 import { mukta, tiro } from "@/lib/fonts";
 import { DEFAULT_THEME, THEME_COLORS } from "@/lib/theme/constants";
 import { THEME_HEAD_SCRIPT } from "@/lib/theme/head-script";
@@ -41,7 +45,13 @@ export default async function LocaleLayout({ children, params }: Props) {
         <script dangerouslySetInnerHTML={{ __html: THEME_HEAD_SCRIPT }} />
       </head>
       <body className="min-h-dvh">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <SkipLink />
+          <Thread />
+          <Header />
+          {children}
+          <Footer />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

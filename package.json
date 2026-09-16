@@ -37,5 +37,9 @@
     "tsx": "^4.23.13",
     "typescript": "^5",
     "vitest": "^5.0.1"
+  },
+  "overrides": {
+    "playwright-core": "1.56.1",
+    "playwright": "1.56.1"
   }
 }

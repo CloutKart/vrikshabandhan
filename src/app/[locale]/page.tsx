@@ -7,7 +7,7 @@ export default async function HomePage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("hero");
   return (
-    <main id="content" className="px-6 py-24">
+    <main id="content" className="page py-24">
       <h1 className="text-5xl">{t("title")}</h1>
       <p className="mt-6 max-w-prose">{t("lede")}</p>
     </main>

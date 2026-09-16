@@ -59,6 +59,59 @@
   }
 }
 
+@layer components {
+  /* Page gutter: content starts to the right of the thread on wide screens. */
+  .page {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 820px) {
+    .page {
+      padding-left: var(--thread-gutter);
+      padding-right: 2.5rem;
+    }
+  }
+  /* A red underline that draws itself, left to right, like thread. Also on keyboard focus. */
+  .u-thread {
+    position: relative;
+    text-decoration: none;
+  }
+  .u-thread::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.15em;
+    height: 2px;
+    background: var(--sutra);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--motion-state) var(--ease-enter);
+  }
+  .u-thread:hover::after,
+  .u-thread:focus-visible::after,
+  .u-thread[aria-current]::after {
+    transform: scaleX(1);
+  }
+  /* Full-screen sheet for the phone menu. */
+  .sheet {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    padding: 1.25rem;
+    background: var(--ground);
+    color: var(--ink);
+  }
+  .sheet::backdrop {
+    background: var(--ground);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
