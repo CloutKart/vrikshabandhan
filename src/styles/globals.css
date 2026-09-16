@@ -76,8 +76,8 @@
   }
   @media (min-width: 820px) {
     .page {
-      padding-left: var(--thread-gutter);
-      padding-right: 2.5rem;
+      padding-left: max(var(--thread-gutter), 3.5vw);
+      padding-right: max(2.5rem, 3.5vw);
     }
   }
   /* A red underline that draws itself, left to right, like thread. Also on keyboard focus. */
