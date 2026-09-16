@@ -36,7 +36,7 @@ export default async function StoriesPage({ params, searchParams }: Props) {
       <PageHeader
         pair={pair}
         lede={t("lede")}
-        aside={<PaintingDetail crop="canopy" ratio="16/9" alt={home("canopyAlt")} sizes="(min-width: 1024px) 38vw, 100vw" />}
+        aside={<PaintingDetail crop="canopy" ratio="16/9" zoom={1.6} alt={home("canopyAlt")} sizes="(min-width: 1024px) 38vw, 100vw" />}
       />
       <div className="page">
         <TagFilter tags={tags} active={tag} locale={locale} />

@@ -1,11 +1,12 @@
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { PaintingDetail } from "@/components/painting/PaintingDetail";
+import type { CSSProperties } from "react";
 import { BilingualHeading } from "@/components/typography/BilingualHeading";
 import { Button } from "@/components/ui/Button";
 import type { Locale } from "@/i18n/routing";
 import { bilingual } from "@/lib/i18n/bilingual";
 
-/** Chapter one: the promise, stated at display size beside the knot. */
+/** Chapter one: the promise, stated at display size beside the founder planting a sapling. */
 export async function PromiseSection({ locale }: { locale: Locale }) {
   const [pair, t, hero] = await Promise.all([
     bilingual(locale, "home", "promise"),
@@ -23,7 +24,23 @@ export async function PromiseSection({ locale }: { locale: Locale }) {
             <Button href="/get-involved">{hero("tieThread")}</Button>
           </div>
         </div>
-        <PaintingDetail crop="knot" ratio="4/5" phoneRatio="4/3" alt={t("knotAlt")} sizes="(min-width: 1024px) 38vw, 100vw" className="max-h-[76vh]" />
+        {/* The site's first field photograph: a portrait panel on desktop, a short band on phones. */}
+        <div
+          data-photo="planting"
+          data-reveal="mask"
+          className="painting-detail relative max-h-[76vh] overflow-hidden rounded-[var(--radius-panel)] bg-stone"
+          style={{ "--ratio": "4 / 5", "--ratio-phone": "4 / 3" } as CSSProperties}
+        >
+          <Image
+            src="/images/planting.jpg"
+            alt={t("plantingAlt")}
+            fill
+            sizes="(min-width: 1024px) 38vw, 100vw"
+            quality={70}
+            className="object-cover"
+            style={{ objectPosition: "50% 58%" }}
+          />
+        </div>
       </div>
     </section>
   );

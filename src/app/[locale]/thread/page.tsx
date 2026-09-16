@@ -36,7 +36,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ locale:
           <p>{t("p3")}</p>
         </div>
         <aside data-aside className="min-[1024px]:self-start">
-          <PaintingDetail crop="knot" ratio="4/3" alt={home("knotAlt")} sizes="(min-width: 1024px) 34vw, 100vw" />
+          <PaintingDetail crop="knot" ratio="4/3" zoom={1.9} alt={home("knotAlt")} sizes="(min-width: 1024px) 34vw, 100vw" />
         </aside>
       </div>
       <div className="page section">

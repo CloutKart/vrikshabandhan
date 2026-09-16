@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 type Crop = "knot" | "canopy" | "trunk";
 type Ratio = "4/5" | "4/3" | "16/9" | "3/1" | "1/1";
 
-const POSITION: Record<Crop, string> = { knot: "74% 86%", canopy: "22% 28%", trunk: "80% 58%" };
+const POSITION: Record<Crop, string> = { knot: "82% 82%", canopy: "24% 32%", trunk: "80% 62%" };
 const RATIO: Record<Ratio, string> = { "4/5": "4 / 5", "4/3": "4 / 3", "16/9": "16 / 9", "3/1": "3 / 1", "1/1": "1 / 1" };
 
 /**
@@ -17,6 +17,7 @@ export function PaintingDetail({
   crop,
   ratio = "4/5",
   phoneRatio = ratio,
+  zoom = 1,
   alt,
   sizes = "(min-width: 1024px) 40vw, 100vw",
   className = "",
@@ -24,6 +25,8 @@ export function PaintingDetail({
   crop: Crop;
   ratio?: Ratio;
   phoneRatio?: Ratio;
+  /** Magnification about the crop point, so a wide box can still show a detail. */
+  zoom?: number;
   alt: string;
   sizes?: string;
   className?: string;
@@ -42,7 +45,7 @@ export function PaintingDetail({
         sizes={sizes}
         quality={62}
         className="object-cover"
-        style={{ objectPosition: POSITION[crop] }}
+        style={{ objectPosition: POSITION[crop], transformOrigin: POSITION[crop], transform: zoom === 1 ? undefined : `scale(${zoom})` }}
       />
     </div>
   );
