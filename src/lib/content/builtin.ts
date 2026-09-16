@@ -1,7 +1,7 @@
 import type { Post } from "./types";
 
 /**
- * The three posts that shipped with the v2 site, ported verbatim (bodies keep
+ * The posts that shipped with the v2 site (ported verbatim, bodies keep
  * the "## " and "> " mini-markup). They render until the database has a copy
  * of the same slug, and stay as a fallback when the database is unreachable.
  * Hindi bodies do not exist yet; the story page says so and shows English.
@@ -24,6 +24,35 @@ export const builtinPosts: Post[] = [
     ],
     "yt": "",
     "media": [],
+    "live": true
+  },
+  {
+    "id": "builtin-seed-bombers",
+    "slug": "seed-bombers-2023",
+    "title_en": "Seed Bombers of Uttarakhand",
+    "title_hi": "उत्तराखंड के सीड बॉम्बर्स",
+    "summary_en": "The 2023 Abhiyan opened with a seed-bombing campaign: volunteers set out to plant or sow two lakh seeds before Raksha Bandhan.",
+    "summary_hi": "2023 का अभियान सीड बॉम्बिंग से शुरू हुआ: रक्षाबंधन से पहले दो लाख बीज बोने या रोपने का संकल्प।",
+    "body_en": "Vrikshabandhan Abhiyan 2023 has set out with a seed-bombing campaign in Uttarakhand. Seed Bombers of Uttarakhand is the record of this beginning, a contribution to ecology and environment.\n## First, Vrikshabandhan Abhiyan\nVrikshabandhan Abhiyan was conceptualised by Sainik Shiromani Manoj Dhyani in 2009 under the joint flagship of Uttarakhand Rajya Nirman Senani Sangh (Regd.) and RTI Lok Sewa (Regd.). It is one of the biggest word-of-mouth campaigns for a green planet. Before the monsoon, targets are set for the volunteers, preparation and strategies are worked out, and the plan is carried out during Sawan and Bhado, the months of the monsoon. It culminates on Raksha Bandhan, when a pledge to protect trees is taken through raksha sutras.\nAfter year-on-year campaigns, the team of Vrikshabandhan Abhiyan volunteers has taken up the challenge to plant or sow 2,00,000 seeds in 2023 as well.\nTo realise the dream and bring young people and villagers to the cause, Uttarakhand Rajya Nirman Senani Sangh (Regd.) began a series of talks. On 22 April 2023 it invited people to exchange ideas on the management of the Himalayas. On 25 May 2023, the birth anniversary of the freedom fighter Sridev Suman, the talk centred on the preservation of Uttarakhand's culture. As that culture deeply embraces the protection of ecology and environment, the talk deliberated on the core issue of the Uttarakhand movement: jal, jungle, jamin (water, forest, land). Then came the inception date of Vrikshabandhan Abhiyan, 5 June 2023, which is also World Environment Day, when the volunteers learnt how to make seed bombs.\n## What is a seed bomb\nA seed bomb holds the seeds of flowers, trees or plants inside a ball of mud and organic fertiliser. It is prepared just before the monsoon arrives. As the rains come, the seed bombs are thrown around barren land, dry ponds and river banks, and inside forests. The idea is to start planting on a large scale, to hold back the loss of flora and fauna, and so to fight global warming.\nThe film of the 2023 seed-bombing campaign by Vrikshabandhan Abhiyan follows.",
+    "body_hi": "",
+    "date": "2023-06-20",
+    "place": "Uttarakhand",
+    "tags": [
+      "Seed bombing",
+      "Campaign"
+    ],
+    "yt": "https://youtu.be/XTmHXvDXcI0",
+    "media": [
+      {
+        "path": "images/seed-bombers-2023.jpg",
+        "url": "/images/seed-bombers-2023.jpg",
+        "type": "image",
+        "alt_en": "Volunteers of Vrikshabandhan Abhiyan 2023 seated on a grassy hillside with the campaign banner, Manoj Dhyani among them",
+        "alt_hi": "वृक्षबंधन अभियान 2023 के स्वयंसेवक घास की ढलान पर अभियान के बैनर के साथ बैठे हुए, बीच में मनोज ध्यानी",
+        "width": 1280,
+        "height": 720
+      }
+    ],
     "live": true
   },
   {

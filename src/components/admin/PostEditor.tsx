@@ -10,6 +10,7 @@ import { Field, inputClass } from "@/components/ui/Field";
 import { toast } from "@/components/ui/Toast";
 import { emptyDraft, parseTags, validateDraft, type Draft, type DraftErrors } from "@/lib/content/admin";
 import { slugify } from "@/lib/content/slug";
+import { ytId } from "@/lib/content/youtube";
 import { browserClient } from "@/lib/supabase/browser";
 import { MediaUploader } from "./MediaUploader";
 
@@ -121,8 +122,8 @@ export function PostEditor({ id, initial, deletedAt }: Props) {
           <Field id="tags" label="Tags" hint="Separate with commas: Raksha Bandhan, School drive, Open letter">
             <input id="tags" value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} className={inputClass} />
           </Field>
-          <Field id="yt" label="YouTube link (optional)">
-            <input id="yt" type="url" value={draft.yt} onChange={(e) => set("yt", e.target.value)} className={inputClass} placeholder="https://www.youtube.com/watch?v=" />
+          <Field id="yt" label="YouTube video (optional)" hint="Paste a youtube.com or youtu.be link. The film plays on the story page, below the text." error={errors.yt}>
+            <input id="yt" type="url" value={draft.yt} onChange={(e) => set("yt", e.target.value)} className={inputClass} placeholder="https://youtu.be/" aria-invalid={Boolean(errors.yt)} aria-describedby={errors.yt ? "yt-error" : undefined} />
           </Field>
           <Field id="summary_en" label="Summary (English)" hint="One or two lines, shown in the list.">
             <input id="summary_en" value={draft.summary_en} onChange={(e) => set("summary_en", e.target.value)} className={inputClass} />
@@ -131,6 +132,15 @@ export function PostEditor({ id, initial, deletedAt }: Props) {
             <input id="summary_hi" lang="hi" value={draft.summary_hi} onChange={(e) => set("summary_hi", e.target.value)} className={inputClass} />
           </Field>
         </div>
+
+        {ytId(draft.yt) ? (
+          <div className="max-w-[36rem]">
+            <p className="font-sans text-sm text-ink-2">Video preview</p>
+            <div className="mt-2 aspect-video overflow-hidden bg-ground-2">
+              <iframe src={`https://www.youtube-nocookie.com/embed/${ytId(draft.yt)}`} title="Video preview" loading="lazy" allow="encrypted-media; picture-in-picture" allowFullScreen className="h-full w-full" />
+            </div>
+          </div>
+        ) : null}
 
         <div className="grid gap-6 min-[820px]:grid-cols-2">
           <Field id="body_en" label="Text (English)" hint='One paragraph per line. Start a line with "## " for a subheading, "> " for a quote, and end a quote with " — Name" to credit it.'>

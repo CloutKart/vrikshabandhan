@@ -18,6 +18,12 @@ describe("validateDraft", () => {
     expect(validateDraft(draft).media).toBeDefined();
     expect(validateDraft({ ...draft, live: false }).media).toBeUndefined();
   });
+  it("rejects a video link that is not a YouTube link, and accepts youtu.be", () => {
+    const base = { ...emptyDraft(), title_en: "T", date: "2024-01-01" };
+    expect(validateDraft({ ...base, yt: "https://example.com/watch?v=abc" }).yt).toBeDefined();
+    expect(validateDraft({ ...base, yt: "https://youtu.be/XTmHXvDXcI0" }).yt).toBeUndefined();
+    expect(validateDraft({ ...base, yt: "" }).yt).toBeUndefined();
+  });
   it("accepts a complete draft", () => {
     expect(validateDraft({ ...emptyDraft(), title_en: "T", date: "2024-01-01" })).toEqual({});
   });

@@ -5,8 +5,10 @@ test.describe("stories index", () => {
     await page.goto("/en/stories");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Stories from the field");
     const links = page.locator("[data-story-list] a[href^='/en/stories/']");
-    await expect(links).toHaveCount(3);
+    await expect(links).toHaveCount(4);
     await expect(links.first()).toHaveAttribute("href", "/en/stories/silkyara-open-letter");
+    // The seed-bombing story is the one with a photograph, shown as a small cover in its row.
+    await expect(page.locator("[data-story-row] img[alt*='banner']")).toHaveCount(1);
     await expect(links.last()).toHaveAttribute("href", "/en/stories/rampur-tiraha");
   });
 
@@ -49,6 +51,18 @@ test.describe("story page", () => {
     await page.goto("/hi/stories/silkyara-open-letter");
     await expect(page.getByText("यह कहानी अभी केवल अंग्रेज़ी में उपलब्ध है।")).toBeVisible();
     await expect(page.locator("[data-body]")).toHaveAttribute("lang", "en");
+  });
+
+  test("the seed-bombing story shows its photograph and plays its film on the page", async ({ page }) => {
+    await page.goto("/en/stories/seed-bombers-2023");
+    await expect(page.locator("h1")).toContainText("Seed Bombers of Uttarakhand");
+    await expect(page.locator("[data-paper] img[alt*='banner']")).toBeVisible();
+    const frame = page.locator("[data-paper] iframe");
+    await expect(frame).toHaveCount(1);
+    await expect(frame).toHaveAttribute("src", /youtube-nocookie\.com\/embed\/XTmHXvDXcI0/);
+    await expect(frame).toHaveAttribute("title", /Video/);
+    await expect(page.getByRole("heading", { level: 2, name: "What is a seed bomb" })).toBeVisible();
+    await expect(page.locator("[data-paper] time")).toHaveText("20 June 2023");
   });
 
   test("an unknown slug is a 404", async ({ page }) => {

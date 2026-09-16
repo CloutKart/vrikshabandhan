@@ -1,4 +1,5 @@
 import type { MediaItem } from "./types";
+import { ytId } from "./youtube";
 
 /** What the editor form holds. Same shape as a row minus the server-managed columns. */
 export type Draft = {
@@ -51,6 +52,7 @@ export function validateDraft(d: Draft): DraftErrors {
   const errors: DraftErrors = {};
   if (!d.title_en.trim()) errors.title_en = "Give the post an English title.";
   if (!/^\d{4}-\d{2}-\d{2}$/.test(d.date)) errors.date = "Pick a date.";
+  if (d.yt.trim() && !ytId(d.yt)) errors.yt = "Paste a youtube.com or youtu.be link to the video.";
   if (d.live && d.media.some((m) => m.type === "image" && !m.alt_en.trim()))
     errors.media = "Every photo needs an English description before the post goes live.";
   return errors;
