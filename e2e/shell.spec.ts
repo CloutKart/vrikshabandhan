@@ -66,6 +66,13 @@ test.describe("layout shell", () => {
     await expect(page.locator('[data-thread]')).toBeHidden();
   });
 
+  test("the thread is a braided rakhi with a medallion and leaves, not a plain bar", async ({ page }) => {
+    await page.goto("/en");
+    await expect(page.locator("[data-thread] line")).toHaveAttribute("stroke", /^url\(/);
+    await expect(page.locator("[data-knot-dot] .leaf")).toHaveCount(3);
+    await expect(page.locator("[data-knot-dot] circle").first()).toBeVisible();
+  });
+
   test("no link uses a bare hash href", async ({ page }) => {
     await page.goto("/en");
     expect(await page.locator('a[href="#"]').count()).toBe(0);
