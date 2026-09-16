@@ -111,6 +111,53 @@
   .u-thread[aria-current]::after {
     transform: scaleX(1);
   }
+  /* Painting details keep one ratio on desktop and may take a shorter one on phones. */
+  .painting-detail {
+    aspect-ratio: var(--ratio);
+  }
+  @media (max-width: 819px) {
+    .painting-detail {
+      aspect-ratio: var(--ratio-phone, var(--ratio));
+    }
+  }
+  /* The header draws a thread along its bottom edge once the page has scrolled under it. */
+  [data-site-header] {
+    position: sticky;
+    top: 0;
+  }
+  [data-site-header]::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--sutra);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--motion-enter) var(--ease-enter);
+  }
+  [data-site-header][data-scrolled]::after {
+    transform: scaleX(1);
+  }
+  /* The theme toggle shows the theme it would switch to; the glyphs cross over. */
+  [data-glyph] {
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--motion-state) var(--ease-move),
+      transform var(--motion-enter) var(--ease-move);
+  }
+  [data-glyph="moon"] {
+    opacity: 0;
+    transform: rotate(-60deg) scale(0.7);
+  }
+  [aria-pressed="true"] [data-glyph="moon"] {
+    opacity: 1;
+    transform: none;
+  }
+  [aria-pressed="true"] [data-glyph="sun"] {
+    opacity: 0;
+    transform: rotate(60deg) scale(0.7);
+  }
   /* Section rhythm and the red thread as a rule that marks where a section begins. */
   .section {
     padding-block: var(--section);
@@ -128,7 +175,7 @@
   }
   .numeral-xl {
     font-family: var(--font-serif);
-    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-size: clamp(2.75rem, 6vw, 5.5rem);
     line-height: 0.95;
     color: var(--gold);
     font-variant-numeric: lining-nums;

@@ -23,7 +23,7 @@ export async function PromiseSection({ locale }: { locale: Locale }) {
             <Button href="/get-involved">{hero("tieThread")}</Button>
           </div>
         </div>
-        <PaintingDetail crop="knot" ratio="4/5" alt={t("knotAlt")} sizes="(min-width: 1024px) 38vw, 100vw" className="max-h-[76vh]" />
+        <PaintingDetail crop="knot" ratio="4/5" phoneRatio="4/3" alt={t("knotAlt")} sizes="(min-width: 1024px) 38vw, 100vw" className="max-h-[76vh]" />
       </div>
     </section>
   );

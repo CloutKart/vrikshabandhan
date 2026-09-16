@@ -40,6 +40,17 @@ test.describe("layout shell", () => {
     await expect(trigger).toBeFocused();
   });
 
+  test("the theme toggle shows the theme it would switch to: a moon while light is on", async ({ page }) => {
+    await page.goto("/en");
+    const toggle = page.locator("header nav button[aria-pressed]");
+    await expect(toggle.locator("[data-glyph='sun']")).toHaveCSS("opacity", "1");
+    await expect(toggle.locator("[data-glyph='moon']")).toHaveCSS("opacity", "0");
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-pressed", "true");
+    await expect(toggle.locator("[data-glyph='moon']")).toHaveCSS("opacity", "1");
+    await expect(toggle.locator("[data-glyph='sun']")).toHaveCSS("opacity", "0");
+  });
+
   test("the theme toggle switches to light, persists across reload and updates theme-color", async ({ page }) => {
     await page.goto("/en");
     await page.getByRole("button", { name: "Switch to the light theme" }).click();

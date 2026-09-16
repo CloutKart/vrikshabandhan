@@ -14,7 +14,7 @@ for (const route of routes) {
     for (const theme of themes) {
       for (const width of widths) {
         const name = `${route === "/" ? "home" : route.slice(1).replace(/\//g, "-")}-${locale}-${theme}-${width}`;
-        if ((width === 1024 || width === 1920) && route !== "/") continue;
+        if (width === 1920 && route !== "/") continue;
         test(`screenshot ${name}`, async ({ page }) => {
           await page.setViewportSize({ width, height: width >= 1920 ? 960 : width > 820 ? 900 : 844 });
           await page.addInitScript((t) => localStorage.setItem("va-theme", t), theme);

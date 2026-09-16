@@ -29,7 +29,7 @@ function nameHeading(el: Element): () => void {
 export function mount(pathname: string): Cleanup {
   const html = document.documentElement;
   const full = html.dataset.motion === "full";
-  const cleanups: Cleanup[] = [revealObserver()];
+  const cleanups: Cleanup[] = [revealObserver(), headerRule()];
   if (full) cleanups.push(heroSequence(), titleReveal(), knot(), flipMorph(pathname));
   // Lets tests (and anything else) know the listeners exist for this route.
   html.dataset.motionReady = "";
@@ -40,6 +40,28 @@ export function mount(pathname: string): Cleanup {
 }
 
 /* Reveals: mark elements once they enter the viewport; CSS does the rest. */
+/** The header's thread rule appears once the page has scrolled under it. */
+function headerRule(): Cleanup {
+  const header = document.querySelector<HTMLElement>("[data-site-header]");
+  if (!header) return noop;
+  let raf = 0;
+  const update = () => {
+    raf = 0;
+    if (window.scrollY > 8) header.dataset.scrolled = "";
+    else delete header.dataset.scrolled;
+  };
+  const onScroll = () => {
+    if (!raf) raf = requestAnimationFrame(update);
+  };
+  update();
+  window.addEventListener("scroll", onScroll, { passive: true });
+  return () => {
+    window.removeEventListener("scroll", onScroll);
+    if (raf) cancelAnimationFrame(raf);
+    delete header.dataset.scrolled;
+  };
+}
+
 function revealObserver(): Cleanup {
   const targets = document.querySelectorAll("[data-reveal]:not([data-revealed])");
   if (!targets.length) return noop;

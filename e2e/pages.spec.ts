@@ -87,6 +87,13 @@ test("stories index: the first story starts inside the first screen at 1440", as
   await expect(page.locator("main [data-painting-detail]")).toHaveCount(1);
 });
 
+test("on a phone the promise panel is landscape, so the chapter stays short", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/en");
+  const panel = await page.locator('[data-section="promise"] [data-painting-detail="knot"]').boundingBox();
+  expect(panel!.height).toBeLessThan(panel!.width);
+});
+
 test("home promise panel never outgrows the screen at 1920", async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 960 });
   await page.goto("/en");

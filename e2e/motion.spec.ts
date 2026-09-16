@@ -19,6 +19,16 @@ test.describe("reduced motion", () => {
 });
 
 test.describe("full motion", () => {
+  test("the header draws its thread rule once the page has scrolled, and takes it back at the top", async ({ page }) => {
+    await page.goto("/en/thread");
+    await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
+    await expect(page.locator("header[data-site-header]")).not.toHaveAttribute("data-scrolled", "");
+    await page.evaluate(() => window.scrollTo({ top: 400, behavior: "instant" }));
+    await expect(page.locator("header[data-site-header]")).toHaveAttribute("data-scrolled", "");
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+    await expect(page.locator("header[data-site-header]")).not.toHaveAttribute("data-scrolled", "");
+  });
+
   test("the hero plays once per session, then leaves the heading intact", async ({ page }) => {
     await page.goto("/en");
     await expect(page.locator("html")).toHaveAttribute("data-motion", "full");

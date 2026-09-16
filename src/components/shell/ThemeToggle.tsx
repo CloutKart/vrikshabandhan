@@ -38,10 +38,15 @@ export function ThemeToggle() {
       onClick={() => applyTheme(next)}
       className="grid h-11 w-11 place-items-center rounded-full text-ink transition-colors duration-150 ease-enter hover:bg-ground-2 active:scale-[var(--scale-press)]"
     >
-      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <circle cx="10" cy="10" r="4.5" />
-        <path d="M10 1.5v2.5M10 16v2.5M1.5 10H4M16 10h2.5M4 4l1.8 1.8M14.2 14.2 16 16M4 16l1.8-1.8M14.2 5.8 16 4" />
-      </svg>
+      <span className="grid h-5 w-5 place-items-center">
+        <svg data-glyph="sun" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <circle cx="10" cy="10" r="4.5" />
+          <path d="M10 1.5v2.5M10 16v2.5M1.5 10H4M16 10h2.5M4 4l1.8 1.8M14.2 14.2 16 16M4 16l1.8-1.8M14.2 5.8 16 4" />
+        </svg>
+        <svg data-glyph="moon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M16.5 12.3A7 7 0 0 1 7.7 3.5a7 7 0 1 0 8.8 8.8Z" />
+        </svg>
+      </span>
     </button>
   );
 }

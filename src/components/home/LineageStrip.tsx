@@ -20,7 +20,7 @@ export async function LineageStrip({ locale }: { locale: Locale }) {
         pair={pair}
         action={<SectionAction href="/thread">{home("lineageCta")}</SectionAction>}
       />
-      <ol className="mt-12 grid gap-x-8 gap-y-12 min-[640px]:grid-cols-2 min-[1024px]:grid-cols-4">
+      <ol className="mt-10 grid gap-x-8 gap-y-8 min-[640px]:grid-cols-2 min-[640px]:gap-y-12 min-[1024px]:grid-cols-4">
         {entries.map((e) => (
           <li key={e.year} className="border-t border-moss/60 pt-6">
             <time dateTime={e.year} className="numeral-xl block">
