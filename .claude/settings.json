@@ -1,0 +1,27 @@
+{
+  "enabledPlugins": {
+    "superpowers@superpowers-marketplace": true,
+    "frontend-design@claude-plugins-official": true,
+    "accesslint@accesslint": true
+  },
+  "extraKnownMarketplaces": {
+    "superpowers-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "obra/superpowers-marketplace"
+      }
+    },
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    },
+    "accesslint": {
+      "source": {
+        "source": "github",
+        "repo": "accesslint/claude-marketplace"
+      }
+    }
+  }
+}
