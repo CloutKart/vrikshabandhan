@@ -54,7 +54,7 @@
   aspect-ratio: 1672 / 941;
   overflow: hidden;
   background: var(--stone);
-  border-radius: 0 0 var(--radius-hero) var(--radius-hero);
+  border-radius: var(--radius-hero);
 }
 .hero-painting,
 .hero-cutout {

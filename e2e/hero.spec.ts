@@ -50,7 +50,8 @@ test.describe("wide, short screens", () => {
     const pageMax = 2000; // the layout fills the window
     expect(painting!.x + painting!.width, "painting stays inside the column").toBeLessThanOrEqual((2000 - pageMax) / 2 + pageMax + 1);
     expect(Math.abs(thread!.x + thread!.width / 2 - ((2000 - pageMax) / 2 + 28)), "thread hugs the column, not the window").toBeLessThanOrEqual(2);
-    expect(await page.locator(".hero-art").evaluate((el) => getComputedStyle(el).borderBottomLeftRadius)).toBe("24px");
+    expect(await page.locator(".hero-art").evaluate((el) => getComputedStyle(el).borderTopLeftRadius)).toBe("24px");
+    expect(await page.locator(".hero-art").evaluate((el) => getComputedStyle(el).borderBottomRightRadius)).toBe("24px");
     await expect(page.getByText(/Since 2005 we have planted/)).toBeInViewport();
   });
 });
