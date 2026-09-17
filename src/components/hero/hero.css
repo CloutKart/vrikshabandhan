@@ -79,17 +79,21 @@
   z-index: 3;
   transform-origin: 50% 0;
 }
+/* A breeze, not a swing: the ends rotate about the knot and lift a little as they pass through the middle. */
 @keyframes tassel-sway {
-  from {
-    transform: rotate(-1.4deg) translateX(-0.6px);
+  0% {
+    transform: rotate(-3.2deg) translateX(-1px);
   }
-  to {
-    transform: rotate(1.4deg) translateX(0.6px);
+  50% {
+    transform: rotate(0.4deg) translateY(-1.5px);
+  }
+  100% {
+    transform: rotate(3.4deg) translateX(1px);
   }
 }
 @media (min-width: 820px) {
   html[data-motion="full"] .hero-tassel {
-    animation: tassel-sway 7s ease-in-out infinite alternate;
+    animation: tassel-sway 4.5s ease-in-out infinite alternate;
   }
 }
 /* One painting per theme. The cut-out only exists from 820 px up, where the headline sits under the leaves. */

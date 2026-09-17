@@ -86,8 +86,8 @@ transition `(.4,0,.2,1)`, GSAP `expo.out` / `power2.out` / `none` for scrub; sta
 2. **The header thread grows with the scroll** (a `--progress` custom property set from a rAF-throttled scroll
    listener; the 2 px red line scales from the left).
 3. **Photo reveal**: `clip-path` inset opens once on viewport entry, CSS only.
-   The thread's loose ends in the hero drift on their own layer (a 1.4° rotation over 7 s, alternating); the band
-   round the trunk never moves.
+   The thread's loose ends in the hero drift on their own layer (about 3° each way over 4.5 s, alternating); the
+   band round the trunk never moves.
 4. **Story link hover/focus**: a red underline draws left to right like thread (pseudo-element `scaleX`).
 5. **Chips and buttons**: 150 ms colour and 1 px lift, press scale .98, always with a matching reverse.
 6. **Language switch**: 150 ms out / 200 ms in crossfade with reserved height; it is a route change to the other
