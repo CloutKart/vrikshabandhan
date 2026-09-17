@@ -90,3 +90,10 @@
   --radius-hero: 1.5rem;
   --header-h: 72px;
 }
+
+/* Phones: chapters sit closer, the screen is short. */
+@media (max-width: 819px) {
+  :root {
+    --section: clamp(3.25rem, 8vh, 4.5rem);
+  }
+}

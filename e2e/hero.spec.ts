@@ -200,3 +200,42 @@ test.describe("latest stories in the hero", () => {
     expect(list!.y).toBeGreaterThan(art!.y + art!.height);
   });
 });
+
+test("a frame that reads wrong (a black texture, as Safari has produced) keeps the still tree in view", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  await context.addInitScript(() => {
+    // Whatever WebGL draws, report opaque black everywhere, the way a failed texture upload looks.
+    WebGLRenderingContext.prototype.readPixels = function (_x, _y, _w, _h, _f, _t, out: ArrayBufferView | null) {
+      if (out instanceof Uint8Array) out.set([0, 0, 0, 255]);
+    } as typeof WebGLRenderingContext.prototype.readPixels;
+  });
+  const page = await context.newPage();
+  await page.goto("/en");
+  await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
+  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toBeVisible();
+  await expect.poll(() => page.locator("canvas.hero-sway").count(), { timeout: 5000 }).toBe(0);
+  await expect(page.locator(".hero-art")).not.toHaveAttribute("data-sway", "");
+  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toHaveCSS("opacity", "1");
+  await context.close();
+});
+
+test("on phones the frame is a square window on the tree; on desktop it is nothing", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/en");
+  const frame = (await page.locator(".hero-frame").boundingBox())!;
+  const art = (await page.locator(".hero-art").boundingBox())!;
+  const band = (await page.locator('img.hero-thread-band[data-variant="dark"]').boundingBox())!;
+  expect(Math.abs(frame.width - frame.height)).toBeLessThanOrEqual(1);
+  expect(frame.x).toBeGreaterThanOrEqual(0);
+  expect(frame.x + frame.width).toBeLessThanOrEqual(390);
+  expect(art.width).toBeGreaterThan(390);
+  expect(band.x).toBeGreaterThan(frame.x);
+  expect(band.x + band.width).toBeLessThan(frame.x + frame.width);
+  expect(band.y + band.height).toBeLessThan(frame.y + frame.height);
+  expect(await page.locator(".hero-frame").evaluate((el) => getComputedStyle(el).borderTopLeftRadius)).toBe("24px");
+  const title = (await page.locator(".hero-title").boundingBox())!;
+  const lede = (await page.getByText(/Since 2005 we have planted/).boundingBox())!;
+  expect(Math.abs(title.x - lede.x), "title and lede share a left edge").toBeLessThanOrEqual(1);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  expect(await page.locator(".hero-frame").evaluate((el) => getComputedStyle(el).display)).toBe("contents");
+});

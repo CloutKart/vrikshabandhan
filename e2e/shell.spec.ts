@@ -161,3 +161,12 @@ test("the footer lists both e-mails and the three social links", async ({ page }
   const hosts = await page.locator("footer a[target='_blank']").evaluateAll((els) => els.map((e) => new URL(e.getAttribute("href")!).hostname));
   expect(hosts).toEqual(["www.facebook.com", "www.youtube.com", "www.instagram.com"]);
 });
+
+test("on phones the story filters are one row that scrolls sideways", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/en/stories");
+  const nav = page.getByRole("navigation", { name: /filter/i });
+  const rows = new Set(await nav.locator("a").evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top))));
+  expect(rows.size).toBe(1);
+  expect(await nav.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+});

@@ -56,6 +56,31 @@
   background: var(--stone);
   border-radius: var(--radius-hero);
 }
+/* The frame is nothing on desktop. On phones it is a square window on the painting's right 56 %: the whole trunk,
+   the knot and the right canopy at about three times the size the whole painting would get. Every layer is placed
+   in percentages of the art, so the thread, the leaves and the moving tree stay aligned. */
+.hero-frame {
+  display: contents;
+}
+@media (max-width: 819px) {
+  .hero-frame {
+    display: block;
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: var(--stone);
+    border-radius: var(--radius-hero);
+  }
+  .hero-art {
+    position: absolute;
+    top: 0;
+    left: -68%;
+    width: 178%;
+    height: auto;
+    border-radius: 0;
+    container-type: inline-size;
+  }
+}
 .hero-painting,
 .hero-tree,
 .hero-sway {
@@ -212,7 +237,7 @@ html[data-motion="full"] .hero-leaves {
   display: block;
 }
 .hero-title {
-  margin: 1.5rem 1.25rem 0;
+  margin: 1.5rem 0 0;
   font-size: clamp(2.5rem, 11vw, 4rem);
   line-height: 1.05;
   letter-spacing: -0.02em;

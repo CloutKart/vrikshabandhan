@@ -15,7 +15,7 @@ export function Footer() {
   return (
     <footer className="page mt-[var(--section)] pb-12 font-sans text-sm text-ink-2">
       <hr className="rule" />
-      <div className="mt-10 grid gap-10 min-[820px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="mt-10 grid gap-10 max-[819px]:mt-8 max-[819px]:gap-8 min-[820px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
         <div>
           <div className="flex items-start gap-4">
             <Mark size={64} />
