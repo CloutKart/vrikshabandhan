@@ -294,3 +294,18 @@ test("the word thread in the headline wears the thread's red, in both languages 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator(".hero-title [data-accent]").nth(0)).toBeVisible();
 });
+
+
+test("a pinch zoom redraws the tree at the zoomed density instead of stretching it", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/en");
+  await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
+  const canvas = page.locator("canvas.hero-sway");
+  const before = await canvas.evaluate((el: HTMLCanvasElement) => el.width);
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send("Emulation.setPageScaleFactor", { pageScaleFactor: 2.5 });
+  await expect.poll(() => canvas.evaluate((el: HTMLCanvasElement) => el.width), { timeout: 3000 }).toBeGreaterThanOrEqual(Math.round(before * 2.4));
+  await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "");
+  await cdp.send("Emulation.setPageScaleFactor", { pageScaleFactor: 1 });
+  await expect.poll(() => canvas.evaluate((el: HTMLCanvasElement) => el.width), { timeout: 3000 }).toBe(before);
+});

@@ -311,9 +311,13 @@ export function treeSway(): Cleanup {
     return trunk[3] > 200 && trunk[0] + trunk[1] + trunk[2] > 60 && ground[3] === 0;
   };
 
+  // The backing store follows the pinch zoom too (visualViewport.scale): a zoomed-in tree is redrawn at the
+  // zoomed density instead of being stretched, within a 4096 px width so no device runs out of texture.
   const resize = () => {
-    const dpr = Math.min(maxDpr(), window.devicePixelRatio || 1);
-    const w = Math.round(art.clientWidth * dpr), h = Math.round(art.clientHeight * dpr);
+    const zoom = window.visualViewport?.scale || 1;
+    const cw = Math.max(1, art.clientWidth);
+    const dpr = Math.min((window.devicePixelRatio || 1) * zoom, maxDpr() * zoom, 4096 / cw);
+    const w = Math.round(cw * dpr), h = Math.round(art.clientHeight * dpr);
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
       canvas.height = h;
@@ -322,6 +326,7 @@ export function treeSway(): Cleanup {
   };
   const ro = new ResizeObserver(resize);
   ro.observe(art);
+  window.visualViewport?.addEventListener("resize", resize);
   resize();
 
   const frame = () => {
@@ -358,6 +363,7 @@ export function treeSway(): Cleanup {
     disposed = true;
     cancelAnimationFrame(raf);
     ro.disconnect();
+    window.visualViewport?.removeEventListener("resize", resize);
     themeObserver.disconnect();
     phone.removeEventListener("change", onFrameChange);
     images.forEach((img) => img.removeEventListener("load", onFrameChange));
