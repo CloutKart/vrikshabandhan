@@ -53,12 +53,12 @@ export default async function GetInvolvedPage({ params }: { params: Promise<{ lo
               <p>{t("org")}</p>
               <p>{t("city")}</p>
               <p className="mt-6">
-                <a className={`${link} [overflow-wrap:anywhere]`} href={`mailto:${t("email")}`}>
+                <a className={`${link} max-[419px]:text-base [overflow-wrap:anywhere]`} href={`mailto:${t("email")}`}>
                   {t("email")}
                 </a>
               </p>
               <p className="mt-3">
-                <a className={`${link} [overflow-wrap:anywhere]`} href={`mailto:${t("email2")}`}>
+                <a className={`${link} max-[419px]:text-base [overflow-wrap:anywhere]`} href={`mailto:${t("email2")}`}>
                   {t("email2")}
                 </a>
               </p>
