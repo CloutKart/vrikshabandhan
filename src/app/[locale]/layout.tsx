@@ -8,7 +8,6 @@ import { MotionRoot } from "@/components/motion/MotionRoot";
 import { Footer } from "@/components/shell/Footer";
 import { Header } from "@/components/shell/Header";
 import { SkipLink } from "@/components/shell/SkipLink";
-import { Thread } from "@/components/thread/Thread";
 import { mukta, muktaDevanagari, tiro, tiroItalic } from "@/lib/fonts";
 import { DEFAULT_THEME, THEME_COLORS } from "@/lib/theme/constants";
 import { THEME_HEAD_SCRIPT } from "@/lib/theme/head-script";
@@ -51,7 +50,6 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body className="min-h-dvh">
         <NextIntlClientProvider messages={{ nav }}>
           <SkipLink />
-          <Thread />
           <Header />
           {children}
           <Footer />

@@ -9,7 +9,7 @@ import { join } from "node:path";
 const chunksDir = ".next/static/chunks";
 const gsapChunks = readdirSync(chunksDir)
   .filter((f) => f.endsWith(".js"))
-  .filter((f) => /SplitText|ScrollTrigger/.test(readFileSync(join(chunksDir, f), "utf8")));
+  .filter((f) => /SplitText|Flip/.test(readFileSync(join(chunksDir, f), "utf8")));
 if (!gsapChunks.length) {
   console.error("No GSAP chunk found; is the build current?");
   process.exit(1);

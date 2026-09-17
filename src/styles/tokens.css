@@ -88,7 +88,5 @@
   --section: clamp(5rem, 10vh, 8rem);
   --radius-panel: 1.5rem;
   --radius-hero: 1.5rem;
-  --thread-x: 28px;
-  --thread-gutter: 64px;
   --header-h: 72px;
 }

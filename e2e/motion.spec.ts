@@ -19,7 +19,7 @@ test.describe("reduced motion", () => {
 });
 
 test.describe("full motion", () => {
-  test("the header draws its thread rule once the page has scrolled, and takes it back at the top", async ({ page }) => {
+  test("the header marks a scrolled page and takes the mark back at the top", async ({ page }) => {
     await page.goto("/en/thread");
     await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
     await expect(page.locator("header[data-site-header]")).not.toHaveAttribute("data-scrolled", "");
@@ -48,24 +48,6 @@ test.describe("full motion", () => {
     await expect(title).toHaveText("Stories from the field");
     // The split wrappers are reverted when the words finish rising.
     await expect.poll(() => title.locator("[aria-hidden]").count(), { timeout: 2500 }).toBe(0);
-  });
-
-  test("the knot follows the scroll", async ({ page }) => {
-    await page.goto("/en/stories");
-    await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "", { timeout: 5000 });
-    const knot = page.locator("[data-knot]");
-    const before = await knot.evaluate((el) => getComputedStyle(el).transform);
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
-    await expect.poll(async () => knot.evaluate((el) => getComputedStyle(el).transform), { timeout: 3000 }).not.toBe(before);
-  });
-
-  test("the knot slides to the story row under the pointer", async ({ page }) => {
-    await page.goto("/en/stories");
-    await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "", { timeout: 5000 });
-    const dot = page.locator("[data-knot-dot]");
-    await page.mouse.move(5, 5);
-    await page.locator("[data-story-row]").nth(2).hover();
-    await expect.poll(async () => dot.evaluate((el) => getComputedStyle(el).transform), { timeout: 3000 }).not.toBe("none");
   });
 
   test("images and the timeline reveal once they enter the viewport", async ({ page }) => {

@@ -41,16 +41,14 @@ test("no painting credit is shown while the credit is empty", async ({ page }) =
 test.describe("wide, short screens", () => {
   test.use({ viewport: { width: 2000, height: 960 } });
 
-  test("the painting, the brand and the thread share one column, and the lede is in the first screen", async ({ page }) => {
+  test("the painting and the brand share one column, and the lede is in the first screen", async ({ page }) => {
     await page.goto("/en");
     const painting = await page.locator(".hero-art").boundingBox();
     const brand = await page.getByRole("link", { name: /Vrikshabandhan Abhiyan/ }).first().boundingBox();
-    const thread = await page.locator("[data-thread]").boundingBox();
-    expect(painting && brand && thread).toBeTruthy();
+    expect(painting && brand).toBeTruthy();
     expect(Math.abs(painting!.x - brand!.x), "painting aligns with the brand").toBeLessThanOrEqual(1);
     const pageMax = 2000; // the layout fills the window
     expect(painting!.x + painting!.width, "painting stays inside the column").toBeLessThanOrEqual((2000 - pageMax) / 2 + pageMax + 1);
-    expect(Math.abs(thread!.x + thread!.width / 2 - ((2000 - pageMax) / 2 + 28)), "thread hugs the column, not the window").toBeLessThanOrEqual(2);
     expect(await page.locator(".hero-art").evaluate((el) => getComputedStyle(el).borderTopLeftRadius)).toBe("24px");
     expect(await page.locator(".hero-art").evaluate((el) => getComputedStyle(el).borderBottomRightRadius)).toBe("24px");
     await expect(page.getByText(/Since 2005 we have planted/)).toBeInViewport();

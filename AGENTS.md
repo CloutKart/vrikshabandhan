@@ -17,6 +17,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   `text-sutra` ...), never raw hex. `tests/unit/tokens.contrast.test.ts` enforces the WCAG pairs.
 - Every visible string lives in `messages/en.json` and `messages/hi.json` with identical keys.
 - Motion lives in `src/lib/motion/site.ts`, loaded only through `MotionRoot`; markup opts in with data attributes
-  (`data-reveal`, `data-title-reveal`, `data-hero-title`, `data-story-row`, `data-flip-id`). Initial hidden states exist
+  (`data-reveal`, `data-title-reveal`, `data-hero-title`, `data-story-row`, `data-flip-id`, `data-site-header`). Initial hidden states exist
   only under `html[data-motion="full"]`.
 - Checks before pushing: `npm run lint`, `npm run typecheck`, `npm run test`, `npm run e2e`, `npm run check:bundle`.

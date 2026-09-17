@@ -70,28 +70,31 @@ test.describe("layout shell", () => {
     await expect(page).toHaveURL(/\/en$/);
   });
 
-  test("the thread is present on desktop and hidden on phones", async ({ page }) => {
+  test("there is no left thread; the page margin is symmetric and the scrollbar is thin", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/en");
-    await expect(page.locator('[data-thread]')).toBeVisible();
-    await page.setViewportSize({ width: 390, height: 800 });
-    await expect(page.locator('[data-thread]')).toBeHidden();
+    await expect(page.locator("[data-thread]")).toHaveCount(0);
+    const pad = await page.locator("main .page").first().evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return [parseFloat(cs.paddingLeft), parseFloat(cs.paddingRight)];
+    });
+    expect(Math.abs(pad[0] - pad[1])).toBeLessThan(1);
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollbarWidth)).toBe("thin");
   });
 
-  test("the thread is a braided rakhi with a medallion and leaves, not a plain bar", async ({ page }) => {
-    await page.goto("/en");
-    await expect(page.locator("[data-thread] line")).toHaveAttribute("stroke", /^url\(/);
-    await expect(page.locator("[data-knot-dot] .leaf")).toHaveCount(3);
-    await expect(page.locator("[data-knot-dot] circle").first()).toBeVisible();
-  });
-
-  test("the native scrollbar is hidden where the rakhi is shown, and the page still scrolls", async ({ page }) => {
-    await page.goto("/en/stories");
-    expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollbarWidth)).toBe("none");
-    expect(await page.evaluate(() => window.innerWidth - document.documentElement.clientWidth)).toBe(0);
-    await page.evaluate(() => window.scrollTo({ top: 400, behavior: "instant" }));
-    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(300);
-    await page.setViewportSize({ width: 390, height: 800 });
-    expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollbarWidth)).not.toBe("none");
+  test("the header thread grows with the scroll, like a thread being tied", async ({ page }) => {
+    await page.goto("/en/thread");
+    await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
+    const scale = () =>
+      page.evaluate(() => {
+        const t = getComputedStyle(document.querySelector("[data-site-header]")!, "::after").transform;
+        const m = t.match(/matrix\(([^,]+),/);
+        return m ? parseFloat(m[1]) : t === "none" ? 1 : NaN;
+      });
+    expect(await scale()).toBeLessThan(0.05);
+    await page.evaluate(() => window.scrollTo({ top: (document.documentElement.scrollHeight - innerHeight) / 2, behavior: "instant" }));
+    await expect.poll(scale, { timeout: 2000 }).toBeGreaterThan(0.3);
+    await expect.poll(scale, { timeout: 2000 }).toBeLessThan(0.75);
   });
 
   test("no link uses a bare hash href", async ({ page }) => {

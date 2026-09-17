@@ -6,7 +6,7 @@ import { BilingualHeading } from "./BilingualHeading";
 export function SectionHeading({ pair, action, id }: { pair: Pair; action?: ReactNode; id?: string }) {
   return (
     <div>
-      <hr className="thread-rule" />
+      <hr className="rule" />
       <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
         <BilingualHeading
           as="h2"

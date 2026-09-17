@@ -60,13 +60,15 @@ Theme: `data-theme` on `<html>`, defaults to dark, honours a stored choice, `col
 
 ### Layout
 
-- 12-column grid, 1440 max, with the thread gutter on the left (thread fixed at 28 px, content starts at 64 px on
-  desktop; thread hidden under 820 px as in v2). Asymmetric: text left, images bleed right or full width.
+- Fluid grid to the window edge with a symmetric margin. No fixed thread at the left: the header ties a thin red
+  thread along its bottom edge as the reader scrolls (its length is the reading progress). Asymmetric compositions:
+  text left, images right or full width. Chapters open with a 1 px moss hairline; red is kept for documents (the
+  letterhead), the timeline and lineage spines, the underline draw and the header thread.
 - Hero: the painting shown whole (16:9, ≤86vh) with the headline tucked under the leaves as in v2, cutout tree in
   front. Under it, in the first screen on desktop, the three latest stories as a list (date and place, title in both
   scripts, cover thumb), no cards.
 - Lists everywhere instead of cards: story rows, the three ways to help, the lineage, the timeline. Rows are
-  separated by space, and the thread's knot slides to the row under the pointer or keyboard focus.
+  separated by hairlines; a row's title draws a red underline under the pointer or keyboard focus.
 - Reading pages: a paper sheet centred on the ground, 65ch, cover image above the title, body via
   `@tailwindcss/typography`, YouTube and gallery below.
 - Routes: `/[locale]` home; `/[locale]/stories` (chips as `?tag=` search param); `/[locale]/stories/[slug]`;
@@ -79,11 +81,10 @@ Tokens: durations 100/150/200/300/500/900 ms; easings entrance `cubic-bezier(0,0
 transition `(.4,0,.2,1)`, GSAP `expo.out` / `power2.out` / `none` for scrub; stagger 15 ms chars, 30 ms lists,
 60 ms grids; distances 4 px lift, 12–24 px reveal, scale .98 press. Transform and opacity only.
 
-1. **Load, once per session:** the thread draws down the left edge (SVG `stroke-dashoffset`, 900 ms), then the
-   headline characters rise (GSAP SplitText, y 20, rotateX −40, 15 ms stagger, `expo.out`; Hindi split by words,
+1. **Load, once per session:** the headline characters rise (GSAP SplitText, y 20, rotateX −40, 15 ms stagger, `expo.out`; Hindi split by words,
    never characters, to keep conjuncts intact) while the cutout leaves fade in. Whole sequence ≤ 1.2 s.
-2. **Knot follows scroll** (ScrollTrigger scrub 0.6, no layout reads per frame) and **slides to the hovered or
-   focused list row**.
+2. **The header thread grows with the scroll** (a `--progress` custom property set from a rAF-throttled scroll
+   listener; the 2 px red line scales from the left).
 3. **Photo reveal**: `clip-path` inset opens once on viewport entry, CSS only.
 4. **Story link hover/focus**: a red underline draws left to right like thread (pseudo-element `scaleX`).
 5. **Chips and buttons**: 150 ms colour and 1 px lift, press scale .98, always with a matching reverse.

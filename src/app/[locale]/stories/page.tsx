@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { PaintingDetail } from "@/components/painting/PaintingDetail";
+import { PhotoPanel } from "@/components/media/PhotoPanel";
 import { StoryList } from "@/components/stories/StoryList";
 import { TagFilter } from "@/components/stories/TagFilter";
 import { PageHeader } from "@/components/typography/PageHeader";
@@ -30,13 +30,12 @@ export default async function StoriesPage({ params, searchParams }: Props) {
     bilingual(locale, "stories", "title"),
     getTranslations({ locale, namespace: "stories" }),
   ]);
-  const home = await getTranslations({ locale, namespace: "home" });
   return (
     <main id="content" className="pb-24">
       <PageHeader
         pair={pair}
         lede={t("lede")}
-        aside={<PaintingDetail crop="canopy" ratio="16/9" zoom={1.6} alt={home("canopyAlt")} sizes="(min-width: 1024px) 38vw, 100vw" />}
+        aside={<PhotoPanel name="stream" src="/images/founder-stream.jpg" alt={t("headerAlt")} ratio="16/9" position="50% 38%" sizes="(min-width: 1024px) 38vw, 100vw" />}
       />
       <div className="page">
         <TagFilter tags={tags} active={tag} locale={locale} />

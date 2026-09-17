@@ -31,7 +31,7 @@ export default async function GetInvolvedPage({ params }: { params: Promise<{ lo
         <ol className="grid gap-12 min-[1024px]:grid-cols-3 min-[1024px]:gap-10">
           {ways.map((w) => (
             <li key={w} className="flex flex-col">
-              <hr className="thread-rule" />
+              <hr className="rule" />
               <h2 className="mt-6 text-[2rem] leading-tight">{t(`${w}Title`)}</h2>
               <p className="mt-4 max-w-[44ch] flex-1 text-ink-2">{t(`${w}Text`)}</p>
               <div className="mt-8">

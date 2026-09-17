@@ -14,7 +14,7 @@ export function Footer() {
   const otherName = other === "hi" ? "वृक्षबंधन अभियान" : "Vrikshabandhan Abhiyan";
   return (
     <footer className="page mt-[var(--section)] pb-12 font-sans text-sm text-ink-2">
-      <hr className="thread-rule" />
+      <hr className="rule" />
       <div className="mt-10 grid gap-10 min-[820px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
         <div>
           <div className="flex items-start gap-4">

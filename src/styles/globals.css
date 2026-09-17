@@ -7,14 +7,10 @@
     scroll-behavior: smooth;
     background: var(--ground);
   }
-  /* The rakhi is the scroll indicator where it is shown; the native bar is hidden there. Scrolling itself is unchanged. */
-  @media (min-width: 820px) {
-    html {
-      scrollbar-width: none;
-    }
-    html::-webkit-scrollbar {
-      display: none;
-    }
+  /* A thin scrollbar in the page's own tones. */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--moss) var(--ground);
   }
   body {
     background: var(--ground);
@@ -85,8 +81,7 @@
   }
   @media (min-width: 820px) {
     .page {
-      padding-left: max(var(--thread-gutter), 3.5vw);
-      padding-right: max(2.5rem, 3.5vw);
+      padding-inline: max(2.5rem, 3.5vw);
     }
   }
   /* A red underline that draws itself, left to right, like thread. Also on keyboard focus. */
@@ -120,7 +115,7 @@
       aspect-ratio: var(--ratio-phone, var(--ratio));
     }
   }
-  /* The header draws a thread along its bottom edge once the page has scrolled under it. */
+  /* The header ties a thread along its bottom edge as the page scrolls: its length is the reading progress. */
   [data-site-header] {
     position: sticky;
     top: 0;
@@ -132,12 +127,9 @@
     bottom: 0;
     height: 2px;
     background: var(--sutra);
-    transform: scaleX(0);
+    transform: scaleX(var(--progress, 0));
     transform-origin: left;
-    transition: transform var(--motion-enter) var(--ease-enter);
-  }
-  [data-site-header][data-scrolled]::after {
-    transform: scaleX(1);
+    transition: transform var(--motion-state) linear;
   }
   /* The theme toggle shows the theme it would switch to; the glyphs cross over. */
   [data-glyph] {
@@ -158,14 +150,14 @@
     opacity: 0;
     transform: rotate(60deg) scale(0.7);
   }
-  /* Section rhythm and the red thread as a rule that marks where a section begins. */
+  /* Section rhythm. A chapter opens with the same hairline the story rows use; red is kept for documents and threads. */
   .section {
     padding-block: var(--section);
   }
-  .thread-rule {
+  .rule {
     border: 0;
-    height: 2px;
-    background: var(--sutra);
+    height: 1px;
+    background: color-mix(in srgb, var(--moss) 70%, transparent);
     margin: 0;
   }
   .display-xl {
@@ -262,11 +254,6 @@
     opacity: 1;
   }
 }
-@keyframes force-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
 @keyframes page-in {
   from {
     opacity: 0;
@@ -279,11 +266,6 @@ html[data-motion="full"][data-hero="pending"] .hero-cutout,
 html[data-motion="full"][data-hero="pending"] [data-hero-title] {
   opacity: 0;
   animation: force-visible 0s 1.6s forwards;
-}
-html[data-motion="full"][data-hero="pending"] [data-thread] line {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: force-draw 0s 1.6s forwards;
 }
 html[data-motion="full"] [data-title-reveal]:not([data-title-done]) {
   opacity: 0;

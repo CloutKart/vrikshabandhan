@@ -7,7 +7,9 @@ test.describe("stories index", () => {
     const links = page.locator("[data-story-list] a[href^='/en/stories/']");
     await expect(links).toHaveCount(4);
     await expect(links.first()).toHaveAttribute("href", "/en/stories/silkyara-open-letter");
-    // The seed-bombing story is the one with a photograph, shown as a small cover in its row.
+    // The page's one image is the founder by the stream; the seed-bombing row shows its own small cover.
+    await expect(page.locator("main [data-photo='stream'] img")).toHaveAttribute("alt", /stream/);
+    await expect(page.locator("main [data-painting-detail]")).toHaveCount(0);
     await expect(page.locator("[data-story-row] img[alt*='banner']")).toHaveCount(1);
     await expect(links.last()).toHaveAttribute("href", "/en/stories/rampur-tiraha");
   });

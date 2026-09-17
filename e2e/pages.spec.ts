@@ -84,7 +84,7 @@ test("stories index: the first story starts inside the first screen at 1440", as
   await page.goto("/en/stories");
   const first = await page.locator("[data-story-list] [data-story-row]").first().boundingBox();
   expect(first!.y).toBeLessThan(880);
-  await expect(page.locator("main [data-painting-detail]")).toHaveCount(1);
+  await expect(page.locator("main [data-photo='stream']")).toHaveCount(1);
 });
 
 test("on a phone the promise panel is landscape, so the chapter stays short", async ({ page }) => {

@@ -30,7 +30,7 @@ export function mount(pathname: string): Cleanup {
   const html = document.documentElement;
   const full = html.dataset.motion === "full";
   const cleanups: Cleanup[] = [revealObserver(), headerRule()];
-  if (full) cleanups.push(heroSequence(), titleReveal(), knot(), flipMorph(pathname));
+  if (full) cleanups.push(heroSequence(), titleReveal(), flipMorph(pathname));
   // Lets tests (and anything else) know the listeners exist for this route.
   html.dataset.motionReady = "";
   return () => {
@@ -40,13 +40,16 @@ export function mount(pathname: string): Cleanup {
 }
 
 /* Reveals: mark elements once they enter the viewport; CSS does the rest. */
-/** The header's thread rule appears once the page has scrolled under it. */
+/** The header ties its thread as the page scrolls: --progress is the share of the page read, data-scrolled marks any scroll. */
 function headerRule(): Cleanup {
   const header = document.querySelector<HTMLElement>("[data-site-header]");
   if (!header) return noop;
   let raf = 0;
   const update = () => {
     raf = 0;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    header.style.setProperty("--progress", progress.toFixed(4));
     if (window.scrollY > 8) header.dataset.scrolled = "";
     else delete header.dataset.scrolled;
   };
@@ -55,9 +58,12 @@ function headerRule(): Cleanup {
   };
   update();
   window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll, { passive: true });
   return () => {
     window.removeEventListener("scroll", onScroll);
+    window.removeEventListener("resize", onScroll);
     if (raf) cancelAnimationFrame(raf);
+    header.style.removeProperty("--progress");
     delete header.dataset.scrolled;
   };
 }
@@ -79,7 +85,7 @@ function revealObserver(): Cleanup {
   return () => io.disconnect();
 }
 
-/* The one orchestrated moment: thread draws, headline rises under the leaves, leaves fade in. Once per session. */
+/* The one orchestrated moment: the headline rises under the leaves, the leaves fade in. Once per session. */
 function heroSequence(): Cleanup {
   const html = document.documentElement;
   if (html.dataset.hero !== "pending") return noop;
@@ -94,7 +100,6 @@ function heroSequence(): Cleanup {
   const primary = title.querySelector<HTMLElement>(":scope > span:first-child");
   const secondary = title.querySelector<HTMLElement>(":scope > span:nth-child(2)");
   const cutout = document.querySelector<HTMLElement>(".hero-cutout");
-  const line = document.querySelector<SVGLineElement>("[data-thread] line");
 
   let done = false;
   let split: { revert: () => void } | undefined;
@@ -126,8 +131,7 @@ function heroSequence(): Cleanup {
     gsap.set(title, { perspective: 600 });
     const timeline = gsap.timeline({ onComplete: finish, defaults: { ease: ease.out } });
     tl = timeline;
-    if (line) timeline.fromTo(line, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: dur.orchestrated, ease: ease.inOut });
-    timeline.set(title, { opacity: 1 }, line ? "-=0.45" : 0);
+    timeline.set(title, { opacity: 1 }, 0);
     timeline.from(
       pieces,
       { y: move.char, rotateX: -40, opacity: 0, duration: 0.6, stagger: hindi ? stagger.word : stagger.char, ease: ease.expo },
@@ -190,53 +194,6 @@ function titleReveal(): Cleanup {
   };
 }
 
-/* The knot rides the thread with the scroll, and slides to the story row under the pointer or focus. */
-function knot(): Cleanup {
-  const knotEl = document.querySelector<HTMLElement>("[data-knot]");
-  const dot = knotEl?.querySelector<HTMLElement>("[data-knot-dot]");
-  if (!knotEl || !dot) return noop;
-  const { gsap, ScrollTrigger } = getGsap();
-
-  const ride = gsap.to(knotEl, {
-    y: () => Math.max(0, window.innerHeight - 240),
-    ease: ease.none,
-    scrollTrigger: { start: 0, end: "max", scrub: 0.6, invalidateOnRefresh: true },
-  });
-  ScrollTrigger.refresh();
-
-  let current: Element | null = null;
-  const follow = (row: Element | null) => {
-    if (row === current) return;
-    current = row;
-    if (!row) {
-      gsap.to(dot, { y: 0, duration: 0.35, ease: ease.out, overwrite: true });
-      return;
-    }
-    const rowTop = row.getBoundingClientRect().top;
-    const k = knotEl.getBoundingClientRect();
-    const delta = rowTop + 30 - (k.top + k.height / 2);
-    gsap.to(dot, { y: delta, duration: 0.35, ease: ease.out, overwrite: true });
-  };
-  const rowOf = (t: EventTarget | null) => (t instanceof Element ? t.closest("[data-story-row]") : null);
-  const onOver = (e: Event) => follow(rowOf(e.target));
-  const onFocus = (e: Event) => follow(rowOf(e.target));
-  const onBlur = (e: FocusEvent) => {
-    if (!rowOf(e.relatedTarget)) follow(null);
-  };
-  document.addEventListener("pointerover", onOver);
-  document.addEventListener("focusin", onFocus);
-  document.addEventListener("focusout", onBlur);
-
-  return () => {
-    document.removeEventListener("pointerover", onOver);
-    document.removeEventListener("focusin", onFocus);
-    document.removeEventListener("focusout", onBlur);
-    ride.scrollTrigger?.kill();
-    ride.kill();
-    gsap.set(dot, { clearProps: "transform" });
-    gsap.set(knotEl, { clearProps: "transform" });
-  };
-}
 
 /* A story cover morphs from its row into the story page. Falls back to the page fade when there is no captured state. */
 type FlipState = { id: string; state: unknown; at: number };

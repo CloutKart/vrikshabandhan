@@ -10,10 +10,10 @@ test("hero sequence frames", async ({ page }) => {
   }
 });
 
-test("knot follows a hovered story row", async ({ page }) => {
+test("the header thread at half scroll", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/en/stories");
-  await page.locator("[data-story-row]").nth(1).hover();
+  await page.evaluate(() => window.scrollTo({ top: (document.documentElement.scrollHeight - innerHeight) / 2, behavior: "instant" }));
   await page.waitForTimeout(500);
-  await page.screenshot({ path: "e2e/__screenshots__/frame-knot-hover.png" });
+  await page.screenshot({ path: "e2e/__screenshots__/frame-header-progress.png", clip: { x: 0, y: 0, width: 1440, height: 120 } });
 });
