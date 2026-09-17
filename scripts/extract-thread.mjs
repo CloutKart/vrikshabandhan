@@ -78,6 +78,47 @@ async function run(variant) {
       }
   };
 
+  // Bark for the trunk under the band: blend the rows just above and below across the gap (no streaks), then add
+  // the texture of the bark further down (its high-frequency detail), so the fill reads as paint, not as a smear.
+  const bandFill = (buf, mask, below) => {
+    const top = BAND.y - 1;
+    const box = (x, y) => {
+      const acc = [0, 0, 0, 0];
+      let n = 0;
+      for (let dy = -3; dy <= 3; dy++)
+        for (let dx = -3; dx <= 3; dx++) {
+          const X = x + dx, Y = y + dy;
+          if (X < 0 || Y < 0 || X >= W || Y >= H) continue;
+          const i = idx(X, Y);
+          for (let c = 0; c < 4; c++) acc[c] += data[i + c];
+          n++;
+        }
+      return acc.map((v) => v / n);
+    };
+    for (let x = BAND.x; x < BAND.x + BAND.w; x++) {
+      // The first clean row below the band in this column: past the loose ends, which hang below the knot.
+      let bottom = BAND.y + BAND.h;
+      while (bottom < H - 1 && below[bottom * W + x]) bottom++;
+      if (!opaque(x, top) || !opaque(x, bottom)) continue;
+      const a = idx(x, top), b = idx(x, bottom);
+      for (let y = BAND.y; y < BAND.y + BAND.h; y++) {
+        if (!mask[y * W + x]) continue;
+        const t = (y - top) / (bottom - top);
+        // Texture comes from the bark above the band as luminance only, so no colour (foliage, thread) can bleed in.
+        const sy = y - BAND.h - 8;
+        const src = idx(x, sy);
+        const mean = box(x, sy);
+        const lum = (r, g, bl) => 0.299 * r + 0.587 * g + 0.114 * bl;
+        const detail = sy > 0 ? Math.max(-40, Math.min(40, lum(data[src], data[src + 1], data[src + 2]) - lum(mean[0], mean[1], mean[2]))) : 0;
+        const o = idx(x, y);
+        for (let c = 0; c < 3; c++) {
+          const base = data[a + c] * (1 - t) + data[b + c] * t;
+          buf[o + c] = Math.max(0, Math.min(255, Math.round(base + 0.85 * detail)));
+        }
+        buf[o + 3] = 255;
+      }
+    }
+  };
   const band = maskFor(BAND, true);
   const bandOnly = maskFor(BAND, false);
   const ends = maskFor(ENDS, false);
@@ -85,6 +126,7 @@ async function run(variant) {
   await layer(ENDS, ends.mask, `public/images/tassel${suffix}.png`);
   const out = Buffer.from(data);
   inpaint(out, BAND, band.mask, [[0, -1], [0, 1]], "mean");
+  bandFill(out, band.mask, ends.mask);
   // The trunk's edge runs almost vertically through the ends, so fill them from above and below to keep it crisp.
   inpaint(out, ENDS, ends.mask, [[0, 1], [0, -1]], "nearest");
   await sharp(out, { raw: { width: W, height: H, channels: 4 } }).webp({ quality: 90, alphaQuality: 95 }).toFile(`public/images/tree-cutout${suffix}.webp`);
