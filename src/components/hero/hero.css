@@ -56,31 +56,6 @@
   background: var(--stone);
   border-radius: var(--radius-hero);
 }
-/* The frame is nothing on desktop. On phones it is a square window on the painting's right 56 %: the whole trunk,
-   the knot and the right canopy at about three times the size the whole painting would get. Every layer is placed
-   in percentages of the art, so the thread, the leaves and the moving tree stay aligned. */
-.hero-frame {
-  display: contents;
-}
-@media (max-width: 819px) {
-  .hero-frame {
-    display: block;
-    position: relative;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    background: var(--stone);
-    border-radius: var(--radius-hero);
-  }
-  .hero-art {
-    position: absolute;
-    top: 0;
-    left: -68%;
-    width: 178%;
-    height: auto;
-    border-radius: 0;
-    container-type: inline-size;
-  }
-}
 .hero-painting,
 .hero-tree,
 .hero-sway {
@@ -263,5 +238,27 @@ html[data-motion="full"] .hero-leaves {
   }
   .hero-title [lang="hi"]:first-child {
     font-size: 0.92em;
+  }
+}
+/* Phones show the square painting (its own canvas, tree and thread patches, chosen by <picture>), so the art is a
+   square and every thread patch is placed for that frame. The knot sits at about (0.86, 0.73) of the square. */
+@media (max-width: 819px) {
+  .hero-art {
+    aspect-ratio: 1 / 1;
+  }
+  .hero-thread-band {
+    left: 78.55%;
+    top: 70.33%;
+    width: 11.16%;
+    transform-origin: 71% 55%;
+  }
+  .hero-tassel {
+    left: 84.13%;
+    top: 75.12%;
+    width: 9.57%;
+  }
+  .hero-leaf {
+    left: var(--xs);
+    top: var(--ys);
   }
 }

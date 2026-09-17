@@ -219,23 +219,31 @@ test("a frame that reads wrong (a black texture, as Safari has produced) keeps t
   await context.close();
 });
 
-test("on phones the frame is a square window on the tree; on desktop it is nothing", async ({ page }) => {
+test("on phones the hero is the square painting with its own tree and thread; on desktop the wide one", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/en");
-  const frame = (await page.locator(".hero-frame").boundingBox())!;
   const art = (await page.locator(".hero-art").boundingBox())!;
-  const band = (await page.locator('img.hero-thread-band[data-variant="dark"]').boundingBox())!;
-  expect(Math.abs(frame.width - frame.height)).toBeLessThanOrEqual(1);
-  expect(frame.x).toBeGreaterThanOrEqual(0);
-  expect(frame.x + frame.width).toBeLessThanOrEqual(390);
-  expect(art.width).toBeGreaterThan(390);
-  expect(band.x).toBeGreaterThan(frame.x);
-  expect(band.x + band.width).toBeLessThan(frame.x + frame.width);
-  expect(band.y + band.height).toBeLessThan(frame.y + frame.height);
-  expect(await page.locator(".hero-frame").evaluate((el) => getComputedStyle(el).borderTopLeftRadius)).toBe("24px");
+  expect(Math.abs(art.width - art.height)).toBeLessThanOrEqual(1);
+  expect(art.x).toBeGreaterThanOrEqual(0);
+  expect(art.x + art.width).toBeLessThanOrEqual(390);
+  const tree = page.locator('img.hero-tree[data-variant="dark"]');
+  await expect.poll(() => tree.evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("tree-cutout-sq");
+  await expect.poll(() => page.locator('img.hero-painting[data-variant="dark"]').evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("canvas-sq");
+  const band = page.locator('img.hero-thread-band[data-variant="dark"]');
+  await expect.poll(() => band.evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("thread-band-sq");
+  const box = (await band.boundingBox())!;
+  expect(box.x).toBeGreaterThan(art.x + art.width / 2);
+  expect(box.y).toBeGreaterThan(art.y + art.height / 2);
+  expect(box.x + box.width).toBeLessThan(art.x + art.width);
+  expect(box.y + box.height).toBeLessThan(art.y + art.height);
+  // The moving tree draws the square frame and its first frame passes the check.
+  await expect(page.locator(".hero-art canvas.hero-sway")).toHaveCount(1);
+  await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
+  await expect(page.locator("[data-hero-leaves] .hero-leaf")).toHaveCount(9);
   const title = (await page.locator(".hero-title").boundingBox())!;
   const lede = (await page.getByText(/Since 2005 we have planted/).boundingBox())!;
   expect(Math.abs(title.x - lede.x), "title and lede share a left edge").toBeLessThanOrEqual(1);
   await page.setViewportSize({ width: 1440, height: 900 });
-  expect(await page.locator(".hero-frame").evaluate((el) => getComputedStyle(el).display)).toBe("contents");
+  await expect.poll(() => tree.evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("tree-cutout.");
+  await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
 });

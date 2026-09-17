@@ -14,10 +14,51 @@
  */
 type Cleanup = () => void;
 
+/**
+ * Two paintings, two geometries: the wide one on desktop and the square one on phones (chosen by <picture>). Each
+ * has its trunk axis, its joints and the two pixels that prove a drawn frame. Positions are in units of the width.
+ */
+type Body = { pivot: readonly [number, number]; degrees: number; lag: number };
+type Frame = {
+  aspect: number;
+  axis: Array<[number, number]>;
+  crown: Body;
+  left: Body & { blend: [number, number] };
+  right: Body & { blend: [number, number]; rows: [number, number] };
+  trunk: { below: number; within: number };
+  check: { trunk: [number, number]; ground: [number, number] };
+};
+const FRAMES: Record<"wide" | "square", Frame> = {
+  wide: {
+    aspect: 1672 / 941,
+    axis: [
+      [0.815, 1.0],
+      [0.81, 0.8],
+      [0.79, 0.68],
+      [0.76, 0.56],
+    ],
+    crown: { pivot: [0.76, 0.56], degrees: 0.6, lag: 0 }, // the whole crown, the slow lean
+    left: { pivot: [0.69, 0.48], degrees: 1.0, lag: 0.35, blend: [0.62, 0.55] }, // the long bough and its canopy
+    right: { pivot: [0.8, 0.55], degrees: 1.2, lag: 0.25, blend: [0.86, 0.9], rows: [0.75, 0.6] }, // the right-hand branches
+    trunk: { below: 0.6, within: 0.1 },
+    check: { trunk: [0.815, 0.92], ground: [0.5, 0.99] },
+  },
+  square: {
+    aspect: 1,
+    axis: [
+      [0.85, 1.0],
+      [0.845, 0.84],
+      [0.83, 0.72],
+      [0.8, 0.62],
+    ],
+    crown: { pivot: [0.8, 0.62], degrees: 0.6, lag: 0 },
+    left: { pivot: [0.66, 0.56], degrees: 1.0, lag: 0.35, blend: [0.66, 0.58] },
+    right: { pivot: [0.87, 0.6], degrees: 1.2, lag: 0.25, blend: [0.86, 0.92], rows: [0.78, 0.62] },
+    trunk: { below: 0.65, within: 0.1 },
+    check: { trunk: [0.85, 0.95], ground: [0.2, 0.97] },
+  },
+};
 const WIND = {
-  crown: { pivot: [0.76, 0.56] as const, degrees: 0.6, lag: 0 }, // the whole crown, the slow lean
-  left: { pivot: [0.69, 0.48] as const, degrees: 1.0, lag: 0.35 }, // the long bough and its canopy
-  right: { pivot: [0.8, 0.55] as const, degrees: 1.2, lag: 0.25 }, // the right-hand branches
   tremor: 0.0015, // foliage shimmer, share of the width
   periods: [6.1, 2.7, 1.1], // slow lean, medium sway, fine tremor
   weights: [0.55, 0.3, 0.15],
@@ -25,14 +66,6 @@ const WIND = {
 };
 const COLS = 48;
 const ROWS = 28;
-const ASPECT = 1672 / 941;
-/** The trunk, bottom to fork. Points near it belong to no body. */
-const AXIS: Array<[number, number]> = [
-  [0.815, 1.0],
-  [0.81, 0.8],
-  [0.79, 0.68],
-  [0.76, 0.56],
-];
 
 const VERT = `
 attribute vec2 a_pos;
@@ -44,13 +77,13 @@ uniform vec2 u_pivotCrown;
 uniform vec2 u_pivotLeft;
 uniform vec2 u_pivotRight;
 uniform float u_tremor;
+uniform float u_aspect;
 varying vec2 v_uv;
-const float ASPECT = ${ASPECT.toFixed(5)};
 vec2 turn(vec2 p, vec2 pivot, float a) {
-  vec2 q = vec2(p.x - pivot.x, (p.y - pivot.y) / ASPECT);
+  vec2 q = vec2(p.x - pivot.x, (p.y - pivot.y) / u_aspect);
   float c = cos(a), s = sin(a);
   q = vec2(q.x * c - q.y * s, q.x * s + q.y * c);
-  return vec2(q.x + pivot.x, q.y * ASPECT + pivot.y);
+  return vec2(q.x + pivot.x, q.y * u_aspect + pivot.y);
 }
 void main() {
   vec2 p = a_pos;
@@ -69,12 +102,12 @@ void main() {
   gl_FragColor = texture2D(u_tex, v_uv);
 }`;
 
-function distanceToAxis(x: number, y: number): number {
-  const px = x, py = y / ASPECT;
+function distanceToAxis(x: number, y: number, f: Frame): number {
+  const px = x, py = y / f.aspect;
   let best = Infinity;
-  for (let i = 0; i < AXIS.length - 1; i++) {
-    const [ax, ay0] = AXIS[i], [bx, by0] = AXIS[i + 1];
-    const ay = ay0 / ASPECT, by = by0 / ASPECT;
+  for (let i = 0; i < f.axis.length - 1; i++) {
+    const [ax, ay0] = f.axis[i], [bx, by0] = f.axis[i + 1];
+    const ay = ay0 / f.aspect, by = by0 / f.aspect;
     const vx = bx - ax, vy = by - ay;
     const t = Math.max(0, Math.min(1, ((px - ax) * vx + (py - ay) * vy) / (vx * vx + vy * vy)));
     best = Math.min(best, Math.hypot(px - (ax + t * vx), py - (ay + t * vy)));
@@ -88,17 +121,17 @@ function smoothstep(a: number, b: number, x: number): number {
 }
 
 /** Body weights for a point: crown, left bough, right branches. The trunk gets none. */
-export function weightsAt(x: number, y: number): [number, number, number] {
-  const d = distanceToAxis(x, y);
-  const trunk = y > 0.6 && d < 0.1 ? 0 : smoothstep(0.02, 0.09, d);
-  const left = smoothstep(0.62, 0.55, x); // 1 left of the bough's base, blending in over 0.55 to 0.62
-  const right = smoothstep(0.86, 0.9, x) * smoothstep(0.75, 0.6, y); // the branches leaving the trunk to the right
+export function weightsAt(x: number, y: number, f: Frame = FRAMES.wide): [number, number, number] {
+  const d = distanceToAxis(x, y, f);
+  const trunk = y > f.trunk.below && d < f.trunk.within ? 0 : smoothstep(0.02, 0.09, d);
+  const left = smoothstep(f.left.blend[0], f.left.blend[1], x); // 1 left of the bough's base, blending in at the joint
+  const right = smoothstep(f.right.blend[0], f.right.blend[1], x) * smoothstep(f.right.rows[0], f.right.rows[1], y); // the branches leaving the trunk to the right
   return [trunk, trunk * left, trunk * right];
 }
 
 /** How much a point trembles: the foliage, not the wood. */
-export function leafAt(x: number, y: number): number {
-  return smoothstep(0.25, 0.5, distanceToAxis(x, y));
+export function leafAt(x: number, y: number, f: Frame = FRAMES.wide): number {
+  return smoothstep(0.25, 0.5, distanceToAxis(x, y, f));
 }
 
 function gust(t: number): number {
@@ -140,15 +173,18 @@ export function treeSway(): Cleanup {
   gl.useProgram(program);
 
   const positions: number[] = [];
-  const weights: number[] = [];
-  const leaf: number[] = [];
   for (let r = 0; r <= ROWS; r++)
-    for (let c = 0; c <= COLS; c++) {
-      const x = c / COLS, y = r / ROWS;
-      positions.push(x, y);
-      weights.push(...weightsAt(x, y));
-      leaf.push(leafAt(x, y));
-    }
+    for (let c = 0; c <= COLS; c++) positions.push(c / COLS, r / ROWS);
+  const bodies = (f: Frame) => {
+    const weights: number[] = [];
+    const leaf: number[] = [];
+    for (let r = 0; r <= ROWS; r++)
+      for (let c = 0; c <= COLS; c++) {
+        weights.push(...weightsAt(c / COLS, r / ROWS, f));
+        leaf.push(leafAt(c / COLS, r / ROWS, f));
+      }
+    return { weights, leaf };
+  };
   const indices: number[] = [];
   for (let r = 0; r < ROWS; r++)
     for (let c = 0; c < COLS; c++) {
@@ -162,22 +198,36 @@ export function treeSway(): Cleanup {
     const loc = gl.getAttribLocation(program, name);
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, size, gl.FLOAT, false, 0, 0);
+    return buf;
   };
   bind("a_pos", positions, 2);
-  bind("a_w", weights, 3);
-  bind("a_leaf", leaf, 1);
+  const first = bodies(FRAMES.wide);
+  const weightBuf = bind("a_w", first.weights, 3);
+  const leafBuf = bind("a_leaf", first.leaf, 1);
   const ibo = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
   const u = (name: string) => gl.getUniformLocation(program, name);
-  gl.uniform2fv(u("u_pivotCrown"), WIND.crown.pivot as unknown as number[]);
-  gl.uniform2fv(u("u_pivotLeft"), WIND.left.pivot as unknown as number[]);
-  gl.uniform2fv(u("u_pivotRight"), WIND.right.pivot as unknown as number[]);
   gl.uniform1f(u("u_tremor"), WIND.tremor);
   const uT = u("u_t");
   const uAngles = u("u_angles");
   const rad = Math.PI / 180;
+  // The frame follows the image the browser chose: square on phones, wide elsewhere.
+  let geo: Frame = FRAMES.wide;
+  const setFrame = (f: Frame) => {
+    geo = f;
+    gl.uniform2fv(u("u_pivotCrown"), f.crown.pivot as unknown as number[]);
+    gl.uniform2fv(u("u_pivotLeft"), f.left.pivot as unknown as number[]);
+    gl.uniform2fv(u("u_pivotRight"), f.right.pivot as unknown as number[]);
+    gl.uniform1f(u("u_aspect"), f.aspect);
+    const b = bodies(f);
+    gl.bindBuffer(gl.ARRAY_BUFFER, weightBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(b.weights), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, leafBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(b.leaf), gl.STATIC_DRAW);
+  };
+  setFrame(FRAMES.wide);
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
@@ -220,6 +270,9 @@ export function treeSway(): Cleanup {
       if (!ctx) return;
       ctx.clearRect(0, 0, scratch.width, scratch.height);
       ctx.drawImage(img, 0, 0);
+      const square = Math.abs(img.naturalWidth / img.naturalHeight - 1) < 0.05;
+      const next = square ? FRAMES.square : FRAMES.wide;
+      if (next !== geo) setFrame(next);
       gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, scratch);
       textured = true;
@@ -235,6 +288,11 @@ export function treeSway(): Cleanup {
   upload();
   const themeObserver = new MutationObserver(upload);
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  // The <picture> swaps its source when the viewport crosses the phone width: the image loads again, so re-upload.
+  const phone = window.matchMedia("(max-width: 819px)");
+  const onFrameChange = () => upload();
+  phone.addEventListener("change", onFrameChange);
+  images.forEach((img) => img.addEventListener("load", onFrameChange));
 
   // Two pixels prove a frame: the trunk (opaque and pale in both cut-outs) and the empty ground below the crown
   // (fully transparent). A browser that uploaded the texture as opaque black, or lost the context, fails this and
@@ -246,8 +304,8 @@ export function treeSway(): Cleanup {
   };
   const frameLooksRight = () => {
     if (gl.getError() !== gl.NO_ERROR) return false;
-    const trunk = read(0.815, 0.92);
-    const ground = read(0.5, 0.99);
+    const trunk = read(...geo.check.trunk);
+    const ground = read(...geo.check.ground);
     return trunk[3] > 200 && trunk[0] + trunk[1] + trunk[2] > 60 && ground[3] === 0;
   };
 
@@ -277,9 +335,9 @@ export function treeSway(): Cleanup {
     gl.uniform1f(uT, t);
     gl.uniform3f(
       uAngles,
-      WIND.crown.degrees * rad * gust(t - WIND.crown.lag),
-      WIND.left.degrees * rad * gust(t - WIND.left.lag),
-      WIND.right.degrees * rad * gust(t - WIND.right.lag),
+      geo.crown.degrees * rad * gust(t - geo.crown.lag),
+      geo.left.degrees * rad * gust(t - geo.left.lag),
+      geo.right.degrees * rad * gust(t - geo.right.lag),
     );
     gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
     if (!verified) {
@@ -299,6 +357,8 @@ export function treeSway(): Cleanup {
     cancelAnimationFrame(raf);
     ro.disconnect();
     themeObserver.disconnect();
+    phone.removeEventListener("change", onFrameChange);
+    images.forEach((img) => img.removeEventListener("load", onFrameChange));
     canvas.removeEventListener("webglcontextlost", onLost);
     delete art.dataset.sway;
     canvas.remove();

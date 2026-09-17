@@ -6,11 +6,11 @@ import type { CSSProperties } from "react";
  * leaf colours with the same dark edge and midrib), size, timing, drift and spin,
  * They start inside the
  * canopy, behind the cut-out, so they appear to come out of the tree rather than
- * out of the air. Decorative: hidden from assistive tech, and not rendered at all
+ * out of the air; x/y are origins on the wide painting, xs/ys on the square one phones show. Decorative: hidden from assistive tech, and not rendered at all
  * under reduced motion or on phones. hero.css does the falling.
  */
 type Shape = "ovate" | "narrow" | "broad" | "heart" | "toothed";
-type Leaf = { x: number; y: number; size: number; colour: "green" | "blue" | "gold"; shape: Shape; duration: number; delay: number; drift: number; spin: number; flip?: boolean };
+type Leaf = { x: number; y: number; xs: number; ys: number; size: number; colour: "green" | "blue" | "gold"; shape: Shape; duration: number; delay: number; drift: number; spin: number; flip?: boolean };
 
 /** Leaf outlines and midribs in a 32x18 box, tip to the right. */
 const SHAPES: Record<Shape, { outline: string; rib: string }> = {
@@ -22,15 +22,15 @@ const SHAPES: Record<Shape, { outline: string; rib: string }> = {
 };
 
 const LEAVES: Leaf[] = [
-  { x: 7, y: 26, size: 30, colour: "green", shape: "ovate", duration: 8.5, delay: 0, drift: 26, spin: 250 },
-  { x: 15, y: 30, size: 24, colour: "gold", shape: "narrow", duration: 10, delay: 2.2, drift: 18, spin: 210, flip: true },
-  { x: 25, y: 27, size: 32, colour: "blue", shape: "broad", duration: 9, delay: 4.6, drift: 30, spin: 300 },
-  { x: 36, y: 33, size: 22, colour: "green", shape: "heart", duration: 7.5, delay: 1.4, drift: 22, spin: 180 },
-  { x: 45, y: 35, size: 28, colour: "gold", shape: "toothed", duration: 11, delay: 6.1, drift: 34, spin: 240, flip: true },
-  { x: 54, y: 37, size: 26, colour: "green", shape: "narrow", duration: 8, delay: 3.3, drift: 20, spin: 270 },
-  { x: 63, y: 38, size: 30, colour: "blue", shape: "ovate", duration: 9.5, delay: 7.4, drift: 28, spin: 200 },
-  { x: 73, y: 31, size: 23, colour: "gold", shape: "heart", duration: 8.8, delay: 5.2, drift: 16, spin: 230, flip: true },
-  { x: 81, y: 27, size: 27, colour: "green", shape: "broad", duration: 10.5, delay: 0.9, drift: 24, spin: 190 },
+  { x: 7, y: 26, xs: 7, ys: 46, size: 30, colour: "green", shape: "ovate", duration: 8.5, delay: 0, drift: 26, spin: 250 },
+  { x: 15, y: 30, xs: 15, ys: 48, size: 24, colour: "gold", shape: "narrow", duration: 10, delay: 2.2, drift: 18, spin: 210, flip: true },
+  { x: 25, y: 27, xs: 25, ys: 51, size: 32, colour: "blue", shape: "broad", duration: 9, delay: 4.6, drift: 30, spin: 300 },
+  { x: 36, y: 33, xs: 36, ys: 56, size: 22, colour: "green", shape: "heart", duration: 7.5, delay: 1.4, drift: 22, spin: 180 },
+  { x: 45, y: 35, xs: 45, ys: 62, size: 28, colour: "gold", shape: "toothed", duration: 11, delay: 6.1, drift: 34, spin: 240, flip: true },
+  { x: 54, y: 37, xs: 54, ys: 68, size: 26, colour: "green", shape: "narrow", duration: 8, delay: 3.3, drift: 20, spin: 270 },
+  { x: 63, y: 38, xs: 63, ys: 70, size: 30, colour: "blue", shape: "ovate", duration: 9.5, delay: 7.4, drift: 28, spin: 200 },
+  { x: 73, y: 31, xs: 73, ys: 58, size: 23, colour: "gold", shape: "heart", duration: 8.8, delay: 5.2, drift: 16, spin: 230, flip: true },
+  { x: 81, y: 27, xs: 81, ys: 46, size: 27, colour: "green", shape: "broad", duration: 10.5, delay: 0.9, drift: 24, spin: 190 },
 ];
 
 export function HeroLeaves() {
@@ -48,6 +48,8 @@ export function HeroLeaves() {
               {
                 "--x": `${l.x}cqw`,
                 "--y": `${l.y}cqw`,
+                "--xs": `${l.xs}cqw`,
+                "--ys": `${l.ys}cqw`,
                 "--size": l.size,
                 "--duration": `${l.duration}s`,
                 "--delay": `${l.delay}s`,

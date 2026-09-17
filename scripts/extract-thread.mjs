@@ -1,23 +1,30 @@
 /**
  * Lifts the raksha sutra off the hero cut-outs so it can move on its own layers.
  *   node scripts/extract-thread.mjs
- * Reads assets/painting/tree-cutout*.webp (untouched sources) and writes, per theme:
+ * Reads assets/painting/tree-cutout*.webp (untouched sources) and writes, per frame and theme:
  *   public/images/thread-band*.png   the band and the knot round the trunk
  *   public/images/tassel*.png        the two loose ends below the knot
  *   public/images/tree-cutout*.webp  the tree with the thread painted out
  * The trunk under the band is filled from the rows above and below it (its sides are transparent);
  * the ground under the ends is filled from the pixels to their left and right.
+ * Two frames: the wide painting (1672x941, desktop) and the square one (1254x1254, phones).
  */
 import sharp from "sharp";
 
-const BAND = { x: 1290, y: 722, w: 190, h: 56 };
-const ENDS = { x: 1330, y: 778, w: 150, h: 102 };
+const FRAMES = {
+  wide: { name: "tree-cutout", BAND: { x: 1290, y: 722, w: 190, h: 56 }, ENDS: { x: 1330, y: 778, w: 150, h: 102 }, smooth: false, bandFillMode: "mean", bandDirs: [[0, -1], [0, 1]], endsDirs: [[0, 1], [0, -1]] },
+  // The square trunk carries heavier knife strokes, so its fill starts from box-averaged rows (single pixels would
+  // stripe), and its edge slants under the loose ends, so those are filled from the nearest side in any direction.
+  square: { name: "tree-cutout-sq", BAND: { x: 985, y: 882, w: 140, h: 60 }, ENDS: { x: 1055, y: 942, w: 120, h: 104 }, smooth: true, bandFillMode: "nearest", bandDirs: [[1, 0], [-1, 0], [0, 1], [0, -1]], endsDirs: [[1, 0], [-1, 0], [0, 1], [0, -1]] },
+};
 // Red and orange, including the darker shadowed strands along the edges of the band.
 const isThread = (r, g, b, a) => a > 128 && r > 90 && r - g > 30 && r - b > 40;
 
-async function run(variant) {
+async function run(frame, variant) {
+  const { BAND, ENDS, smooth, bandFillMode, bandDirs, endsDirs } = FRAMES[frame];
   const suffix = variant === "light" ? "-light" : "";
-  const { data, info } = await sharp(`assets/painting/tree-cutout${suffix}.webp`).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const base = FRAMES[frame].name;
+  const { data, info } = await sharp(`assets/painting/${base}${suffix}.webp`).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: W, height: H } = info;
   const idx = (x, y) => (y * W + x) * 4;
 
@@ -101,6 +108,8 @@ async function run(variant) {
       while (bottom < H - 1 && below[bottom * W + x]) bottom++;
       if (!opaque(x, top) || !opaque(x, bottom)) continue;
       const a = idx(x, top), b = idx(x, bottom);
+      const above = smooth ? box(x, top - 3) : [data[a], data[a + 1], data[a + 2]];
+      const under = smooth ? box(x, bottom + 3) : [data[b], data[b + 1], data[b + 2]];
       for (let y = BAND.y; y < BAND.y + BAND.h; y++) {
         if (!mask[y * W + x]) continue;
         const t = (y - top) / (bottom - top);
@@ -112,7 +121,7 @@ async function run(variant) {
         const detail = sy > 0 ? Math.max(-40, Math.min(40, lum(data[src], data[src + 1], data[src + 2]) - lum(mean[0], mean[1], mean[2]))) : 0;
         const o = idx(x, y);
         for (let c = 0; c < 3; c++) {
-          const base = data[a + c] * (1 - t) + data[b + c] * t;
+          const base = above[c] * (1 - t) + under[c] * t;
           buf[o + c] = Math.max(0, Math.min(255, Math.round(base + 0.85 * detail)));
         }
         buf[o + 3] = 255;
@@ -122,16 +131,18 @@ async function run(variant) {
   const band = maskFor(BAND, true);
   const bandOnly = maskFor(BAND, false);
   const ends = maskFor(ENDS, false);
-  await layer(BAND, bandOnly.mask, `public/images/thread-band${suffix}.png`);
-  await layer(ENDS, ends.mask, `public/images/tassel${suffix}.png`);
+  await layer(BAND, bandOnly.mask, `public/images/${base.replace("tree-cutout", "thread-band")}${suffix}.png`);
+  await layer(ENDS, ends.mask, `public/images/${base.replace("tree-cutout", "tassel")}${suffix}.png`);
   const out = Buffer.from(data);
-  inpaint(out, BAND, band.mask, [[0, -1], [0, 1]], "mean");
+  inpaint(out, BAND, band.mask, bandDirs, bandFillMode);
   bandFill(out, band.mask, ends.mask);
   // The trunk's edge runs almost vertically through the ends, so fill them from above and below to keep it crisp.
-  inpaint(out, ENDS, ends.mask, [[0, 1], [0, -1]], "nearest");
-  await sharp(out, { raw: { width: W, height: H, channels: 4 } }).webp({ quality: 90, alphaQuality: 95 }).toFile(`public/images/tree-cutout${suffix}.webp`);
-  console.log(`${variant}: band ${band.count} px, ends ${ends.count} px lifted`);
+  inpaint(out, ENDS, ends.mask, endsDirs, "nearest");
+  await sharp(out, { raw: { width: W, height: H, channels: 4 } }).webp({ quality: 90, alphaQuality: 95 }).toFile(`public/images/${base}${suffix}.webp`);
+  console.log(`${frame} ${variant}: band ${band.count} px, ends ${ends.count} px lifted`);
 }
 
-await run("dark");
-await run("light");
+for (const frame of Object.keys(FRAMES)) {
+  await run(frame, "dark");
+  await run(frame, "light");
+}
