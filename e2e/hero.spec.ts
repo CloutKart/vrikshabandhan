@@ -23,7 +23,7 @@ test("the painting is the priority image and describes itself", async ({ page })
   const fetchPriority = await painting.getAttribute("fetchpriority");
   expect(preloads > 0 || fetchPriority === "high").toBe(true);
   await expect(painting).toHaveAttribute("alt", /raksha sutra/);
-  await expect(page.locator('img.hero-cutout[data-variant="dark"]')).toHaveAttribute("alt", "");
+  await expect(page.locator('img.hero-cutout:not(.hero-tassel)[data-variant="dark"]')).toHaveAttribute("alt", "");
   // The light variants exist for the light theme but are never fetched while hidden.
   await expect(page.locator('img.hero-painting[data-variant="light"]')).toHaveAttribute("loading", "lazy");
   await expect(page.locator('img.hero-painting[data-variant="light"]')).toBeHidden();
@@ -35,13 +35,39 @@ test("the light theme shows the cream painting and its cut-out, and keeps the de
   await page.goto("/en");
   await expect(page.locator('img.hero-painting[data-variant="light"]')).toBeVisible();
   await expect(page.locator('img.hero-painting[data-variant="dark"]')).toBeHidden();
-  await expect(page.locator('img.hero-cutout[data-variant="light"]')).toBeVisible();
-  await expect(page.locator('img.hero-cutout[data-variant="dark"]')).toBeHidden();
+  await expect(page.locator('img.hero-cutout:not(.hero-tassel)[data-variant="light"]')).toBeVisible();
+  await expect(page.locator('img.hero-cutout:not(.hero-tassel)[data-variant="dark"]')).toBeHidden();
   // The headline sits under the leaves: its top is above the canopy's lower edge (about 72% of the art height).
   const art = await page.locator(".hero-art").boundingBox();
   const title = await page.locator("h1").boundingBox();
   expect(title!.y).toBeLessThan(art!.y + art!.height * 0.7);
   expect(title!.width).toBeGreaterThan(art!.width * 0.3);
+});
+
+test("the thread's loose ends are their own layer and drift only with full motion on desktop", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/en");
+  await expect(page.locator("img.hero-tassel")).toHaveCount(2);
+  await expect(page.locator('img.hero-tassel[data-variant="dark"]')).toHaveAttribute("alt", "");
+  await expect(page.locator('img.hero-tassel[data-variant="light"]')).toBeHidden();
+  const tassel = page.locator('img.hero-tassel[data-variant="dark"]');
+  await expect(tassel).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
+  await expect.poll(() => tassel.evaluate((el) => getComputedStyle(el).animationName)).toBe("tassel-sway");
+  const art = await page.locator(".hero-art").boundingBox();
+  const box = await tassel.boundingBox();
+  expect(box!.x).toBeGreaterThan(art!.x + art!.width / 2);
+  expect(box!.y).toBeGreaterThan(art!.y + art!.height / 2);
+  await page.setViewportSize({ width: 390, height: 800 });
+  await expect(tassel).toBeHidden();
+});
+
+test("with reduced motion the loose ends hold still", async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
+  await page.goto("/en");
+  expect(await page.locator('img.hero-tassel[data-variant="dark"]').evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+  await context.close();
 });
 
 test("the hero calls to action are real links", async ({ page }) => {

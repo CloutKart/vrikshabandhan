@@ -68,6 +68,9 @@ export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNod
             className="hero-cutout"
             data-variant="light"
           />
+          {/* The thread's loose ends, lifted off the cut-out so they can drift. Same theme switch and fade as the cut-out. */}
+          <Image src="/images/tassel.png" alt="" width={150} height={120} loading="lazy" className="hero-cutout hero-tassel" data-variant="dark" />
+          <Image src="/images/tassel-light.png" alt="" width={150} height={120} loading="lazy" className="hero-cutout hero-tassel" data-variant="light" />
         </div>
         <BilingualHeading
           as="h1"

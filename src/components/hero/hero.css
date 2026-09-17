@@ -69,6 +69,29 @@
 .hero-cutout {
   z-index: 2;
 }
+/* The thread's loose ends: a 150x120 patch at the knot (x 1330, y 760 of the 1672x941 frame) that drifts a little. */
+.hero-tassel {
+  inset: auto;
+  left: 79.55%;
+  top: 80.77%;
+  width: 8.97%;
+  height: auto;
+  z-index: 3;
+  transform-origin: 50% 0;
+}
+@keyframes tassel-sway {
+  from {
+    transform: rotate(-1.4deg) translateX(-0.6px);
+  }
+  to {
+    transform: rotate(1.4deg) translateX(0.6px);
+  }
+}
+@media (min-width: 820px) {
+  html[data-motion="full"] .hero-tassel {
+    animation: tassel-sway 7s ease-in-out infinite alternate;
+  }
+}
 /* One painting per theme. The cut-out only exists from 820 px up, where the headline sits under the leaves. */
 .hero-painting[data-variant="light"],
 .hero-cutout {
