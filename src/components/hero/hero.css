@@ -103,11 +103,11 @@
   .hero-title {
     position: absolute;
     z-index: 1;
-    left: 4.5cqw;
-    bottom: 3.4cqw;
+    left: 5cqw;
+    bottom: 4.6cqw;
     margin: 0;
-    max-width: 46cqw;
-    font-size: 7cqw;
+    max-width: 52cqw;
+    font-size: 8.2cqw;
     line-height: 0.98;
     color: var(--stone-ink);
   }
