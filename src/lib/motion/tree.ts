@@ -320,11 +320,12 @@ export function treeSway(): Cleanup {
   };
 
   // The backing store follows the pinch zoom too (visualViewport.scale): a zoomed-in tree is redrawn at the
-  // zoomed density instead of being stretched, within a 4096 px width so no device runs out of texture.
+  // zoomed density instead of being stretched, within a 3072 px width: a square at that size stays well under the
+  // 16.7 million pixel canvas limit of iOS Safari.
   const resize = () => {
     const zoom = window.visualViewport?.scale || 1;
     const cw = Math.max(1, art.clientWidth);
-    const dpr = Math.min((window.devicePixelRatio || 1) * zoom, maxDpr() * zoom, 4096 / cw);
+    const dpr = Math.min((window.devicePixelRatio || 1) * zoom, maxDpr() * zoom, 3072 / cw);
     const w = Math.round(cw * dpr), h = Math.round(art.clientHeight * dpr);
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
