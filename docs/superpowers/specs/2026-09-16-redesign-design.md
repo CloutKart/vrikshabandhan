@@ -53,7 +53,7 @@ Theme: `data-theme` on `<html>`, defaults to dark, honours a stored choice, `col
 - Tiro Devanagari Hindi 400 and 400 italic, loaded via `next/font/google` twice (`latin`, `devanagari` subsets).
   Display headlines show both languages: the current locale first, the other beneath at 0.55× with its own `lang`.
   Devanagari lines get 0.92× the English size and 1.25 line-height (matras need it). Hierarchy by size, not weight:
-  hero `clamp(3rem, 9vw, 8.5rem)`, page title 3.5–5 rem, section 2.25 rem, body 1.125 rem / 1.7, reading column 65ch.
+  hero 8.2cqw of the painting (clamp(2.5rem, 11vw, 4rem) on phones), page title 3.5–5 rem, section 2.25 rem, body 1.125 rem / 1.7, reading column 65ch.
 - Mukta 400/500 for navigation, chips, form labels, dates. No all-caps, no tracked-out labels, no eyebrows.
 - Copy rules: sentence case; comma or line break instead of middle dots ("11 December 2023, Dehradun"); no em dashes;
   no epigrams or "X is not Y, it is Z" cadence; CTAs say what happens ("Read the letter", "Send a photo").
