@@ -23,55 +23,17 @@ export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNod
       <div className="hero-grid">
       <div className="hero-canvas">
         <div className="hero-art">
-          {/* Two paintings, one per theme: the grey canvas for the dark ground, the cream one for the light. CSS shows one; the hidden one is lazy, so it is never fetched. */}
-          <Image
-            src="/images/tree-painting.jpg"
-            alt={t("paintingAlt")}
-            width={1672}
-            height={941}
-            priority
-            fetchPriority="high"
-            quality={55}
-            sizes="(min-width: 820px) min(100vw, 153vh), 100vw"
-            className="hero-painting"
-            data-variant="dark"
-          />
-          <Image
-            src="/images/tree-painting-light.jpg"
-            alt={t("paintingAlt")}
-            width={1672}
-            height={941}
-            loading="lazy"
-            quality={55}
-            sizes="(min-width: 820px) min(100vw, 153vh), 100vw"
-            className="hero-painting"
-            data-variant="light"
-          />
-          <Image
-            src="/images/tree-cutout.webp"
-            alt=""
-            width={1672}
-            height={941}
-            quality={70}
-            loading="lazy"
-            sizes="(min-width: 820px) min(100vw, 153vh), 100vw"
-            className="hero-cutout"
-            data-variant="dark"
-          />
-          <Image
-            src="/images/tree-cutout-light.webp"
-            alt=""
-            width={1672}
-            height={941}
-            quality={70}
-            loading="lazy"
-            sizes="(min-width: 820px) min(100vw, 153vh), 100vw"
-            className="hero-cutout"
-            data-variant="light"
-          />
-          {/* The thread's loose ends, lifted off the cut-out so they can drift. Same theme switch and fade as the cut-out. */}
-          <Image src="/images/tassel.png" alt="" width={150} height={120} loading="lazy" className="hero-cutout hero-tassel" data-variant="dark" />
-          <Image src="/images/tassel-light.png" alt="" width={150} height={120} loading="lazy" className="hero-cutout hero-tassel" data-variant="light" />
+          {/* Layers, back to front: the bare canvas (one per theme), the headline, the falling leaves, the tree (a still
+              image, or the WebGL canvas that moves it), then the thread in two parts: the band with the knot, and the
+              loose ends. Hidden variants are lazy, so they are never fetched. */}
+          <Image src="/images/canvas.jpg" alt="" width={1672} height={941} priority fetchPriority="high" quality={55} sizes="(min-width: 820px) min(100vw, 153vh), 100vw" className="hero-painting" data-variant="dark" />
+          <Image src="/images/canvas-light.jpg" alt="" width={1672} height={941} loading="lazy" quality={55} sizes="(min-width: 820px) min(100vw, 153vh), 100vw" className="hero-painting" data-variant="light" />
+          <Image src="/images/tree-cutout.webp" alt={t("paintingAlt")} width={1672} height={941} priority fetchPriority="high" quality={70} sizes="(min-width: 820px) min(100vw, 153vh), 100vw" className="hero-cutout hero-tree" data-variant="dark" />
+          <Image src="/images/tree-cutout-light.webp" alt={t("paintingAlt")} width={1672} height={941} loading="lazy" quality={70} sizes="(min-width: 820px) min(100vw, 153vh), 100vw" className="hero-cutout hero-tree" data-variant="light" />
+          <Image src="/images/thread-band.png" alt="" width={190} height={56} loading="lazy" className="hero-cutout hero-thread-band" data-variant="dark" />
+          <Image src="/images/thread-band-light.png" alt="" width={190} height={56} loading="lazy" className="hero-cutout hero-thread-band" data-variant="light" />
+          <Image src="/images/tassel.png" alt="" width={150} height={102} loading="lazy" className="hero-cutout hero-tassel" data-variant="dark" />
+          <Image src="/images/tassel-light.png" alt="" width={150} height={102} loading="lazy" className="hero-cutout hero-tassel" data-variant="light" />
           <HeroLeaves />
         </div>
         <BilingualHeading

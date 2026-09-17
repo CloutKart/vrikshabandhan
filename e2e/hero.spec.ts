@@ -14,19 +14,23 @@ test("the Hindi home page leads with the Hindi line", async ({ page }) => {
   await expect(first).toHaveAttribute("lang", "hi");
 });
 
-test("the painting is the priority image and describes itself", async ({ page }) => {
+test("the tree is the priority image and describes itself; the canvas behind it is bare", async ({ page }) => {
   await page.goto("/en");
-  const painting = page.locator('img.hero-painting[data-variant="dark"]');
+  const tree = page.locator('img.hero-tree[data-variant="dark"]');
   // next/image "priority": never lazy, and either a preload link or fetchpriority=high.
-  expect(await painting.getAttribute("loading")).not.toBe("lazy");
-  const preloads = await page.locator('link[rel="preload"][as="image"][imagesrcset*="tree-painting"]').count();
-  const fetchPriority = await painting.getAttribute("fetchpriority");
+  expect(await tree.getAttribute("loading")).not.toBe("lazy");
+  const preloads = await page.locator('link[rel="preload"][as="image"][imagesrcset*="tree-cutout"]').count();
+  const fetchPriority = await tree.getAttribute("fetchpriority");
   expect(preloads > 0 || fetchPriority === "high").toBe(true);
-  await expect(painting).toHaveAttribute("alt", /raksha sutra/);
-  await expect(page.locator('img.hero-cutout:not(.hero-tassel)[data-variant="dark"]')).toHaveAttribute("alt", "");
+  await expect(tree).toHaveAttribute("alt", /raksha sutra/);
+  // The background is the bare canvas, so nothing is ever painted twice behind the moving tree.
+  const canvas = page.locator('img.hero-painting[data-variant="dark"]');
+  await expect(canvas).toHaveAttribute("alt", "");
+  expect(await canvas.getAttribute("src")).toContain("canvas");
   // The light variants exist for the light theme but are never fetched while hidden.
   await expect(page.locator('img.hero-painting[data-variant="light"]')).toHaveAttribute("loading", "lazy");
   await expect(page.locator('img.hero-painting[data-variant="light"]')).toBeHidden();
+  await expect(page.locator('img.hero-tree[data-variant="light"]')).toBeHidden();
 });
 
 test("the light theme shows the cream painting and its cut-out, and keeps the depth", async ({ page }) => {
@@ -35,8 +39,8 @@ test("the light theme shows the cream painting and its cut-out, and keeps the de
   await page.goto("/en");
   await expect(page.locator('img.hero-painting[data-variant="light"]')).toBeVisible();
   await expect(page.locator('img.hero-painting[data-variant="dark"]')).toBeHidden();
-  await expect(page.locator('img.hero-cutout:not(.hero-tassel)[data-variant="light"]')).toBeVisible();
-  await expect(page.locator('img.hero-cutout:not(.hero-tassel)[data-variant="dark"]')).toBeHidden();
+  await expect(page.locator('img.hero-tree[data-variant="light"]')).toBeVisible();
+  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toBeHidden();
   // The headline sits under the leaves: its top is above the canopy's lower edge (about 72% of the art height).
   const art = await page.locator(".hero-art").boundingBox();
   const title = await page.locator("h1").boundingBox();
@@ -59,7 +63,8 @@ test("the thread's loose ends are their own layer and drift only with full motio
   expect(box!.x).toBeGreaterThan(art!.x + art!.width / 2);
   expect(box!.y).toBeGreaterThan(art!.y + art!.height / 2);
   await page.setViewportSize({ width: 390, height: 800 });
-  await expect(tassel).toBeHidden();
+  await expect(tassel).toBeVisible();
+  expect(await tassel.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
 });
 
 test("leaves fall across the headline with full motion on desktop, and do not exist otherwise", async ({ page, browser }) => {
@@ -72,7 +77,7 @@ test("leaves fall across the headline with full motion on desktop, and do not ex
   expect(await leaves.first().evaluate((el) => getComputedStyle(el).animationName)).toBe("leaf-fall");
   // In front of the headline, behind the cut-out (so they come out of the canopy and pass behind the trunk).
   const z = await page.locator("[data-hero-leaves]").evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
-  const cutoutZ = await page.locator('img.hero-cutout:not(.hero-tassel)[data-variant="dark"]').evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
+  const cutoutZ = await page.locator('img.hero-tree[data-variant="dark"]').evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
   expect(z).toBeGreaterThan(1);
   expect(z).toBeLessThan(cutoutZ);
   expect(new Set(await leaves.evaluateAll((els) => els.map((e) => e.getAttribute("data-shape")))).size).toBeGreaterThanOrEqual(5);
@@ -92,8 +97,9 @@ test("the branches move in the wind on desktop with full motion, and the tips mo
   await page.goto("/en");
   await expect(page.locator(".hero-art canvas.hero-sway")).toHaveCount(1);
   await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
-  await expect(page.locator('img.hero-cutout:not(.hero-tassel)[data-variant="dark"]')).toHaveCSS("opacity", "0");
+  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toHaveCSS("opacity", "0");
   const art = (await page.locator(".hero-art").boundingBox())!;
+  const cutoutZ = await page.locator('img.hero-tree[data-variant="dark"]').evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
   const region = (x: number, y: number, w: number, h: number) => ({ x: art.x + art.width * x, y: art.y + art.height * y, width: art.width * w, height: art.height * h });
   const tips = region(0.03, 0.25, 0.22, 0.4);
   // The trunk base, below the knot and the moving thread ends.
@@ -115,8 +121,16 @@ test("the branches move in the wind on desktop with full motion, and the tips mo
   const trunkChange = Math.max(meanDiff(frames[0].trunk, frames[1].trunk), meanDiff(frames[1].trunk, frames[2].trunk));
   expect(tipChange, "tips move").toBeGreaterThan(2);
   expect(trunkChange, "trunk stays").toBeLessThan(1);
+  // The thread: band and ends are their own springy layers above the tree.
+  const band = page.locator('img.hero-thread-band[data-variant="dark"]');
+  await expect(band).toBeVisible();
+  expect(await band.evaluate((el) => getComputedStyle(el).animationName)).toBe("thread-settle");
+  expect(await band.evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10))).toBeGreaterThan(cutoutZ);
   await page.setViewportSize({ width: 390, height: 800 });
   await expect(page.locator(".hero-art canvas.hero-sway")).toBeHidden();
+  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toBeVisible();
+  await expect(band).toBeVisible();
+  expect(await band.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
   const quiet = await context.newPage();
   await quiet.goto("/en");

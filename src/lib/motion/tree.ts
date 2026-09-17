@@ -1,20 +1,24 @@
 /**
- * The tree moves in the wind. The cut-out is drawn through a 48x28 grid whose
- * vertices are displaced by one gust signal, weighted by how far each vertex is
- * from a rigid axis through the trunk: nothing at the base, a little on the
- * boughs, most at the tips and the outer canopy, with the tips lagging a beat
- * behind. The static cut-out image stays underneath for reduced motion, phones
- * and browsers without WebGL; it is hidden once the canvas has drawn a frame.
+ * The tree moves in the wind, stiffly. Branches are wood, so they do not bend
+ * like rubber: the cut-out is drawn through a 48x28 grid in which three rigid
+ * bodies turn about their joints (the whole crown about the fork, the left
+ * bough about its base, the right branches about theirs), blended only in
+ * narrow zones at the joints, where a real tree gives. Inside a body every
+ * point turns by the same angle, so branches stay straight and the tips travel
+ * most. A tiny tremor is added on the foliage alone. The trunk never moves.
  *
- * Tuning lives in WIND below. Distances are in units of the painting's width.
+ * The still tree image stays underneath for reduced motion, phones and browsers
+ * without WebGL; it is hidden once the canvas has drawn. Tuning lives in WIND.
+ * Positions are in units of the painting's width; y is scaled by the aspect so
+ * angles are true.
  */
 type Cleanup = () => void;
 
 const WIND = {
-  amplitude: 0.022, // sideways travel at flex 1 (about 27 px of a 1250 px painting)
-  dip: 0.35, // downward share of the amplitude when a gust loads a branch
-  flutter: 0.1, // fine tremor across the canopy, share of the amplitude
-  lag: 0.45, // seconds by which the tips trail the boughs
+  crown: { pivot: [0.76, 0.56] as const, degrees: 0.6, lag: 0 }, // the whole crown, the slow lean
+  left: { pivot: [0.69, 0.48] as const, degrees: 1.0, lag: 0.35 }, // the long bough and its canopy
+  right: { pivot: [0.8, 0.55] as const, degrees: 1.2, lag: 0.25 }, // the right-hand branches
+  tremor: 0.0015, // foliage shimmer, share of the width
   periods: [6.1, 2.7, 1.1], // slow lean, medium sway, fine tremor
   weights: [0.55, 0.3, 0.15],
   phases: [0, 1.3, 0.4],
@@ -22,7 +26,7 @@ const WIND = {
 const COLS = 48;
 const ROWS = 28;
 const ASPECT = 1672 / 941;
-/** The trunk, bottom to fork, in (x, y) of the painting. Vertices near it do not move. */
+/** The trunk, bottom to fork. Points near it belong to no body. */
 const AXIS: Array<[number, number]> = [
   [0.815, 1.0],
   [0.81, 0.8],
@@ -32,26 +36,28 @@ const AXIS: Array<[number, number]> = [
 
 const VERT = `
 attribute vec2 a_pos;
-attribute float a_flex;
+attribute vec3 a_w;
+attribute float a_leaf;
 uniform float u_t;
-uniform float u_amp;
-uniform float u_dip;
-uniform float u_flutter;
-uniform float u_lag;
-uniform vec3 u_periods;
-uniform vec3 u_weights;
-uniform vec3 u_phases;
+uniform vec3 u_angles;
+uniform vec2 u_pivotCrown;
+uniform vec2 u_pivotLeft;
+uniform vec2 u_pivotRight;
+uniform float u_tremor;
 varying vec2 v_uv;
-float gust(float t) {
-  vec3 w = u_weights * sin(6.2831853 * t / u_periods + u_phases);
-  return w.x + w.y + w.z;
+const float ASPECT = ${ASPECT.toFixed(5)};
+vec2 turn(vec2 p, vec2 pivot, float a) {
+  vec2 q = vec2(p.x - pivot.x, (p.y - pivot.y) / ASPECT);
+  float c = cos(a), s = sin(a);
+  q = vec2(q.x * c - q.y * s, q.x * s + q.y * c);
+  return vec2(q.x + pivot.x, q.y * ASPECT + pivot.y);
 }
 void main() {
-  float t = u_t - u_lag * a_flex;
-  float g = gust(t);
-  float dx = u_amp * a_flex * g + u_flutter * u_amp * a_flex * sin(6.0 * u_t + 40.0 * a_pos.x + 25.0 * a_pos.y);
-  float dy = u_dip * u_amp * a_flex * g * g;
-  vec2 p = a_pos + vec2(dx, dy * ${ASPECT.toFixed(4)});
+  vec2 p = a_pos;
+  p = turn(p, u_pivotCrown, u_angles.x * a_w.x);
+  p = turn(p, u_pivotLeft, u_angles.y * a_w.y);
+  p = turn(p, u_pivotRight, u_angles.z * a_w.z);
+  p.x += u_tremor * a_leaf * sin(6.0 * u_t + 40.0 * a_pos.x + 25.0 * a_pos.y);
   v_uv = a_pos;
   gl_Position = vec4(p.x * 2.0 - 1.0, 1.0 - p.y * 2.0, 0.0, 1.0);
 }`;
@@ -64,7 +70,6 @@ void main() {
 }`;
 
 function distanceToAxis(x: number, y: number): number {
-  // Work in width units: y is scaled by the aspect so distances are isotropic.
   const px = x, py = y / ASPECT;
   let best = Infinity;
   for (let i = 0; i < AXIS.length - 1; i++) {
@@ -72,8 +77,7 @@ function distanceToAxis(x: number, y: number): number {
     const ay = ay0 / ASPECT, by = by0 / ASPECT;
     const vx = bx - ax, vy = by - ay;
     const t = Math.max(0, Math.min(1, ((px - ax) * vx + (py - ay) * vy) / (vx * vx + vy * vy)));
-    const dx = px - (ax + t * vx), dy = py - (ay + t * vy);
-    best = Math.min(best, Math.hypot(dx, dy));
+    best = Math.min(best, Math.hypot(px - (ax + t * vx), py - (ay + t * vy)));
   }
   return best;
 }
@@ -83,11 +87,24 @@ function smoothstep(a: number, b: number, x: number): number {
   return t * t * (3 - 2 * t);
 }
 
-/** How much a point may move: 0 on the trunk, 1 at the far tips. */
-export function flexAt(x: number, y: number): number {
+/** Body weights for a point: crown, left bough, right branches. The trunk gets none. */
+export function weightsAt(x: number, y: number): [number, number, number] {
   const d = distanceToAxis(x, y);
-  if (y > 0.6 && d < 0.1) return 0;
-  return Math.pow(smoothstep(0.03, 0.55, d), 1.5);
+  const trunk = y > 0.6 && d < 0.1 ? 0 : smoothstep(0.02, 0.09, d);
+  const left = smoothstep(0.62, 0.55, x); // 1 left of the bough's base, blending in over 0.55 to 0.62
+  const right = smoothstep(0.86, 0.9, x) * smoothstep(0.75, 0.6, y); // the branches leaving the trunk to the right
+  return [trunk, trunk * left, trunk * right];
+}
+
+/** How much a point trembles: the foliage, not the wood. */
+export function leafAt(x: number, y: number): number {
+  return smoothstep(0.25, 0.5, distanceToAxis(x, y));
+}
+
+function gust(t: number): number {
+  let g = 0;
+  for (let i = 0; i < 3; i++) g += WIND.weights[i] * Math.sin((2 * Math.PI * t) / WIND.periods[i] + WIND.phases[i]);
+  return g;
 }
 
 function compile(gl: WebGLRenderingContext, type: number, src: string): WebGLShader | null {
@@ -101,7 +118,7 @@ function compile(gl: WebGLRenderingContext, type: number, src: string): WebGLSha
 export function treeSway(): Cleanup {
   const art = document.querySelector<HTMLElement>(".hero-art");
   if (!art) return () => {};
-  const images = Array.from(art.querySelectorAll<HTMLImageElement>("img.hero-cutout:not(.hero-tassel)"));
+  const images = Array.from(art.querySelectorAll<HTMLImageElement>("img.hero-tree"));
   if (!images.length) return () => {};
   const canvas = document.createElement("canvas");
   canvas.className = "hero-sway";
@@ -122,14 +139,15 @@ export function treeSway(): Cleanup {
   gl.linkProgram(program);
   gl.useProgram(program);
 
-  // The grid: positions in painting units and a flex value per vertex.
   const positions: number[] = [];
-  const flex: number[] = [];
+  const weights: number[] = [];
+  const leaf: number[] = [];
   for (let r = 0; r <= ROWS; r++)
     for (let c = 0; c <= COLS; c++) {
       const x = c / COLS, y = r / ROWS;
       positions.push(x, y);
-      flex.push(flexAt(x, y));
+      weights.push(...weightsAt(x, y));
+      leaf.push(leafAt(x, y));
     }
   const indices: number[] = [];
   for (let r = 0; r < ROWS; r++)
@@ -146,20 +164,20 @@ export function treeSway(): Cleanup {
     gl.vertexAttribPointer(loc, size, gl.FLOAT, false, 0, 0);
   };
   bind("a_pos", positions, 2);
-  bind("a_flex", flex, 1);
+  bind("a_w", weights, 3);
+  bind("a_leaf", leaf, 1);
   const ibo = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
   const u = (name: string) => gl.getUniformLocation(program, name);
-  gl.uniform1f(u("u_amp"), WIND.amplitude);
-  gl.uniform1f(u("u_dip"), WIND.dip);
-  gl.uniform1f(u("u_flutter"), WIND.flutter);
-  gl.uniform1f(u("u_lag"), WIND.lag);
-  gl.uniform3fv(u("u_periods"), WIND.periods);
-  gl.uniform3fv(u("u_weights"), WIND.weights);
-  gl.uniform3fv(u("u_phases"), WIND.phases);
+  gl.uniform2fv(u("u_pivotCrown"), WIND.crown.pivot as unknown as number[]);
+  gl.uniform2fv(u("u_pivotLeft"), WIND.left.pivot as unknown as number[]);
+  gl.uniform2fv(u("u_pivotRight"), WIND.right.pivot as unknown as number[]);
+  gl.uniform1f(u("u_tremor"), WIND.tremor);
   const uT = u("u_t");
+  const uAngles = u("u_angles");
+  const rad = Math.PI / 180;
 
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
@@ -222,9 +240,16 @@ export function treeSway(): Cleanup {
     if (software && tick++ % 2) return;
     // Wait for the hero's entrance to finish before the first draw, so the two never compete for the main thread.
     if (document.documentElement.dataset.hero === "pending") return;
+    const t = (performance.now() - start) / 1000;
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniform1f(uT, (performance.now() - start) / 1000);
+    gl.uniform1f(uT, t);
+    gl.uniform3f(
+      uAngles,
+      WIND.crown.degrees * rad * gust(t - WIND.crown.lag),
+      WIND.left.degrees * rad * gust(t - WIND.left.lag),
+      WIND.right.degrees * rad * gust(t - WIND.right.lag),
+    );
     gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
     if (!art.dataset.sway) art.dataset.sway = "";
   };

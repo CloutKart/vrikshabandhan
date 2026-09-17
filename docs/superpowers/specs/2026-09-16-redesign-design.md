@@ -89,9 +89,11 @@ transition `(.4,0,.2,1)`, GSAP `expo.out` / `power2.out` / `none` for scrub; sta
    The thread's loose ends in the hero drift on their own layer (about 7° each way over 2.4 s, alternating); the
    band round the trunk never moves. Nine leaves let go of the canopy and drift down and to the right across the headline on
    staggered 7.5 to 11 s loops (transform and opacity only); under reduced motion they are not rendered at all.
-   The tree itself moves in the wind: the cut-out is drawn by WebGL through a 48×28 grid displaced by one gust
-   signal weighted by distance from the trunk (0 at the trunk, about 27 px at the far tips on a 1440 px screen,
-   tips lagging 0.45 s behind the boughs); the static cut-out remains for reduced motion, phones and no WebGL.
+   The tree itself moves in the wind, stiffly: the cut-out is drawn by WebGL through a 48×28 grid in which three
+   rigid bodies (the crown about the fork, the left bough about its base, the right branches about theirs) turn by
+   under 1.2°, blended only at the joints; the foliage alone trembles. The bare canvas sits behind, the still tree
+   remains for reduced motion, phones and no WebGL. The thread is its own two layers (band and knot; loose ends)
+   with a springy overshoot easing.
 4. **Story link hover/focus**: a red underline draws left to right like thread (pseudo-element `scaleX`).
 5. **Chips and buttons**: 150 ms colour and 1 px lift, press scale .98, always with a matching reverse.
 6. **Language switch**: 150 ms out / 200 ms in crossfade with reserved height; it is a route change to the other
