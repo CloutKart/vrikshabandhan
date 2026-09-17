@@ -79,21 +79,24 @@
   z-index: 3;
   transform-origin: 50% 0;
 }
-/* A breeze, not a swing: the ends rotate about the knot and lift a little as they pass through the middle. */
+/* A breeze on the loose ends: they swing about the knot, with a small catch on the way back, and are clearly moving within the first second. */
 @keyframes tassel-sway {
   0% {
-    transform: rotate(-3.2deg) translateX(-1px);
+    transform: rotate(-7deg) translateX(-1.5px);
   }
-  50% {
-    transform: rotate(0.4deg) translateY(-1.5px);
+  38% {
+    transform: rotate(2.5deg) translateY(-1px);
+  }
+  62% {
+    transform: rotate(-1deg);
   }
   100% {
-    transform: rotate(3.4deg) translateX(1px);
+    transform: rotate(7.5deg) translateX(1.5px);
   }
 }
 @media (min-width: 820px) {
   html[data-motion="full"] .hero-tassel {
-    animation: tassel-sway 4.5s ease-in-out infinite alternate;
+    animation: tassel-sway 2.4s ease-in-out infinite alternate;
   }
 }
 /* One painting per theme. The cut-out only exists from 820 px up, where the headline sits under the leaves. */
