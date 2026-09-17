@@ -18,16 +18,19 @@ const DESKTOP = "(min-width: 820px)";
 const WIDE_SIZES = "(min-width: 820px) min(100vw, 153vh), 100vw";
 const WIDE = { width: 1672, height: 941 };
 const SQUARE = { width: 1254, height: 1254 };
+/* Phones ask for a candidate a fifth wider than the screen, so a 3x phone (about 1200 device px across) gets the
+   square painting at its full 1254 px rather than a resampled 1200 px copy: one scaling step instead of two. */
+const SQUARE_SIZES = "120vw";
 
 type Variant = "dark" | "light";
 
 /** A painting layer in both frames: the wide image with the square one as the phone source. */
 function Painting({ wide, square, alt, variant, priority, quality, squareQuality, className }: { wide: string; square: string; alt: string; variant: Variant; priority?: boolean; quality: number; squareQuality: number; className: string }) {
   const { props: img } = getImageProps({ src: wide, alt, quality, sizes: WIDE_SIZES, priority, loading: priority ? undefined : "lazy", ...WIDE });
-  const { props: sq } = getImageProps({ src: square, alt, quality: squareQuality, sizes: "100vw", ...SQUARE });
+  const { props: sq } = getImageProps({ src: square, alt, quality: squareQuality, sizes: SQUARE_SIZES, ...SQUARE });
   return (
     <picture>
-      <source media={PHONE} srcSet={sq.srcSet} sizes="100vw" />
+      <source media={PHONE} srcSet={sq.srcSet} sizes={SQUARE_SIZES} />
       <img {...img} alt={alt} className={className} data-variant={variant} />
     </picture>
   );
@@ -46,11 +49,11 @@ function Patch({ wide, square, variant, className, size }: { wide: string; squar
 /** getImageProps does not preload, so the two priority layers get their own links, one per frame. */
 function Preload({ wide, square, quality, squareQuality }: { wide: string; square: string; quality: number; squareQuality: number }) {
   const { props: w } = getImageProps({ src: wide, alt: "", quality, sizes: WIDE_SIZES, ...WIDE });
-  const { props: s } = getImageProps({ src: square, alt: "", quality: squareQuality, sizes: "100vw", ...SQUARE });
+  const { props: s } = getImageProps({ src: square, alt: "", quality: squareQuality, sizes: SQUARE_SIZES, ...SQUARE });
   return (
     <>
       <link rel="preload" as="image" imageSrcSet={w.srcSet} imageSizes={w.sizes} media={DESKTOP} fetchPriority="high" />
-      <link rel="preload" as="image" imageSrcSet={s.srcSet} imageSizes="100vw" media={PHONE} fetchPriority="high" />
+      <link rel="preload" as="image" imageSrcSet={s.srcSet} imageSizes={SQUARE_SIZES} media={PHONE} fetchPriority="high" />
     </>
   );
 }
@@ -65,7 +68,7 @@ export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNod
   return (
     <section className="hero page" aria-labelledby="hero-title">
       <Preload wide="/images/canvas.jpg" square="/images/canvas-sq.jpg" quality={55} squareQuality={55} />
-      <Preload wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" quality={70} squareQuality={80} />
+      <Preload wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" quality={70} squareQuality={85} />
       <div className="hero-grid">
       <div className="hero-canvas">
         <div className="hero-art">
@@ -74,8 +77,8 @@ export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNod
               loose ends. The band and knot never move; the loose ends swing. Hidden variants are lazy, so they are never fetched. */}
           <Painting wide="/images/canvas.jpg" square="/images/canvas-sq.jpg" alt="" variant="dark" priority quality={55} squareQuality={55} className="hero-painting" />
           <Painting wide="/images/canvas-light.jpg" square="/images/canvas-sq-light.jpg" alt="" variant="light" quality={55} squareQuality={55} className="hero-painting" />
-          <Painting wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" alt={paintingAlt} variant="dark" priority quality={70} squareQuality={80} className="hero-cutout hero-tree" />
-          <Painting wide="/images/tree-cutout-light.webp" square="/images/tree-cutout-sq-light.webp" alt={paintingAlt} variant="light" quality={70} squareQuality={80} className="hero-cutout hero-tree" />
+          <Painting wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" alt={paintingAlt} variant="dark" priority quality={70} squareQuality={85} className="hero-cutout hero-tree" />
+          <Painting wide="/images/tree-cutout-light.webp" square="/images/tree-cutout-sq-light.webp" alt={paintingAlt} variant="light" quality={70} squareQuality={85} className="hero-cutout hero-tree" />
           <Patch wide="/images/thread-band.png" square="/images/thread-band-sq.png" variant="dark" className="hero-cutout hero-thread-band" size={{ width: 160, height: 56 }} />
           <Patch wide="/images/thread-band-light.png" square="/images/thread-band-sq-light.png" variant="light" className="hero-cutout hero-thread-band" size={{ width: 160, height: 56 }} />
           <Patch wide="/images/tassel.png" square="/images/tassel-sq.png" variant="dark" className="hero-cutout hero-tassel" size={{ width: 150, height: 102 }} />

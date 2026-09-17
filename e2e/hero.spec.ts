@@ -254,6 +254,7 @@ test("on phones the hero is the square painting with its own tree and thread; on
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect.poll(() => tree.evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("tree-cutout.");
   await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
+  await expect(page.locator("canvas.hero-sway")).toHaveAttribute("data-texture", "1672x941");
 });
 
 test("on a 3x phone the tree is drawn at full pixel density", async ({ browser }) => {
@@ -271,7 +272,12 @@ test("on a 3x phone the tree is drawn at full pixel density", async ({ browser }
     return /swiftshader|llvmpipe|software/i.test(renderer);
   });
   expect(drawn).toBe(Math.round(art.width * (software ? 1 : 3)));
-  await expect.poll(() => page.locator('img.hero-tree[data-variant="dark"]').evaluate((el: HTMLImageElement) => el.currentSrc)).toMatch(/w=1200/);
+  // The candidate above the screen's 1170 device px: Next serves the painting at its full 1254 px for it.
+  const src = await page.locator('img.hero-tree[data-variant="dark"]').evaluate((el: HTMLImageElement) => el.currentSrc);
+  expect(src).toMatch(/w=1920/);
+  expect(src).toMatch(/q=85/);
+  // The texture is the painting's own size, not the density-divided naturalWidth (305 here).
+  await expect(page.locator("canvas.hero-sway")).toHaveAttribute("data-texture", "1254x1254");
   await context.close();
 });
 

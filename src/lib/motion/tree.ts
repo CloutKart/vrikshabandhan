@@ -21,6 +21,8 @@ type Cleanup = () => void;
 type Body = { pivot: readonly [number, number]; degrees: number; lag: number };
 type Frame = {
   aspect: number;
+  /** The painting's pixel size: the texture is drawn at this, whatever candidate the browser fetched. */
+  source: [number, number];
   axis: Array<[number, number]>;
   crown: Body;
   left: Body & { blend: [number, number] };
@@ -31,6 +33,7 @@ type Frame = {
 const FRAMES: Record<"wide" | "square", Frame> = {
   wide: {
     aspect: 1672 / 941,
+    source: [1672, 941],
     axis: [
       [0.815, 1.0],
       [0.81, 0.8],
@@ -45,6 +48,7 @@ const FRAMES: Record<"wide" | "square", Frame> = {
   },
   square: {
     aspect: 1,
+    source: [1254, 1254],
     axis: [
       [0.85, 1.0],
       [0.845, 0.84],
@@ -265,15 +269,19 @@ export function treeSway(): Cleanup {
     const apply = () => {
       if (disposed || !img.naturalWidth) return;
       // Through a 2D canvas: every browser uploads a canvas faithfully, whatever the image's encoding or decode
-      // state. Safari has handed WebGL an opaque black texture straight from an <img>.
-      scratch.width = img.naturalWidth;
-      scratch.height = img.naturalHeight;
-      const ctx = scratch.getContext("2d");
-      if (!ctx) return;
-      ctx.clearRect(0, 0, scratch.width, scratch.height);
-      ctx.drawImage(img, 0, 0);
+      // state. Safari has handed WebGL an opaque black texture straight from an <img>. The canvas is the painting's
+      // own size, never naturalWidth: for a responsive image that is divided by the candidate's pixel density
+      // (1254 px served for a 3x phone reads as 305), and a texture that small is a blurry tree.
       const square = Math.abs(img.naturalWidth / img.naturalHeight - 1) < 0.05;
       const next = square ? FRAMES.square : FRAMES.wide;
+      const [sw, sh] = next.source;
+      scratch.width = sw;
+      scratch.height = sh;
+      const ctx = scratch.getContext("2d");
+      if (!ctx) return;
+      ctx.clearRect(0, 0, sw, sh);
+      ctx.drawImage(img, 0, 0, sw, sh);
+      canvas.dataset.texture = `${sw}x${sh}`;
       if (next !== geo) setFrame(next);
       gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, scratch);
