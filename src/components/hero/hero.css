@@ -261,4 +261,22 @@ html[data-motion="full"] .hero-leaves {
     left: var(--xs);
     top: var(--ys);
   }
+  /* The headline sits in the painting on phones too: bottom left, where the square canvas is bare, behind the tree. */
+  .hero-title {
+    position: absolute;
+    z-index: 1;
+    left: 5cqw;
+    bottom: 5cqw;
+    margin: 0;
+    max-width: 66cqw;
+    font-size: 9.5cqw;
+    line-height: 0.98;
+    color: var(--stone-ink);
+  }
+  .hero-title [lang="hi"] {
+    line-height: 1.2;
+  }
+  .hero-title [lang="hi"]:first-child {
+    font-size: 0.92em;
+  }
 }
