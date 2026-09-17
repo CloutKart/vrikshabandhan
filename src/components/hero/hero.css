@@ -99,6 +99,62 @@
     animation: tassel-sway 2.4s ease-in-out infinite alternate;
   }
 }
+/*
+  Falling leaves. Nine leaves start at the canopy's lower edge and drift to the bottom of the painting in front of
+  the headline and the cut-out, each on its own duration and delay so the loop never reads as a loop. Transform and
+  opacity only. They exist only with full motion on desktop: a leaf frozen mid-air would be wrong, so reduced motion
+  removes them rather than pausing them.
+*/
+.hero-leaves {
+  display: none;
+}
+@media (min-width: 820px) {
+  html[data-motion="full"] .hero-leaves {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    overflow: hidden;
+  }
+}
+.hero-leaf {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: auto;
+  opacity: 0;
+  transform-origin: 40% 50%;
+  animation: leaf-fall var(--duration) linear var(--delay) infinite;
+  will-change: transform, opacity;
+}
+@keyframes leaf-fall {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scaleX(var(--flip));
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  22% {
+    transform: translate3d(calc(var(--drift) * 0.7), 9cqw, 0) rotate(calc(var(--spin) * 0.22)) scaleX(var(--flip));
+  }
+  44% {
+    transform: translate3d(calc(var(--drift) * -0.5), 19cqw, 0) rotate(calc(var(--spin) * 0.46)) scaleX(var(--flip));
+  }
+  66% {
+    transform: translate3d(calc(var(--drift) * 0.9), 29cqw, 0) rotate(calc(var(--spin) * 0.68)) scaleX(var(--flip));
+  }
+  88% {
+    transform: translate3d(calc(var(--drift) * -0.3), 39cqw, 0) rotate(calc(var(--spin) * 0.9)) scaleX(var(--flip));
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(calc(var(--drift) * 0.2), 46cqw, 0) rotate(var(--spin)) scaleX(var(--flip));
+    opacity: 0;
+  }
+}
 /* One painting per theme. The cut-out only exists from 820 px up, where the headline sits under the leaves. */
 .hero-painting[data-variant="light"],
 .hero-cutout {

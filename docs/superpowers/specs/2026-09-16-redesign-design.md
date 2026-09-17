@@ -87,7 +87,8 @@ transition `(.4,0,.2,1)`, GSAP `expo.out` / `power2.out` / `none` for scrub; sta
    listener; the 2 px red line scales from the left).
 3. **Photo reveal**: `clip-path` inset opens once on viewport entry, CSS only.
    The thread's loose ends in the hero drift on their own layer (about 7° each way over 2.4 s, alternating); the
-   band round the trunk never moves.
+   band round the trunk never moves. Nine leaves let go of the canopy and drift down across the headline on
+   staggered 8 to 12 s loops (transform and opacity only); under reduced motion they are not rendered at all.
 4. **Story link hover/focus**: a red underline draws left to right like thread (pseudo-element `scaleX`).
 5. **Chips and buttons**: 150 ms colour and 1 px lift, press scale .98, always with a matching reverse.
 6. **Language switch**: 150 ms out / 200 ms in crossfade with reserved height; it is a route change to the other

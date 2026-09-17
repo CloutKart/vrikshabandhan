@@ -62,6 +62,26 @@ test("the thread's loose ends are their own layer and drift only with full motio
   await expect(tassel).toBeHidden();
 });
 
+test("leaves fall across the headline with full motion on desktop, and do not exist otherwise", async ({ page, browser }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/en");
+  await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
+  const leaves = page.locator("[data-hero-leaves] .hero-leaf");
+  await expect(leaves).toHaveCount(9);
+  await expect(page.locator("[data-hero-leaves]")).toBeVisible();
+  expect(await leaves.first().evaluate((el) => getComputedStyle(el).animationName)).toBe("leaf-fall");
+  // In front of the headline and the cut-out.
+  const z = await page.locator("[data-hero-leaves]").evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
+  expect(z).toBeGreaterThan(2);
+  await page.setViewportSize({ width: 390, height: 800 });
+  await expect(page.locator("[data-hero-leaves]")).toBeHidden();
+  const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
+  const quiet = await context.newPage();
+  await quiet.goto("/en");
+  await expect(quiet.locator("[data-hero-leaves]")).toBeHidden();
+  await context.close();
+});
+
 test("with reduced motion the loose ends hold still", async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
