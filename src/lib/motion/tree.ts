@@ -248,7 +248,9 @@ export function treeSway(): Cleanup {
   const dbg = gl.getExtension("WEBGL_debug_renderer_info");
   const renderer = String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
   const software = /swiftshader|llvmpipe|software/i.test(renderer);
-  const maxDpr = software ? 1 : 2;
+  // A pixel budget rather than a fixed ratio: a phone-sized square may draw at 3x (the knot patches beside it are
+  // drawn at full density by the browser, so a 2x tree would look soft), desktop stays at 2x.
+  const maxDpr = () => (software ? 1 : Math.max(2, 1800 / Math.max(1, art.clientWidth)));
   let tick = 0;
 
   const visibleImage = () => {
@@ -310,7 +312,7 @@ export function treeSway(): Cleanup {
   };
 
   const resize = () => {
-    const dpr = Math.min(maxDpr, window.devicePixelRatio || 1);
+    const dpr = Math.min(maxDpr(), window.devicePixelRatio || 1);
     const w = Math.round(art.clientWidth * dpr), h = Math.round(art.clientHeight * dpr);
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;

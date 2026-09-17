@@ -240,10 +240,35 @@ test("on phones the hero is the square painting with its own tree and thread; on
   await expect(page.locator(".hero-art canvas.hero-sway")).toHaveCount(1);
   await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
   await expect(page.locator("[data-hero-leaves] .hero-leaf")).toHaveCount(9);
+  // The headline sits inside the square, bottom left, behind the tree, as on desktop.
   const title = (await page.locator(".hero-title").boundingBox())!;
-  const lede = (await page.getByText(/Since 2005 we have planted/).boundingBox())!;
-  expect(Math.abs(title.x - lede.x), "title and lede share a left edge").toBeLessThanOrEqual(1);
+  expect(title.x).toBeGreaterThan(art.x);
+  expect(title.x + title.width, "title clears the trunk").toBeLessThan(art.x + art.width * 0.74);
+  expect(title.y, "title sits in the lower part").toBeGreaterThan(art.y + art.height * 0.6);
+  expect(title.y + title.height).toBeLessThanOrEqual(art.y + art.height + 1);
+  const titleZ = await page.locator(".hero-title").evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
+  const treeZ = await tree.evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
+  expect(titleZ).toBeLessThan(treeZ);
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect.poll(() => tree.evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("tree-cutout.");
   await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
+});
+
+test("on a 3x phone the tree is drawn at full pixel density", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+  const page = await context.newPage();
+  await page.goto("/en");
+  await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
+  const art = (await page.locator(".hero-art").boundingBox())!;
+  const drawn = await page.locator("canvas.hero-sway").evaluate((el: HTMLCanvasElement) => el.width);
+  // Headless test runners often have no GPU; the module then draws at 1x. With a GPU, a phone square draws at 3x.
+  const software = await page.evaluate(() => {
+    const gl = document.createElement("canvas").getContext("webgl");
+    const dbg = gl?.getExtension("WEBGL_debug_renderer_info");
+    const renderer = String(dbg ? gl?.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl?.getParameter(gl.RENDERER));
+    return /swiftshader|llvmpipe|software/i.test(renderer);
+  });
+  expect(drawn).toBe(Math.round(art.width * (software ? 1 : 3)));
+  await expect.poll(() => page.locator('img.hero-tree[data-variant="dark"]').evaluate((el: HTMLImageElement) => el.currentSrc)).toMatch(/w=1200/);
+  await context.close();
 });

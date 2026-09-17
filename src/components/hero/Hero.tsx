@@ -22,9 +22,9 @@ const SQUARE = { width: 1254, height: 1254 };
 type Variant = "dark" | "light";
 
 /** A painting layer in both frames: the wide image with the square one as the phone source. */
-function Painting({ wide, square, alt, variant, priority, quality, className }: { wide: string; square: string; alt: string; variant: Variant; priority?: boolean; quality: number; className: string }) {
+function Painting({ wide, square, alt, variant, priority, quality, squareQuality, className }: { wide: string; square: string; alt: string; variant: Variant; priority?: boolean; quality: number; squareQuality: number; className: string }) {
   const { props: img } = getImageProps({ src: wide, alt, quality, sizes: WIDE_SIZES, priority, loading: priority ? undefined : "lazy", ...WIDE });
-  const { props: sq } = getImageProps({ src: square, alt, quality, sizes: "100vw", ...SQUARE });
+  const { props: sq } = getImageProps({ src: square, alt, quality: squareQuality, sizes: "100vw", ...SQUARE });
   return (
     <picture>
       <source media={PHONE} srcSet={sq.srcSet} sizes="100vw" />
@@ -44,9 +44,9 @@ function Patch({ wide, square, variant, className, size }: { wide: string; squar
 }
 
 /** getImageProps does not preload, so the two priority layers get their own links, one per frame. */
-function Preload({ wide, square, quality }: { wide: string; square: string; quality: number }) {
+function Preload({ wide, square, quality, squareQuality }: { wide: string; square: string; quality: number; squareQuality: number }) {
   const { props: w } = getImageProps({ src: wide, alt: "", quality, sizes: WIDE_SIZES, ...WIDE });
-  const { props: s } = getImageProps({ src: square, alt: "", quality, sizes: "100vw", ...SQUARE });
+  const { props: s } = getImageProps({ src: square, alt: "", quality: squareQuality, sizes: "100vw", ...SQUARE });
   return (
     <>
       <link rel="preload" as="image" imageSrcSet={w.srcSet} imageSizes={w.sizes} media={DESKTOP} fetchPriority="high" />
@@ -64,18 +64,18 @@ export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNod
 
   return (
     <section className="hero page" aria-labelledby="hero-title">
-      <Preload wide="/images/canvas.jpg" square="/images/canvas-sq.jpg" quality={55} />
-      <Preload wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" quality={70} />
+      <Preload wide="/images/canvas.jpg" square="/images/canvas-sq.jpg" quality={55} squareQuality={55} />
+      <Preload wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" quality={70} squareQuality={80} />
       <div className="hero-grid">
       <div className="hero-canvas">
         <div className="hero-art">
           {/* Layers, back to front: the bare canvas (one per theme), the headline, the falling leaves, the tree (a still
               image, or the WebGL canvas that moves it), then the thread in two parts: the band with the knot, and the
               loose ends. Hidden variants are lazy, so they are never fetched. */}
-          <Painting wide="/images/canvas.jpg" square="/images/canvas-sq.jpg" alt="" variant="dark" priority quality={55} className="hero-painting" />
-          <Painting wide="/images/canvas-light.jpg" square="/images/canvas-sq-light.jpg" alt="" variant="light" quality={55} className="hero-painting" />
-          <Painting wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" alt={paintingAlt} variant="dark" priority quality={70} className="hero-cutout hero-tree" />
-          <Painting wide="/images/tree-cutout-light.webp" square="/images/tree-cutout-sq-light.webp" alt={paintingAlt} variant="light" quality={70} className="hero-cutout hero-tree" />
+          <Painting wide="/images/canvas.jpg" square="/images/canvas-sq.jpg" alt="" variant="dark" priority quality={55} squareQuality={55} className="hero-painting" />
+          <Painting wide="/images/canvas-light.jpg" square="/images/canvas-sq-light.jpg" alt="" variant="light" quality={55} squareQuality={55} className="hero-painting" />
+          <Painting wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" alt={paintingAlt} variant="dark" priority quality={70} squareQuality={80} className="hero-cutout hero-tree" />
+          <Painting wide="/images/tree-cutout-light.webp" square="/images/tree-cutout-sq-light.webp" alt={paintingAlt} variant="light" quality={70} squareQuality={80} className="hero-cutout hero-tree" />
           <Patch wide="/images/thread-band.png" square="/images/thread-band-sq.png" variant="dark" className="hero-cutout hero-thread-band" size={{ width: 190, height: 56 }} />
           <Patch wide="/images/thread-band-light.png" square="/images/thread-band-sq-light.png" variant="light" className="hero-cutout hero-thread-band" size={{ width: 190, height: 56 }} />
           <Patch wide="/images/tassel.png" square="/images/tassel-sq.png" variant="dark" className="hero-cutout hero-tassel" size={{ width: 150, height: 102 }} />
