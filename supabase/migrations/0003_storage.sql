@@ -14,7 +14,8 @@ create policy "editors upload media" on storage.objects
 
 drop policy if exists "editors update media" on storage.objects;
 create policy "editors update media" on storage.objects
-  for update to authenticated using (bucket_id = 'media' and public.is_editor());
+  for update to authenticated using (bucket_id = 'media' and public.is_editor())
+  with check (bucket_id = 'media' and public.is_editor());
 
 drop policy if exists "editors delete media" on storage.objects;
 create policy "editors delete media" on storage.objects

@@ -4,17 +4,16 @@ import { PostEditor } from "@/components/admin/PostEditor";
 import type { Draft } from "@/lib/content/admin";
 import { requireEditor } from "@/lib/supabase/auth";
 import { publicSupabaseEnv } from "@/lib/supabase/env";
-import { serverClient } from "@/lib/supabase/server";
 import type { PostRow } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
   if (!publicSupabaseEnv()) return <NotConfigured />;
-  await requireEditor();
+  const { sb } = await requireEditor();
   const { id } = await params;
-  const sb = await serverClient();
-  const { data } = await sb!.from("posts").select("*").eq("id", id).maybeSingle();
+  const { data, error } = await sb.from("posts").select("*").eq("id", id).maybeSingle();
+  if (error) throw new Error(`Could not load the post: ${error.message}`);
   if (!data) notFound();
   const row = data as PostRow;
   const initial: Draft = {

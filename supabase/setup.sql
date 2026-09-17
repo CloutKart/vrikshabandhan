@@ -1,5 +1,5 @@
 -- One-shot setup for a fresh Supabase project: the three migrations in order, then the editor list.
--- Idempotent: safe to run again. Paste into the SQL editor or run: psql "$DATABASE_URL" -f supabase/setup.sql
+-- Idempotent: safe to run again. Paste into the SQL editor or run: psql "$SUPABASE_DB_URL" -f supabase/setup.sql
 
 -- ---- supabase/migrations/0001_posts.sql
 -- Stories. Bodies keep the editor's mini-markup ("## " heading, "> " quote, one paragraph per line).
@@ -46,7 +46,7 @@ create table if not exists public.editors (
 );
 
 create or replace function public.is_editor() returns boolean
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = '' as $$
   select exists (
     select 1 from public.editors e
     where lower(e.email) = lower(coalesce(auth.jwt() ->> 'email', ''))
@@ -85,14 +85,15 @@ create policy "editors upload media" on storage.objects
 
 drop policy if exists "editors update media" on storage.objects;
 create policy "editors update media" on storage.objects
-  for update to authenticated using (bucket_id = 'media' and public.is_editor());
+  for update to authenticated using (bucket_id = 'media' and public.is_editor())
+  with check (bucket_id = 'media' and public.is_editor());
 
 drop policy if exists "editors delete media" on storage.objects;
 create policy "editors delete media" on storage.objects
   for delete to authenticated using (bucket_id = 'media' and public.is_editor());
 
--- ---- editors
+-- ---- editors (stored lower-case; the site compares addresses without regard to case)
 insert into public.editors (email) values
-  ('UKRajyaNirmanSenaniSangh@gmail.com'),
+  ('ukrajyanirmansenanisangh@gmail.com'),
   ('shivam@clout-kart.com')
 on conflict (email) do nothing;

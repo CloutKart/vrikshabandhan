@@ -14,6 +14,11 @@ const variants: Record<Variant, string> = {
 type LinkProps = { href: ComponentProps<typeof Link>["href"]; variant?: Variant; children: ReactNode; className?: string };
 type ButtonProps = { href?: undefined; variant?: Variant; children: ReactNode; className?: string; type?: "button" | "submit"; onClick?: () => void; disabled?: boolean };
 
+/** The button's classes alone, for links that must not take a locale prefix (the editor). */
+export function buttonClass(variant: Variant = "solid", className = "") {
+  return `${base} ${variants[variant]} ${className}`;
+}
+
 /** A link that looks like a button when it navigates, a real button when it acts. */
 export function Button(props: LinkProps | ButtonProps) {
   const { variant = "solid", children, className = "" } = props;

@@ -5,7 +5,7 @@ create table if not exists public.editors (
 );
 
 create or replace function public.is_editor() returns boolean
-language sql stable security definer set search_path = public as $$
+language sql stable security definer set search_path = '' as $$
   select exists (
     select 1 from public.editors e
     where lower(e.email) = lower(coalesce(auth.jwt() ->> 'email', ''))

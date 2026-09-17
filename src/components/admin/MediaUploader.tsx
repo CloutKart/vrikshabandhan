@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { MAX_UPLOAD_BYTES, acceptedFile } from "@/lib/supabase/storage";
 import { Field, inputClass } from "@/components/ui/Field";
 import { toast } from "@/components/ui/Toast";
 import { mediaUrl } from "@/lib/content/posts";
@@ -16,16 +17,24 @@ export function MediaUploader({ items, slug, onChange, error }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(0);
   const [dragging, setDragging] = useState(false);
+  // The latest list, so two overlapping drops never work from a stale one.
+  const latest = useRef(items);
+  useEffect(() => {
+    latest.current = items;
+  }, [items]);
 
   async function addFiles(files: File[]) {
-    if (!files.length) return;
-    setUploading((n) => n + files.length);
-    let next = items;
-    for (const file of files) {
+    const accepted = files.filter((f) => {
+      const why = acceptedFile(f);
+      if (why) toast(`${f.name}: ${why}`);
+      return !why;
+    });
+    if (!accepted.length) return;
+    setUploading((n) => n + accepted.length);
+    for (const file of accepted) {
       try {
         const item = await uploadMedia(file, slug);
-        next = [...next, item];
-        onChange(next);
+        onChange([...latest.current, item]);
       } catch (e) {
         toast(`Upload failed: ${e instanceof Error ? e.message : "error"}`);
       } finally {
@@ -56,7 +65,7 @@ export function MediaUploader({ items, slug, onChange, error }: Props) {
         className={`rounded-sm border border-dashed p-6 text-center font-sans text-sm ${dragging ? "border-sutra" : "border-moss"}`}
       >
         <label htmlFor={`${id}-files`} className="cursor-pointer">
-          Drop files here or choose files (JPG, PNG, WebP, MP4 up to 20 MB)
+          Drop files here or choose files (JPG, PNG, WebP, MP4 up to {Math.round(MAX_UPLOAD_BYTES / 1048576)} MB)
         </label>
         <input
           ref={inputRef}

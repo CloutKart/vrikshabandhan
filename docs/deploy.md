@@ -12,13 +12,16 @@ editor and new stories once a Supabase project is attached.
    - `supabase/migrations/0002_editors_rls.sql` (editor list, row-level security)
    - `supabase/migrations/0003_storage.sql` (the public `media` bucket, 20 MB, JPEG/PNG/WebP/MP4)
 3. Add the people who may edit: `insert into public.editors (email) values ('someone@example.com');`
-   Only these addresses can sign in. Anyone else who follows a magic link is told they are not an editor.
+   Only these addresses can sign in (case does not matter). Anyone else who follows a magic link is told they are
+   not an editor. If the SQL editor refuses the storage statements, create the `media` bucket and its four policies
+   under Storage in the dashboard instead; they are listed in `supabase/migrations/0003_storage.sql`.
 4. Authentication, URL configuration: set the Site URL to the public domain and add
    `https://<domain>/admin/auth/callback` to the redirect allow list. Keep the default e-mail magic-link template or
    adjust its wording; the link must point at that callback.
 5. Seed the three built-in stories so they become editable (optional, local machine only, never in CI):
    `NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run seed`
    (`npm run seed -- --dry-run` prints the rows first.) The service-role key must never reach the browser or Vercel.
+   Seeding upserts by slug: running it again overwrites any edits an editor has made to those four stories.
 
 ## 2. Vercel
 
@@ -29,7 +32,8 @@ editor and new stories once a Supabase project is attached.
    Nothing else. Without these the site deploys fine and the editor shows "Editor not configured".
 3. Add the domain under Settings, Domains, and point DNS at Vercel (CNAME `cname.vercel-dns.com` for a subdomain,
    the A record Vercel shows for an apex).
-4. `next.config.ts` allows images from the Supabase host automatically, derived from `NEXT_PUBLIC_SUPABASE_URL`.
+4. `next.config.ts` allows images from the Supabase host automatically, derived from `NEXT_PUBLIC_SUPABASE_URL`
+   at build time, so the variable must be set before the build runs (it is, on Vercel).
 
 ## 3. Publishing flow
 

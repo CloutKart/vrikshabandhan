@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import { buttonClass } from "@/components/ui/Button";
 import type { PostRow } from "@/lib/supabase/types";
 import { formatStoryDate } from "@/lib/i18n/format";
 
@@ -31,7 +31,9 @@ export function PostList({ posts, show }: { posts: PostRow[]; show: Show }) {
     <main id="content" className="page py-16 font-sans">
       <div className="flex flex-wrap items-end justify-between gap-6">
         <h1 className="font-serif text-[2.5rem] leading-tight">Posts</h1>
-        <Button href="/admin/posts/new">New post</Button>
+        <Link href="/admin/posts/new" className={buttonClass()}>
+          New post
+        </Link>
       </div>
       <nav aria-label="Show" className="mt-8 flex gap-6">
         {filters.map(([key, label]) => (

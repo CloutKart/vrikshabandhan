@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/Toast";
 import { mukta, muktaDevanagari, tiro, tiroItalic } from "@/lib/fonts";
 import { publicSupabaseEnv } from "@/lib/supabase/env";
+import { serverClient } from "@/lib/supabase/server";
 import { DEFAULT_THEME, THEME_COLORS } from "@/lib/theme/constants";
 import { THEME_HEAD_SCRIPT } from "@/lib/theme/head-script";
 import { signOut } from "./actions";
@@ -12,8 +13,10 @@ import "@/styles/globals.css";
 export const metadata: Metadata = { title: "Editor", robots: { index: false, follow: false } };
 
 /** Second root layout: the editor lives outside the locale routes and is English-only. */
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
   const configured = Boolean(publicSupabaseEnv());
+  const sb = configured ? await serverClient() : null;
+  const signedIn = sb ? Boolean((await sb.auth.getUser()).data.user) : false;
   return (
     <html lang="en" data-theme={DEFAULT_THEME} className={`${tiro.variable} ${tiroItalic.variable} ${mukta.variable} ${muktaDevanagari.variable}`} suppressHydrationWarning>
       <head>
@@ -29,7 +32,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <Link href="/en" className="u-thread">
               View site
             </Link>
-            {configured ? (
+            {signedIn ? (
               <form action={signOut}>
                 <button type="submit" className="u-thread min-h-11">
                   Sign out

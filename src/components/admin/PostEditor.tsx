@@ -16,6 +16,14 @@ import { MediaUploader } from "./MediaUploader";
 
 type Props = { id?: string; initial?: Draft; deletedAt?: string | null };
 
+/** Turn a Supabase error into a sentence an editor can act on. */
+function explain(e: unknown): string {
+  const code = typeof e === "object" && e && "code" in e ? String((e as { code: unknown }).code) : "";
+  if (code === "23505") return "another post already uses this address; change the address field.";
+  if (code === "PGRST116") return "the post was not found, or your session has ended. Sign in again and retry.";
+  return e instanceof Error ? e.message : "error";
+}
+
 /**
  * Create or edit a post. Saves go straight to Supabase under row-level
  * security (the signed-in editor's session), then the public pages are
@@ -30,7 +38,17 @@ export function PostEditor({ id, initial, deletedAt }: Props) {
   const [preview, setPreview] = useState(false);
 
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) => setDraft((d) => ({ ...d, [key]: value }));
-  const slugForUploads = draft.slug || slugify(draft.title_en, draft.date);
+  // Uploads are filed under the row id once it exists, so renaming a post never strands its files.
+  const uploadFolder = id ?? (draft.slug || slugify(draft.title_en, draft.date));
+
+  /** Revalidation is not part of saving: a post that saved but did not revalidate is still saved. */
+  async function revalidate() {
+    try {
+      await revalidateStories();
+    } catch {
+      toast("Saved, but the public pages could not be refreshed yet. They refresh on their own within a minute.");
+    }
+  }
 
   async function save() {
     const next = { ...draft, tags: parseTags(tagsInput), slug: draft.slug || slugify(draft.title_en, draft.date) };
@@ -43,37 +61,39 @@ export function PostEditor({ id, initial, deletedAt }: Props) {
     const sb = browserClient();
     if (!sb) return;
     setBusy(true);
+    let savedId: string | null = null;
     try {
       if (id) {
-        const { error } = await sb.from("posts").update(next).eq("id", id);
+        // .select().single() makes a silent no-op (expired session, policy) an error instead of a false success.
+        const { error } = await sb.from("posts").update(next).eq("id", id).select("id").single();
         if (error) throw error;
+        savedId = id;
       } else {
         const { data, error } = await sb.from("posts").insert(next).select("id").single();
         if (error) throw error;
-        await revalidateStories();
-        toast(next.live ? "Published." : "Saved as a draft.");
-        router.push(`/admin/posts/${data.id}`);
-        return;
+        savedId = data.id;
       }
-      await revalidateStories();
-      setDraft(next);
-      toast(next.live ? "Published." : "Saved as a draft.");
     } catch (e) {
-      toast(`Could not save: ${e instanceof Error ? e.message : "error"}`);
-    } finally {
+      toast(`Could not save: ${explain(e)}`);
       setBusy(false);
+      return;
     }
+    await revalidate();
+    toast(next.live ? "Published." : "Saved as a draft.");
+    setBusy(false);
+    if (id) setDraft(next);
+    else router.push(`/admin/posts/${savedId}`);
   }
 
   async function setDeleted(value: string | null) {
     const sb = browserClient();
     if (!sb || !id) return;
-    const { error } = await sb.from("posts").update({ deleted_at: value }).eq("id", id);
+    const { error } = await sb.from("posts").update({ deleted_at: value }).eq("id", id).select("id").single();
     if (error) {
-      toast(`Could not change: ${error.message}`);
+      toast(`Could not change: ${explain(error)}`);
       return;
     }
-    await revalidateStories();
+    await revalidate();
     router.refresh();
   }
 
@@ -115,6 +135,9 @@ export function PostEditor({ id, initial, deletedAt }: Props) {
           </Field>
           <Field id="date" label="Date" error={errors.date}>
             <input id="date" type="date" value={draft.date} onChange={(e) => set("date", e.target.value)} className={inputClass} aria-invalid={Boolean(errors.date)} required />
+          </Field>
+          <Field id="slug" label="Address (slug)" hint="Part of the story's web address. Left empty, it comes from the English title.">
+            <input id="slug" value={draft.slug} onChange={(e) => set("slug", slugify(e.target.value, ""))} className={inputClass} placeholder={slugify(draft.title_en, draft.date)} />
           </Field>
           <Field id="place" label="Place" hint="For example: Dharkot, Dehradun">
             <input id="place" value={draft.place} onChange={(e) => set("place", e.target.value)} className={inputClass} />
@@ -162,7 +185,7 @@ export function PostEditor({ id, initial, deletedAt }: Props) {
           ) : null}
         </div>
 
-        <MediaUploader items={draft.media} slug={slugForUploads} onChange={(media) => set("media", media)} error={errors.media} />
+        <MediaUploader items={draft.media} slug={uploadFolder} onChange={(media) => set("media", media)} error={errors.media} />
 
         <label className="flex items-center gap-3 font-sans">
           <input type="checkbox" checked={draft.live} onChange={(e) => set("live", e.target.checked)} className="h-5 w-5" />

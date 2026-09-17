@@ -20,6 +20,12 @@ export type Draft = {
 
 export type DraftErrors = Partial<Record<keyof Draft, string>>;
 
+/** Today in the editor's own time zone, as YYYY-MM-DD (the ISO string would be the UTC date). */
+export function localDate(now = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
 export function emptyDraft(): Draft {
   return {
     slug: "",
@@ -29,7 +35,7 @@ export function emptyDraft(): Draft {
     summary_hi: "",
     body_en: "",
     body_hi: "",
-    date: new Date().toISOString().slice(0, 10),
+    date: localDate(),
     place: "",
     tags: [],
     yt: "",

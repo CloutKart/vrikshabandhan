@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { emptyDraft, parseTags, validateDraft } from "@/lib/content/admin";
+import { emptyDraft, localDate, parseTags, validateDraft } from "@/lib/content/admin";
 
 describe("parseTags", () => {
   it("splits on commas, trims and drops empties and duplicates", () => {
@@ -26,5 +26,13 @@ describe("validateDraft", () => {
   });
   it("accepts a complete draft", () => {
     expect(validateDraft({ ...emptyDraft(), title_en: "T", date: "2024-01-01" })).toEqual({});
+  });
+});
+
+describe("localDate", () => {
+  it("uses the editor's own calendar day, not the UTC one", () => {
+    // 01:30 on 2 June local time, whatever the zone: the UTC date may still be 1 June.
+    const d = new Date(2024, 5, 2, 1, 30);
+    expect(localDate(d)).toBe("2024-06-02");
   });
 });
