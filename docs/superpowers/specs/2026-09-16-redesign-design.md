@@ -104,6 +104,9 @@ transition `(.4,0,.2,1)`, GSAP `expo.out` / `power2.out` / `none` for scrub; sta
 10. **Page titles arrive as words** (the owner asked for typography animation): every page and story title runs a
     lighter version of the hero moment on load, SplitText by words, y 16, 30 ms stagger, `power2.out`, ≤ 600 ms.
     One typographic system: the hero arrives as characters, everything else as words.
+12. **Theme switch, daybreak and dusk**: to light, the new page is revealed in a circle growing from the sun icon
+    with a gold rim (900 ms); to dark, the old page closes into a circle on the moon (800 ms). View Transitions
+    where available, a 400 ms colour crossfade elsewhere, instant under reduced motion.
 11. **Bilingual heading pairs**: on viewport entry, once, the second-language line rises 12 px under the first with
     a 120 ms delay, so the pairing itself is what animates. Section headings only, never body text.
 

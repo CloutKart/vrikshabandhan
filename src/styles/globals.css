@@ -245,6 +245,88 @@
 }
 
 /*
+  Theme switch: daybreak and dusk (see ThemeToggle). The circle's centre is the toggle, passed in --vt-x/--vt-y.
+  With View Transitions the snapshots are clipped; without them the colours crossfade. Reduced motion cancels both.
+*/
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html[data-theme-switching="to-light"]::view-transition-old(root) {
+  z-index: 0;
+}
+html[data-theme-switching="to-light"]::view-transition-new(root) {
+  z-index: 1;
+  animation: daybreak 900ms var(--ease-enter) both;
+}
+html[data-theme-switching="to-dark"]::view-transition-new(root) {
+  z-index: 0;
+}
+html[data-theme-switching="to-dark"]::view-transition-old(root) {
+  z-index: 1;
+  animation: dusk 800ms var(--ease-exit) both;
+}
+@keyframes daybreak {
+  from {
+    clip-path: circle(0 at var(--vt-x, 100%) var(--vt-y, 0));
+  }
+  to {
+    clip-path: circle(150vmax at var(--vt-x, 100%) var(--vt-y, 0));
+  }
+}
+@keyframes dusk {
+  from {
+    clip-path: circle(150vmax at var(--vt-x, 100%) var(--vt-y, 0));
+  }
+  to {
+    clip-path: circle(0 at var(--vt-x, 100%) var(--vt-y, 0));
+  }
+}
+/* The gold rim of the daybreak: a ring of light on the edge of the growing circle. */
+@property --dawn-r {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+.dawn-rim {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  --dawn-r: 0px;
+  background: radial-gradient(
+    circle at var(--vt-x, 100%) var(--vt-y, 0),
+    transparent calc(var(--dawn-r) - 6vmax),
+    color-mix(in srgb, var(--gold) 55%, transparent) calc(var(--dawn-r) - 1.5vmax),
+    color-mix(in srgb, var(--gold) 70%, transparent) var(--dawn-r),
+    transparent calc(var(--dawn-r) + 2vmax)
+  );
+  animation: dawn-rim 900ms var(--ease-enter) both;
+}
+@keyframes dawn-rim {
+  from {
+    --dawn-r: 0px;
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  to {
+    --dawn-r: 150vmax;
+    opacity: 0;
+  }
+}
+/* Without View Transitions: the colours cross over instead of snapping. */
+html[data-theme-switching] body,
+html[data-theme-switching] body * {
+  transition:
+    background-color 400ms var(--ease-move),
+    color 400ms var(--ease-move),
+    border-color 400ms var(--ease-move);
+}
+
+/*
   Motion. Initial hidden states exist only when the head script declared
   html[data-motion="full"]; a zero-duration delayed animation forces the final
   state if the motion chunk never runs, so nothing can stay hidden.

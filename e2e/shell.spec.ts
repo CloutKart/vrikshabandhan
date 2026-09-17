@@ -51,6 +51,48 @@ test.describe("layout shell", () => {
     await expect(toggle.locator("[data-glyph='sun']")).toHaveCSS("opacity", "0");
   });
 
+  test("the theme switch is a daybreak from the sun, and instant under reduced motion", async ({ page, browser }) => {
+    await page.goto("/en");
+    await expect(page.locator("html")).toHaveAttribute("data-motion", "full");
+    const toggle = page.locator("header nav button[aria-pressed]");
+    const box = (await toggle.boundingBox())!;
+    await toggle.click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme-switching", "to-light");
+    const centre = await page.evaluate(() => {
+      const s = document.documentElement.style;
+      return [parseFloat(s.getPropertyValue("--vt-x")), parseFloat(s.getPropertyValue("--vt-y"))];
+    });
+    expect(centre[0]).toBeGreaterThan(box.x);
+    expect(centre[0]).toBeLessThan(box.x + box.width);
+    expect(centre[1]).toBeGreaterThan(box.y);
+    expect(centre[1]).toBeLessThan(box.y + box.height);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await expect(page.locator("html")).not.toHaveAttribute("data-theme-switching", /.+/, { timeout: 3000 });
+    await expect(page.locator(".dawn-rim")).toHaveCount(0);
+    // Back to dark: dusk.
+    await toggle.click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme-switching", "to-dark");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect(page.locator("html")).not.toHaveAttribute("data-theme-switching", /.+/, { timeout: 3000 });
+    const context = await browser.newContext({ reducedMotion: "reduce" });
+    const quiet = await context.newPage();
+    await quiet.goto("/en");
+    const [switching] = await Promise.all([
+      quiet.evaluate(
+        () =>
+          new Promise<string | null>((resolve) => {
+            const html = document.documentElement;
+            const seen = new MutationObserver(() => resolve(html.dataset.themeSwitching ?? null));
+            seen.observe(html, { attributes: true, attributeFilter: ["data-theme"] });
+          }),
+      ),
+      quiet.locator("header nav button[aria-pressed]").click(),
+    ]);
+    expect(switching).toBeNull();
+    await expect(quiet.locator("html")).toHaveAttribute("data-theme", "light");
+    await context.close();
+  });
+
   test("the theme toggle switches to light, persists across reload and updates theme-color", async ({ page }) => {
     await page.goto("/en");
     await page.getByRole("button", { name: "Switch to the light theme" }).click();

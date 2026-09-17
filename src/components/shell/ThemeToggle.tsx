@@ -15,13 +15,53 @@ function subscribe(onChange: () => void) {
   return () => observer.disconnect();
 }
 
-function applyTheme(theme: Theme) {
+function setTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme;
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", THEME_COLORS[theme]);
   try {
     localStorage.setItem(THEME_STORAGE_KEY, theme);
   } catch {
     /* storage may be unavailable; the choice then lasts for this page only */
+  }
+}
+
+type WithViewTransition = Document & { startViewTransition?: (update: () => void) => { finished: Promise<void> } };
+
+/**
+ * The themes are day and night, so the switch is daybreak or dusk from the
+ * toggle itself: to light, the new page is revealed in a circle growing from
+ * the sun with a gold rim on its edge; to dark, the old page closes into a
+ * circle on the moon. View Transitions where available, a colour crossfade
+ * elsewhere, an instant switch under reduced motion.
+ */
+function applyTheme(theme: Theme, button: HTMLElement | null) {
+  const html = document.documentElement;
+  const doc = document as WithViewTransition;
+  if (html.dataset.motion !== "full" || html.dataset.themeSwitching) return setTheme(theme);
+  const box = button?.getBoundingClientRect();
+  const x = box ? box.left + box.width / 2 : window.innerWidth - 40;
+  const y = box ? box.top + box.height / 2 : 36;
+  html.style.setProperty("--vt-x", `${Math.round(x)}px`);
+  html.style.setProperty("--vt-y", `${Math.round(y)}px`);
+  html.dataset.themeSwitching = theme === "light" ? "to-light" : "to-dark";
+  const done = () => {
+    delete html.dataset.themeSwitching;
+    html.style.removeProperty("--vt-x");
+    html.style.removeProperty("--vt-y");
+    rim?.remove();
+  };
+  let rim: HTMLElement | null = null;
+  if (theme === "light") {
+    rim = document.createElement("div");
+    rim.className = "dawn-rim";
+    rim.setAttribute("aria-hidden", "true");
+    document.body.appendChild(rim);
+  }
+  if (typeof doc.startViewTransition === "function") {
+    doc.startViewTransition(() => setTheme(theme)).finished.then(done, done);
+  } else {
+    setTheme(theme);
+    window.setTimeout(done, 450);
   }
 }
 
@@ -35,7 +75,7 @@ export function ThemeToggle() {
       type="button"
       aria-pressed={theme === "light"}
       aria-label={next === "light" ? t("themeToLight") : t("themeToDark")}
-      onClick={() => applyTheme(next)}
+      onClick={(e) => applyTheme(next, e.currentTarget)}
       className="grid h-11 w-11 place-items-center rounded-full text-ink transition-colors duration-150 ease-enter hover:bg-ground-2 active:scale-[var(--scale-press)]"
     >
       <span className="grid h-5 w-5 place-items-center">
