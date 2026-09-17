@@ -12,7 +12,8 @@
     "e2e": "next build && playwright test",
     "e2e:quick": "playwright test",
     "check:bundle": "node scripts/check-bundle.mjs",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "seed:sql": "tsx scripts/seed-sql.ts > supabase/seed.sql"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

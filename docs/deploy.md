@@ -18,10 +18,10 @@ editor and new stories once a Supabase project is attached.
 4. Authentication, URL configuration: set the Site URL to the public domain and add
    `https://<domain>/admin/auth/callback` to the redirect allow list. Keep the default e-mail magic-link template or
    adjust its wording; the link must point at that callback.
-5. Seed the three built-in stories so they become editable (optional, local machine only, never in CI):
-   `NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run seed`
-   (`npm run seed -- --dry-run` prints the rows first.) The service-role key must never reach the browser or Vercel.
-   Seeding upserts by slug: running it again overwrites any edits an editor has made to those four stories.
+5. Seed the four built-in stories so they become editable (optional): paste `supabase/seed.sql` in the SQL editor.
+   It never overwrites a row that already exists. (`npm run seed:sql` regenerates it after the built-in stories
+   change.) The Node alternative, `NEXT_PUBLIC_SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run seed`, upserts
+   instead and so does overwrite edits; the service-role key must never reach the browser or Vercel.
 
 ## 2. Vercel
 
