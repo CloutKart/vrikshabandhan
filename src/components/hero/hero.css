@@ -69,6 +69,24 @@
 .hero-cutout {
   z-index: 3;
 }
+/* The moving tree, drawn by WebGL through a warped grid (src/lib/motion/tree.ts). It takes the cut-out's layer. */
+.hero-sway {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+@media (min-width: 820px) {
+  .hero-sway {
+    display: block;
+  }
+}
+.hero-art[data-sway] .hero-cutout:not(.hero-tassel) {
+  opacity: 0;
+}
 /* The thread's loose ends: a 150x120 patch at the knot (x 1330, y 760 of the 1672x941 frame) that drifts a little. */
 .hero-tassel {
   inset: auto;
@@ -123,9 +141,9 @@
   position: absolute;
   left: var(--x);
   top: var(--y);
-  width: calc(var(--size) * 3.25);
+  width: var(--size);
   height: auto;
-  margin: calc(var(--size) * -0.8) 0 0 calc(var(--size) * -2.2);
+  margin: calc(var(--size) * -0.28) 0 0 calc(var(--size) * -0.5);
   overflow: visible;
   opacity: 0;
   animation: leaf-fall var(--duration) linear var(--delay) infinite;
@@ -133,33 +151,6 @@
 }
 .hero-leaf > g {
   transform-origin: 0 0;
-}
-/* The wind curl draws itself off the leaf, then thins away, three times per fall. */
-.hero-leaf-wind {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: leaf-wind calc(var(--duration) / 3) ease-out var(--delay) infinite;
-}
-@keyframes leaf-wind {
-  0% {
-    stroke-dashoffset: 1;
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.75;
-  }
-  45% {
-    stroke-dashoffset: 0;
-    opacity: 0.6;
-  }
-  80% {
-    stroke-dashoffset: -0.6;
-    opacity: 0;
-  }
-  100% {
-    stroke-dashoffset: -0.6;
-    opacity: 0;
-  }
 }
 /* Down and to the right, with side gusts that swing back a little between them. */
 @keyframes leaf-fall {

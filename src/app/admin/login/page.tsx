@@ -20,7 +20,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <p className="mt-4 max-w-[50ch] text-ink-2">Only e-mail addresses on the editor list can sign in. There is no password: a link arrives by e-mail.</p>
       {denied ? (
         <p role="alert" className="mt-6 max-w-[50ch] text-sutra">
-          This account signed in, but it is not on the editor list. Ask an existing editor to add it.
+          {user?.email ? `Signed in as ${user.email}, which is not on the editor list.` : "This account signed in, but it is not on the editor list."}{" "}
+          An editor adds it in the Supabase SQL editor with <code className="font-sans text-sm">{`insert into public.editors (email) values ('${user?.email ?? "address"}');`}</code> then reloads this page.
         </p>
       ) : null}
       {error ? (

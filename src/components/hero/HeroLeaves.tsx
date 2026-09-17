@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
  * Nine leaves let go of the canopy and are carried down and to the right, as if
  * on a breeze, across the headline. Each has its own shape (drawn in the painting's
  * leaf colours with the same dark edge and midrib), size, timing, drift and spin,
- * and a thin curl of wind that streams off it and fades. They start inside the
+ * They start inside the
  * canopy, behind the cut-out, so they appear to come out of the tree rather than
  * out of the air. Decorative: hidden from assistive tech, and not rendered at all
  * under reduced motion or on phones. hero.css does the falling.
@@ -43,7 +43,7 @@ export function HeroLeaves() {
             key={i}
             className="hero-leaf"
             data-shape={l.shape}
-            viewBox="-70 -26 104 52"
+            viewBox="-16 -9 32 18"
             style={
               {
                 "--x": `${l.x}cqw`,
@@ -57,8 +57,6 @@ export function HeroLeaves() {
               } as CSSProperties
             }
           >
-            {/* The wind: a curl that streams off the leaf towards where it came from, draws itself and fades. */}
-            <path className="hero-leaf-wind" pathLength={1} d="M-8 4C-22 2 -30 -10 -42 -6 -52 -3 -50 8 -40 8 -33 8 -34 2 -40 1" fill="none" stroke="var(--paper-ink)" strokeWidth="1.8" strokeLinecap="round" opacity="0" />
             <g transform="translate(-16 -9)">
               <path d={shape.outline} fill={`var(--leaf-${l.colour})`} stroke="var(--paper-ink)" strokeWidth="1.1" strokeLinejoin="round" />
               <path d={shape.rib} fill="none" stroke="var(--paper-ink)" strokeWidth="0.7" opacity="0.7" />

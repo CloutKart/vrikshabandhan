@@ -76,13 +76,48 @@ test("leaves fall across the headline with full motion on desktop, and do not ex
   expect(z).toBeGreaterThan(1);
   expect(z).toBeLessThan(cutoutZ);
   expect(new Set(await leaves.evaluateAll((els) => els.map((e) => e.getAttribute("data-shape")))).size).toBeGreaterThanOrEqual(5);
-  await expect(page.locator("[data-hero-leaves] .hero-leaf-wind")).toHaveCount(9);
+  await expect(page.locator("[data-hero-leaves] .hero-leaf-wind")).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 800 });
   await expect(page.locator("[data-hero-leaves]")).toBeHidden();
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
   const quiet = await context.newPage();
   await quiet.goto("/en");
   await expect(quiet.locator("[data-hero-leaves]")).toBeHidden();
+  await context.close();
+});
+
+test("the branches move in the wind on desktop with full motion, and the tips move more than the trunk", async ({ page, browser }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.addInitScript(() => sessionStorage.setItem("va-hero", "1"));
+  await page.goto("/en");
+  await expect(page.locator(".hero-art canvas.hero-sway")).toHaveCount(1);
+  await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
+  await expect(page.locator('img.hero-cutout:not(.hero-tassel)[data-variant="dark"]')).toHaveCSS("opacity", "0");
+  const art = (await page.locator(".hero-art").boundingBox())!;
+  const region = (x: number, y: number, w: number, h: number) => ({ x: art.x + art.width * x, y: art.y + art.height * y, width: art.width * w, height: art.height * h });
+  const tips = region(0.03, 0.25, 0.22, 0.4);
+  const trunk = region(0.76, 0.8, 0.1, 0.18);
+  const diff = async (clip: { x: number; y: number; width: number; height: number }) => {
+    const sharp = (await import("sharp")).default;
+    const a = await page.screenshot({ clip });
+    await page.waitForTimeout(900);
+    const b = await page.screenshot({ clip });
+    const [ra, rb] = await Promise.all([a, b].map((buf) => sharp(buf).raw().toBuffer()));
+    let sum = 0;
+    for (let i = 0; i < ra.length; i++) sum += Math.abs(ra[i] - rb[i]);
+    return sum / ra.length;
+  };
+  const tipChange = await diff(tips);
+  const trunkChange = await diff(trunk);
+  expect(tipChange, "tips move").toBeGreaterThan(2);
+  expect(trunkChange, "trunk stays").toBeLessThan(tipChange / 4);
+  await page.setViewportSize({ width: 390, height: 800 });
+  await expect(page.locator(".hero-art canvas.hero-sway")).toBeHidden();
+  const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
+  const quiet = await context.newPage();
+  await quiet.goto("/en");
+  await expect(quiet.locator("html")).toHaveAttribute("data-motion-ready", "");
+  await expect(quiet.locator(".hero-art canvas.hero-sway")).toHaveCount(0);
   await context.close();
 });
 

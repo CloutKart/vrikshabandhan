@@ -9,6 +9,7 @@
  */
 import { HERO_SESSION_KEY } from "@/lib/theme/constants";
 import { getGsap } from "./gsap";
+import { treeSway } from "./tree";
 import { dur, ease, move, stagger } from "./tokens";
 
 type Cleanup = () => void;
@@ -30,7 +31,7 @@ export function mount(pathname: string): Cleanup {
   const html = document.documentElement;
   const full = html.dataset.motion === "full";
   const cleanups: Cleanup[] = [revealObserver(), headerRule()];
-  if (full) cleanups.push(heroSequence(), titleReveal(), flipMorph(pathname));
+  if (full) cleanups.push(heroSequence(), titleReveal(), flipMorph(pathname), treeSway());
   // Lets tests (and anything else) know the listeners exist for this route.
   html.dataset.motionReady = "";
   return () => {
@@ -99,7 +100,7 @@ function heroSequence(): Cleanup {
   }
   const primary = title.querySelector<HTMLElement>(":scope > span:first-child");
   const secondary = title.querySelector<HTMLElement>(":scope > span:nth-child(2)");
-  const cutout = document.querySelectorAll<HTMLElement>(".hero-cutout");
+  const cutout = document.querySelectorAll<HTMLElement>(".hero-cutout, .hero-sway");
 
   let done = false;
   let split: { revert: () => void } | undefined;

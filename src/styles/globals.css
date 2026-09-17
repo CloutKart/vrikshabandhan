@@ -263,6 +263,7 @@
   }
 }
 html[data-motion="full"][data-hero="pending"] .hero-cutout,
+html[data-motion="full"][data-hero="pending"] .hero-sway,
 html[data-motion="full"][data-hero="pending"] [data-hero-title] {
   opacity: 0;
   animation: force-visible 0s 1.6s forwards;
