@@ -6,7 +6,8 @@ editor and new stories once a Supabase project is attached.
 ## 1. Supabase
 
 1. Create a project at supabase.com. Note the project URL and the anon key (Project settings, API).
-2. Run the migrations in order in the SQL editor, or with the CLI (`supabase db push`):
+2. Run `supabase/setup.sql` once in the SQL editor (it is the three migrations below plus the editor list, and is
+   safe to run again), or with `psql "$DATABASE_URL" -f supabase/setup.sql`. The individual migrations, in order:
    - `supabase/migrations/0001_posts.sql` (posts table)
    - `supabase/migrations/0002_editors_rls.sql` (editor list, row-level security)
    - `supabase/migrations/0003_storage.sql` (the public `media` bucket, 20 MB, JPEG/PNG/WebP/MP4)
