@@ -176,6 +176,12 @@ export function treeSway(): Cleanup {
   let raf = 0;
   let textured = false;
   const start = performance.now();
+  // Software rendering (no GPU: some VMs, remote desktops) gets a smaller canvas and half the frames.
+  const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+  const renderer = String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+  const software = /swiftshader|llvmpipe|software/i.test(renderer);
+  const maxDpr = software ? 1 : 2;
+  let tick = 0;
 
   const visibleImage = () => {
     const theme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
@@ -197,7 +203,7 @@ export function treeSway(): Cleanup {
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
   const resize = () => {
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const dpr = Math.min(maxDpr, window.devicePixelRatio || 1);
     const w = Math.round(art.clientWidth * dpr), h = Math.round(art.clientHeight * dpr);
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w;
@@ -213,6 +219,9 @@ export function treeSway(): Cleanup {
     if (disposed) return;
     raf = requestAnimationFrame(frame);
     if (!textured || !canvas.width) return;
+    if (software && tick++ % 2) return;
+    // Wait for the hero's entrance to finish before the first draw, so the two never compete for the main thread.
+    if (document.documentElement.dataset.hero === "pending") return;
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform1f(uT, (performance.now() - start) / 1000);

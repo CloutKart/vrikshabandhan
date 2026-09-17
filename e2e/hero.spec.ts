@@ -96,21 +96,25 @@ test("the branches move in the wind on desktop with full motion, and the tips mo
   const art = (await page.locator(".hero-art").boundingBox())!;
   const region = (x: number, y: number, w: number, h: number) => ({ x: art.x + art.width * x, y: art.y + art.height * y, width: art.width * w, height: art.height * h });
   const tips = region(0.03, 0.25, 0.22, 0.4);
-  const trunk = region(0.76, 0.8, 0.1, 0.18);
-  const diff = async (clip: { x: number; y: number; width: number; height: number }) => {
-    const sharp = (await import("sharp")).default;
-    const a = await page.screenshot({ clip });
-    await page.waitForTimeout(900);
-    const b = await page.screenshot({ clip });
-    const [ra, rb] = await Promise.all([a, b].map((buf) => sharp(buf).raw().toBuffer()));
+  // The trunk base, below the knot and the moving thread ends.
+  const trunk = region(0.77, 0.92, 0.08, 0.07);
+  const sharp = (await import("sharp")).default;
+  const shot = async (clip: { x: number; y: number; width: number; height: number }) => sharp(await page.screenshot({ clip })).raw().toBuffer();
+  const meanDiff = (a: Buffer, b: Buffer) => {
     let sum = 0;
-    for (let i = 0; i < ra.length; i++) sum += Math.abs(ra[i] - rb[i]);
-    return sum / ra.length;
+    for (let i = 0; i < a.length; i++) sum += Math.abs(a[i] - b[i]);
+    return sum / a.length;
   };
-  const tipChange = await diff(tips);
-  const trunkChange = await diff(trunk);
+  // Three moments 700 ms apart: the gust may be near a turning point at one of them, so take the largest change.
+  const frames: Array<{ tips: Buffer; trunk: Buffer }> = [];
+  for (let i = 0; i < 3; i++) {
+    frames.push({ tips: await shot(tips), trunk: await shot(trunk) });
+    if (i < 2) await page.waitForTimeout(700);
+  }
+  const tipChange = Math.max(meanDiff(frames[0].tips, frames[1].tips), meanDiff(frames[1].tips, frames[2].tips), meanDiff(frames[0].tips, frames[2].tips));
+  const trunkChange = Math.max(meanDiff(frames[0].trunk, frames[1].trunk), meanDiff(frames[1].trunk, frames[2].trunk));
   expect(tipChange, "tips move").toBeGreaterThan(2);
-  expect(trunkChange, "trunk stays").toBeLessThan(tipChange / 4);
+  expect(trunkChange, "trunk stays").toBeLessThan(1);
   await page.setViewportSize({ width: 390, height: 800 });
   await expect(page.locator(".hero-art canvas.hero-sway")).toBeHidden();
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
