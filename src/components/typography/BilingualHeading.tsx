@@ -13,7 +13,23 @@ type Props = {
   reveal?: "hero" | "title";
   /** The second-language line rises into place once it is in view. */
   riseSecondary?: boolean;
+  /** A word in each line set in the thread's red (the hero: "thread" / "धागा"). */
+  accent?: string;
+  secondaryAccent?: string;
 };
+
+/** The line with its accented word wrapped, or the plain line when the word is absent. */
+function withAccent(text: string, accent?: string) {
+  const at = accent ? text.indexOf(accent) : -1;
+  if (at < 0) return text;
+  return (
+    <>
+      {text.slice(0, at)}
+      <span data-accent>{accent}</span>
+      {text.slice(at + accent!.length)}
+    </>
+  );
+}
 
 /**
  * A heading that speaks both languages: the page's locale first, the other
@@ -30,6 +46,8 @@ export function BilingualHeading({
   secondaryClassName = "",
   reveal,
   riseSecondary = false,
+  accent,
+  secondaryAccent,
 }: Props) {
   const tagAttrs = reveal === "hero" ? { "data-hero-title": "" } : {};
   const primaryAttrs = reveal === "title" ? { "data-title-reveal": "" } : {};
@@ -37,11 +55,11 @@ export function BilingualHeading({
   return (
     <Tag className={className} {...tagAttrs}>
       <span lang={primaryLang} className="block text-balance" {...primaryAttrs}>
-        {primary}
+        {withAccent(primary, accent)}
       </span>
       {secondary && secondaryLang ? (
         <span lang={secondaryLang} className={`block text-balance text-[0.55em] ${secondaryClassName}`} {...secondaryAttrs}>
-          {secondary}
+          {withAccent(secondary, secondaryAccent)}
         </span>
       ) : null}
     </Tag>

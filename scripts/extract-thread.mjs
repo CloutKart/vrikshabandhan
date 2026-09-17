@@ -2,8 +2,8 @@
  * Lifts the raksha sutra off the hero cut-outs so it can move on its own layers.
  *   node scripts/extract-thread.mjs
  * Reads assets/painting/tree-cutout*.webp (untouched sources) and writes, per frame and theme:
- *   public/images/thread-band*.png   the band and the knot round the trunk
- *   public/images/tassel*.png        the two loose ends below the knot
+ *   public/images/thread-band*.png   the band wrapped round the trunk (it never moves)
+ *   public/images/tassel*.png        the knot and its two loose ends (they swing)
  *   public/images/tree-cutout*.webp  the tree with the thread painted out
  * The trunk under the band is filled from the rows above and below it (its sides are transparent);
  * the ground under the ends is filled from the pixels to their left and right.
@@ -12,16 +12,16 @@
 import sharp from "sharp";
 
 const FRAMES = {
-  wide: { name: "tree-cutout", BAND: { x: 1290, y: 722, w: 190, h: 56 }, ENDS: { x: 1330, y: 778, w: 150, h: 102 }, smooth: false, bandFillMode: "mean", bandDirs: [[0, -1], [0, 1]], endsDirs: [[0, 1], [0, -1]] },
+  wide: { name: "tree-cutout", BAND: { x: 1290, y: 722, w: 160, h: 56 }, ENDS: { x: 1330, y: 778, w: 150, h: 102 }, knotX: 1372, smooth: false, bandFillMode: "nearest", bandDirs: [[1, 0], [-1, 0], [0, 1], [0, -1]], endsDirs: [[0, 1], [0, -1]] },
   // The square trunk carries heavier knife strokes, so its fill starts from box-averaged rows (single pixels would
   // stripe), and its edge slants under the loose ends, so those are filled from the nearest side in any direction.
-  square: { name: "tree-cutout-sq", BAND: { x: 985, y: 882, w: 140, h: 60 }, ENDS: { x: 1055, y: 942, w: 120, h: 104 }, smooth: true, bandFillMode: "nearest", bandDirs: [[1, 0], [-1, 0], [0, 1], [0, -1]], endsDirs: [[1, 0], [-1, 0], [0, 1], [0, -1]] },
+  square: { name: "tree-cutout-sq", BAND: { x: 985, y: 882, w: 140, h: 60 }, ENDS: { x: 1055, y: 942, w: 120, h: 104 }, knotX: 1059, smooth: true, bandFillMode: "nearest", bandDirs: [[1, 0], [-1, 0], [0, 1], [0, -1]], endsDirs: [[1, 0], [-1, 0], [0, 1], [0, -1]] },
 };
 // Red and orange, including the darker shadowed strands along the edges of the band.
 const isThread = (r, g, b, a) => a > 128 && r > 90 && r - g > 30 && r - b > 40;
 
 async function run(frame, variant) {
-  const { BAND, ENDS, smooth, bandFillMode, bandDirs, endsDirs } = FRAMES[frame];
+  const { BAND, ENDS, knotX, smooth, bandFillMode, bandDirs, endsDirs } = FRAMES[frame];
   const suffix = variant === "light" ? "-light" : "";
   const base = FRAMES[frame].name;
   const { data, info } = await sharp(`assets/painting/${base}${suffix}.webp`).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -131,8 +131,14 @@ async function run(frame, variant) {
   const band = maskFor(BAND, true);
   const bandOnly = maskFor(BAND, false);
   const ends = maskFor(ENDS, false);
-  await layer(BAND, bandOnly.mask, `public/images/${base.replace("tree-cutout", "thread-band")}${suffix}.png`);
-  await layer(ENDS, ends.mask, `public/images/${base.replace("tree-cutout", "tassel")}${suffix}.png`);
+  // Two layers: the band wrapped round the trunk (still) and, from knotX on, the knot with its loose ends (moving).
+  const bandRegion = { x: BAND.x, y: BAND.y, w: knotX - BAND.x, h: BAND.h };
+  const knotRegion = { x: knotX, y: BAND.y, w: ENDS.x + ENDS.w - knotX, h: ENDS.y + ENDS.h - BAND.y };
+  const knotMask = new Uint8Array(W * H);
+  for (let i = 0; i < W * H; i++) knotMask[i] = bandOnly.mask[i] | ends.mask[i];
+  await layer(bandRegion, bandOnly.mask, `public/images/${base.replace("tree-cutout", "thread-band")}${suffix}.png`);
+  await layer(knotRegion, knotMask, `public/images/${base.replace("tree-cutout", "tassel")}${suffix}.png`);
+  console.log(`${frame}: band ${bandRegion.w}x${bandRegion.h} at ${bandRegion.x},${bandRegion.y}; knot ${knotRegion.w}x${knotRegion.h} at ${knotRegion.x},${knotRegion.y}`);
   const out = Buffer.from(data);
   inpaint(out, BAND, band.mask, bandDirs, bandFillMode);
   bandFill(out, band.mask, ends.mask);

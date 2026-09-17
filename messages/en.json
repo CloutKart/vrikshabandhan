@@ -24,6 +24,7 @@
   },
   "hero": {
     "title": "A thread tied to a tree",
+    "accent": "thread",
     "lede": "Since 2005 we have planted fruit and shade trees across Uttarakhand, tied a thread round each one, and gone back to water them.",
     "readStories": "Read the stories",
     "tieThread": "Tie a thread with us",
@@ -172,4 +173,4 @@
     "home": "Home",
     "loading": "Loading"
   }
-}
+}\n

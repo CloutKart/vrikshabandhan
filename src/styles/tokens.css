@@ -20,6 +20,7 @@
   --leaf-green: #5B9A3C;
   --leaf-blue: #2F4F8F;
   --leaf-gold: #D8A62A;
+  --thread: #AF472C; /* the raksha sutra's own red, measured on the painting; the same thread in both themes */
   color-scheme: dark;
 }
 
@@ -39,6 +40,7 @@
   --leaf-green: #4C8A32;
   --leaf-blue: #2F4F8F;
   --leaf-gold: #C7961F;
+  --thread: #AF472C;
   color-scheme: light;
 }
 
@@ -56,6 +58,7 @@
   --color-paper-ink-2: var(--paper-ink-2);
   --color-stone: var(--stone);
   --color-stone-ink: var(--stone-ink);
+  --color-thread: var(--thread);
   --color-white: #ffffff;
 
   --radius-sm: 2px;

@@ -121,16 +121,18 @@ test("the branches move in the wind with full motion, and the tips move more tha
   const trunkChange = Math.max(meanDiff(frames[0].trunk, frames[1].trunk), meanDiff(frames[1].trunk, frames[2].trunk));
   expect(tipChange, "tips move").toBeGreaterThan(2);
   expect(trunkChange, "trunk stays").toBeLessThan(1);
-  // The thread: band and ends are their own springy layers above the tree.
+  // The thread: the band round the trunk is still; the knot and its ends are a springy layer above the tree.
   const band = page.locator('img.hero-thread-band[data-variant="dark"]');
   await expect(band).toBeVisible();
-  expect(await band.evaluate((el) => getComputedStyle(el).animationName)).toBe("thread-settle");
+  expect(await band.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+  expect(await page.locator('img.hero-tassel[data-variant="dark"]').evaluate((el) => getComputedStyle(el).animationName)).toBe("tassel-sway");
   expect(await band.evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10))).toBeGreaterThan(cutoutZ);
   // Phones get the same moving tree and thread.
   await page.setViewportSize({ width: 390, height: 800 });
   await expect(page.locator(".hero-art canvas.hero-sway")).toBeVisible();
   await expect(band).toBeVisible();
-  expect(await band.evaluate((el) => getComputedStyle(el).animationName)).toBe("thread-settle");
+  expect(await band.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+  expect(await page.locator('img.hero-tassel[data-variant="dark"]').evaluate((el) => getComputedStyle(el).animationName)).toBe("tassel-sway");
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
   const quiet = await context.newPage();
   await quiet.goto("/en");
@@ -271,4 +273,24 @@ test("on a 3x phone the tree is drawn at full pixel density", async ({ browser }
   expect(drawn).toBe(Math.round(art.width * (software ? 1 : 3)));
   await expect.poll(() => page.locator('img.hero-tree[data-variant="dark"]').evaluate((el: HTMLImageElement) => el.currentSrc)).toMatch(/w=1200/);
   await context.close();
+});
+
+
+test("the word thread in the headline wears the thread's red, in both languages and after the entrance", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/en");
+  await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
+  await expect(page.locator("html")).not.toHaveAttribute("data-hero", "pending", { timeout: 5000 });
+  const accents = page.locator(".hero-title [data-accent]");
+  await expect(accents).toHaveCount(2);
+  await expect(accents.nth(0)).toHaveText("thread");
+  await expect(accents.nth(1)).toHaveText("धागा");
+  for (const el of await accents.all()) expect(await el.evaluate((e) => getComputedStyle(e).color)).toBe("rgb(175, 71, 44)");
+  // The split entrance keeps the word's colour on every character.
+  const charColours = await page.locator(".hero-title [data-accent] *").evaluateAll((els) => els.map((e) => getComputedStyle(e).color));
+  for (const c of charColours) expect(c).toBe("rgb(175, 71, 44)");
+  await page.goto("/hi");
+  await expect(page.locator(".hero-title [data-accent]").nth(0)).toHaveText("धागा");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator(".hero-title [data-accent]").nth(0)).toBeVisible();
 });
