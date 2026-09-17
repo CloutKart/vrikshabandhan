@@ -205,20 +205,51 @@ export function treeSway(): Cleanup {
     const theme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
     return images.find((img) => img.dataset.variant === theme) ?? images[0];
   };
+  // The first frame after every upload is checked before the still tree is hidden (see `frameLooksRight`).
+  let verified = false;
+  const scratch = document.createElement("canvas");
   const upload = () => {
     const img = visibleImage();
     const apply = () => {
       if (disposed || !img.naturalWidth) return;
+      // Through a 2D canvas: every browser uploads a canvas faithfully, whatever the image's encoding or decode
+      // state. Safari has handed WebGL an opaque black texture straight from an <img>.
+      scratch.width = img.naturalWidth;
+      scratch.height = img.naturalHeight;
+      const ctx = scratch.getContext("2d");
+      if (!ctx) return;
+      ctx.clearRect(0, 0, scratch.width, scratch.height);
+      ctx.drawImage(img, 0, 0);
       gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, scratch);
       textured = true;
+      verified = false;
     };
-    if (img.complete && img.naturalWidth) apply();
-    else img.addEventListener("load", apply, { once: true });
+    const ready = () => {
+      const decoded = typeof img.decode === "function" ? img.decode().catch(() => undefined) : Promise.resolve();
+      decoded.then(apply);
+    };
+    if (img.complete && img.naturalWidth) ready();
+    else img.addEventListener("load", ready, { once: true });
   };
   upload();
   const themeObserver = new MutationObserver(upload);
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  // Two pixels prove a frame: the trunk (opaque and pale in both cut-outs) and the empty ground below the crown
+  // (fully transparent). A browser that uploaded the texture as opaque black, or lost the context, fails this and
+  // the still tree stays in view instead of a black frame.
+  const px = new Uint8Array(4);
+  const read = (u: number, v: number) => {
+    gl.readPixels(Math.round(u * (canvas.width - 1)), Math.round((1 - v) * (canvas.height - 1)), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    return Array.from(px);
+  };
+  const frameLooksRight = () => {
+    if (gl.getError() !== gl.NO_ERROR) return false;
+    const trunk = read(0.815, 0.92);
+    const ground = read(0.5, 0.99);
+    return trunk[3] > 200 && trunk[0] + trunk[1] + trunk[2] > 60 && ground[3] === 0;
+  };
 
   const resize = () => {
     const dpr = Math.min(maxDpr, window.devicePixelRatio || 1);
@@ -251,16 +282,33 @@ export function treeSway(): Cleanup {
       WIND.right.degrees * rad * gust(t - WIND.right.lag),
     );
     gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+    if (!verified) {
+      if (!frameLooksRight()) {
+        stop();
+        return;
+      }
+      verified = true;
+    }
     if (!art.dataset.sway) art.dataset.sway = "";
   };
   raf = requestAnimationFrame(frame);
 
-  return () => {
+  const stop = () => {
+    if (disposed) return;
     disposed = true;
     cancelAnimationFrame(raf);
     ro.disconnect();
     themeObserver.disconnect();
+    canvas.removeEventListener("webglcontextlost", onLost);
     delete art.dataset.sway;
     canvas.remove();
   };
+  // A lost context (phones drop WebGL when the tab is backgrounded) hands the layer back to the still tree.
+  const onLost = (e: Event) => {
+    e.preventDefault();
+    stop();
+  };
+  canvas.addEventListener("webglcontextlost", onLost);
+
+  return stop;
 }
