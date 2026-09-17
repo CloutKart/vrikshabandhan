@@ -67,7 +67,7 @@
   z-index: 0;
 }
 .hero-cutout {
-  z-index: 2;
+  z-index: 3;
 }
 /* The thread's loose ends: a 150x120 patch at the knot (x 1330, y 760 of the 1672x941 frame) that drifts a little. */
 .hero-tassel {
@@ -76,7 +76,7 @@
   top: 80.77%;
   width: 8.97%;
   height: auto;
-  z-index: 3;
+  z-index: 4;
   transform-origin: 50% 0;
 }
 /* A breeze on the loose ends: they swing about the knot, with a small catch on the way back, and are clearly moving within the first second. */
@@ -100,10 +100,11 @@
   }
 }
 /*
-  Falling leaves. Nine leaves start at the canopy's lower edge and drift to the bottom of the painting in front of
-  the headline and the cut-out, each on its own duration and delay so the loop never reads as a loop. Transform and
-  opacity only. They exist only with full motion on desktop: a leaf frozen mid-air would be wrong, so reduced motion
-  removes them rather than pausing them.
+  Falling leaves. Nine leaves start inside the canopy, behind the cut-out, so they come out of the tree, then are
+  carried down and to the right as if on a breeze, across the headline and behind the trunk. Each has its own
+  duration and delay so the loop never reads as a loop. Transform and opacity only. They exist only with full
+  motion on desktop: a leaf frozen mid-air would be wrong, so reduced motion removes them rather than pausing them.
+  Layers: painting 0, headline 1, leaves 2, cut-out 3, thread ends 4.
 */
 .hero-leaves {
   display: none;
@@ -113,7 +114,7 @@
     display: block;
     position: absolute;
     inset: 0;
-    z-index: 4;
+    z-index: 2;
     pointer-events: none;
     overflow: hidden;
   }
@@ -122,36 +123,68 @@
   position: absolute;
   left: var(--x);
   top: var(--y);
-  width: var(--size);
+  width: calc(var(--size) * 3.25);
   height: auto;
+  margin: calc(var(--size) * -0.8) 0 0 calc(var(--size) * -2.2);
+  overflow: visible;
   opacity: 0;
-  transform-origin: 40% 50%;
   animation: leaf-fall var(--duration) linear var(--delay) infinite;
   will-change: transform, opacity;
 }
+.hero-leaf > g {
+  transform-origin: 0 0;
+}
+/* The wind curl draws itself off the leaf, then thins away, three times per fall. */
+.hero-leaf-wind {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: leaf-wind calc(var(--duration) / 3) ease-out var(--delay) infinite;
+}
+@keyframes leaf-wind {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.75;
+  }
+  45% {
+    stroke-dashoffset: 0;
+    opacity: 0.6;
+  }
+  80% {
+    stroke-dashoffset: -0.6;
+    opacity: 0;
+  }
+  100% {
+    stroke-dashoffset: -0.6;
+    opacity: 0;
+  }
+}
+/* Down and to the right, with side gusts that swing back a little between them. */
 @keyframes leaf-fall {
   0% {
     transform: translate3d(0, 0, 0) rotate(0deg) scaleX(var(--flip));
-    opacity: 0;
-  }
-  6% {
     opacity: 1;
   }
-  22% {
-    transform: translate3d(calc(var(--drift) * 0.7), 9cqw, 0) rotate(calc(var(--spin) * 0.22)) scaleX(var(--flip));
+  20% {
+    transform: translate3d(calc(var(--drift) * 0.3), 8cqw, 0) rotate(calc(var(--spin) * 0.2)) scaleX(var(--flip));
   }
-  44% {
-    transform: translate3d(calc(var(--drift) * -0.5), 19cqw, 0) rotate(calc(var(--spin) * 0.46)) scaleX(var(--flip));
+  38% {
+    transform: translate3d(calc(var(--drift) * 0.42), 17cqw, 0) rotate(calc(var(--spin) * 0.42)) scaleX(var(--flip));
   }
-  66% {
-    transform: translate3d(calc(var(--drift) * 0.9), 29cqw, 0) rotate(calc(var(--spin) * 0.68)) scaleX(var(--flip));
+  58% {
+    transform: translate3d(calc(var(--drift) * 0.7), 26cqw, 0) rotate(calc(var(--spin) * 0.6)) scaleX(var(--flip));
   }
-  88% {
-    transform: translate3d(calc(var(--drift) * -0.3), 39cqw, 0) rotate(calc(var(--spin) * 0.9)) scaleX(var(--flip));
+  76% {
+    transform: translate3d(calc(var(--drift) * 0.8), 35cqw, 0) rotate(calc(var(--spin) * 0.8)) scaleX(var(--flip));
+  }
+  90% {
+    transform: translate3d(calc(var(--drift) * 0.95), 43cqw, 0) rotate(calc(var(--spin) * 0.92)) scaleX(var(--flip));
     opacity: 1;
   }
   100% {
-    transform: translate3d(calc(var(--drift) * 0.2), 46cqw, 0) rotate(var(--spin)) scaleX(var(--flip));
+    transform: translate3d(var(--drift), 50cqw, 0) rotate(var(--spin)) scaleX(var(--flip));
     opacity: 0;
   }
 }

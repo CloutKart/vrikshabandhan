@@ -70,9 +70,13 @@ test("leaves fall across the headline with full motion on desktop, and do not ex
   await expect(leaves).toHaveCount(9);
   await expect(page.locator("[data-hero-leaves]")).toBeVisible();
   expect(await leaves.first().evaluate((el) => getComputedStyle(el).animationName)).toBe("leaf-fall");
-  // In front of the headline and the cut-out.
+  // In front of the headline, behind the cut-out (so they come out of the canopy and pass behind the trunk).
   const z = await page.locator("[data-hero-leaves]").evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
-  expect(z).toBeGreaterThan(2);
+  const cutoutZ = await page.locator('img.hero-cutout:not(.hero-tassel)[data-variant="dark"]').evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
+  expect(z).toBeGreaterThan(1);
+  expect(z).toBeLessThan(cutoutZ);
+  expect(new Set(await leaves.evaluateAll((els) => els.map((e) => e.getAttribute("data-shape")))).size).toBeGreaterThanOrEqual(5);
+  await expect(page.locator("[data-hero-leaves] .hero-leaf-wind")).toHaveCount(9);
   await page.setViewportSize({ width: 390, height: 800 });
   await expect(page.locator("[data-hero-leaves]")).toBeHidden();
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
