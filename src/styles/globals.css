@@ -106,6 +106,16 @@
   .u-thread[aria-current]::after {
     transform: scaleX(1);
   }
+  /* Painting details carry both canvases; the theme decides which one shows (the other stays lazy and unfetched). */
+  .painting-detail img[data-variant="light"] {
+    display: none;
+  }
+  [data-theme="light"] .painting-detail img[data-variant="dark"] {
+    display: none;
+  }
+  [data-theme="light"] .painting-detail img[data-variant="light"] {
+    display: block;
+  }
   /* Painting details keep one ratio on desktop and may take a shorter one on phones. */
   .painting-detail {
     aspect-ratio: var(--ratio);

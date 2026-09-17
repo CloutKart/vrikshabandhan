@@ -38,15 +38,20 @@ export function PaintingDetail({
       className={`painting-detail relative overflow-hidden rounded-[var(--radius-panel)] bg-stone ${className}`}
       style={{ "--ratio": RATIO[ratio], "--ratio-phone": RATIO[phoneRatio] } as CSSProperties}
     >
-      <Image
-        src="/images/tree-painting.jpg"
-        alt={alt}
-        fill
-        sizes={sizes}
-        quality={62}
-        className="object-cover"
-        style={{ objectPosition: POSITION[crop], transformOrigin: POSITION[crop], transform: zoom === 1 ? undefined : `scale(${zoom})` }}
-      />
+      {(["dark", "light"] as const).map((variant) => (
+        <Image
+          key={variant}
+          src={variant === "dark" ? "/images/tree-painting.jpg" : "/images/tree-painting-light.jpg"}
+          alt={alt}
+          fill
+          sizes={sizes}
+          quality={62}
+          loading="lazy"
+          className="object-cover"
+          data-variant={variant}
+          style={{ objectPosition: POSITION[crop], transformOrigin: POSITION[crop], transform: zoom === 1 ? undefined : `scale(${zoom})` }}
+        />
+      ))}
     </div>
   );
 }

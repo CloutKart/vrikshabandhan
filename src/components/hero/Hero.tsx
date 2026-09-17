@@ -22,6 +22,7 @@ export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNod
       <div className="hero-grid">
       <div className="hero-canvas">
         <div className="hero-art">
+          {/* Two paintings, one per theme: the grey canvas for the dark ground, the cream one for the light. CSS shows one; the hidden one is lazy, so it is never fetched. */}
           <Image
             src="/images/tree-painting.jpg"
             alt={t("paintingAlt")}
@@ -32,6 +33,18 @@ export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNod
             quality={55}
             sizes="(min-width: 820px) min(100vw, 153vh), 100vw"
             className="hero-painting"
+            data-variant="dark"
+          />
+          <Image
+            src="/images/tree-painting-light.jpg"
+            alt={t("paintingAlt")}
+            width={1672}
+            height={941}
+            loading="lazy"
+            quality={55}
+            sizes="(min-width: 820px) min(100vw, 153vh), 100vw"
+            className="hero-painting"
+            data-variant="light"
           />
           <Image
             src="/images/tree-cutout.webp"
@@ -42,6 +55,18 @@ export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNod
             loading="lazy"
             sizes="(min-width: 820px) min(100vw, 153vh), 100vw"
             className="hero-cutout"
+            data-variant="dark"
+          />
+          <Image
+            src="/images/tree-cutout-light.webp"
+            alt=""
+            width={1672}
+            height={941}
+            quality={70}
+            loading="lazy"
+            sizes="(min-width: 820px) min(100vw, 153vh), 100vw"
+            className="hero-cutout"
+            data-variant="light"
           />
         </div>
         <BilingualHeading

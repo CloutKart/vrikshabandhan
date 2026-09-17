@@ -8,7 +8,7 @@ test.describe("reduced motion", () => {
     await expect(page.locator("html")).not.toHaveAttribute("data-hero", /.+/);
     await expect(page.locator("html")).not.toHaveAttribute("data-motion", "full");
     await expect(page.locator("h1")).toHaveCSS("opacity", "1");
-    await expect(page.locator(".hero-cutout")).toHaveCSS("opacity", "1");
+    await expect(page.locator(".hero-cutout").first()).toHaveCSS("opacity", "1");
   });
 
   test("page titles and images are never hidden", async ({ page }) => {

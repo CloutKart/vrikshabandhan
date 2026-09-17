@@ -16,14 +16,32 @@ test("the Hindi home page leads with the Hindi line", async ({ page }) => {
 
 test("the painting is the priority image and describes itself", async ({ page }) => {
   await page.goto("/en");
-  const painting = page.locator('img.hero-painting');
+  const painting = page.locator('img.hero-painting[data-variant="dark"]');
   // next/image "priority": never lazy, and either a preload link or fetchpriority=high.
   expect(await painting.getAttribute("loading")).not.toBe("lazy");
   const preloads = await page.locator('link[rel="preload"][as="image"][imagesrcset*="tree-painting"]').count();
   const fetchPriority = await painting.getAttribute("fetchpriority");
   expect(preloads > 0 || fetchPriority === "high").toBe(true);
   await expect(painting).toHaveAttribute("alt", /raksha sutra/);
-  await expect(page.locator('img.hero-cutout')).toHaveAttribute("alt", "");
+  await expect(page.locator('img.hero-cutout[data-variant="dark"]')).toHaveAttribute("alt", "");
+  // The light variants exist for the light theme but are never fetched while hidden.
+  await expect(page.locator('img.hero-painting[data-variant="light"]')).toHaveAttribute("loading", "lazy");
+  await expect(page.locator('img.hero-painting[data-variant="light"]')).toBeHidden();
+});
+
+test("the light theme shows the cream painting and its cut-out, and keeps the depth", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.addInitScript(() => localStorage.setItem("va-theme", "light"));
+  await page.goto("/en");
+  await expect(page.locator('img.hero-painting[data-variant="light"]')).toBeVisible();
+  await expect(page.locator('img.hero-painting[data-variant="dark"]')).toBeHidden();
+  await expect(page.locator('img.hero-cutout[data-variant="light"]')).toBeVisible();
+  await expect(page.locator('img.hero-cutout[data-variant="dark"]')).toBeHidden();
+  // The headline sits under the leaves: its top is above the canopy's lower edge (about 72% of the art height).
+  const art = await page.locator(".hero-art").boundingBox();
+  const title = await page.locator("h1").boundingBox();
+  expect(title!.y).toBeLessThan(art!.y + art!.height * 0.7);
+  expect(title!.width).toBeGreaterThan(art!.width * 0.3);
 });
 
 test("the hero calls to action are real links", async ({ page }) => {

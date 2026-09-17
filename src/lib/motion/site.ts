@@ -99,7 +99,7 @@ function heroSequence(): Cleanup {
   }
   const primary = title.querySelector<HTMLElement>(":scope > span:first-child");
   const secondary = title.querySelector<HTMLElement>(":scope > span:nth-child(2)");
-  const cutout = document.querySelector<HTMLElement>(".hero-cutout");
+  const cutout = document.querySelectorAll<HTMLElement>(".hero-cutout");
 
   let done = false;
   let split: { revert: () => void } | undefined;
@@ -138,7 +138,7 @@ function heroSequence(): Cleanup {
       "<",
     );
     if (secondary) timeline.from(secondary, { y: move.reveal, opacity: 0, duration: 0.4 }, "-=0.35");
-    if (cutout) timeline.to(cutout, { opacity: 1, duration: 0.6, ease: ease.soft }, "<-0.2");
+    if (cutout.length) timeline.to(cutout, { opacity: 1, duration: 0.6, ease: ease.soft }, "<-0.2");
   });
 
   return () => {

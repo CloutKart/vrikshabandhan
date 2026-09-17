@@ -68,7 +68,17 @@
 }
 .hero-cutout {
   z-index: 2;
+}
+/* One painting per theme. The cut-out only exists from 820 px up, where the headline sits under the leaves. */
+.hero-painting[data-variant="light"],
+.hero-cutout {
   display: none;
+}
+[data-theme="light"] .hero-painting[data-variant="dark"] {
+  display: none;
+}
+[data-theme="light"] .hero-painting[data-variant="light"] {
+  display: block;
 }
 .hero-title {
   margin: 1.5rem 1.25rem 0;
@@ -81,17 +91,23 @@
   line-height: 1.3;
 }
 @media (min-width: 820px) {
-  .hero-cutout {
+  .hero-cutout[data-variant="dark"] {
+    display: block;
+  }
+  [data-theme="light"] .hero-cutout[data-variant="dark"] {
+    display: none;
+  }
+  [data-theme="light"] .hero-cutout[data-variant="light"] {
     display: block;
   }
   .hero-title {
     position: absolute;
     z-index: 1;
     left: 4.5cqw;
-    bottom: 4.2cqw;
+    bottom: 3.4cqw;
     margin: 0;
-    max-width: 44cqw;
-    font-size: 5.7cqw;
+    max-width: 46cqw;
+    font-size: 7cqw;
     line-height: 0.98;
     color: var(--stone-ink);
   }
