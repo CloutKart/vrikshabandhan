@@ -71,15 +71,15 @@ export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNod
         <div className="hero-art">
           {/* Layers, back to front: the bare canvas (one per theme), the headline, the falling leaves, the tree (a still
               image, or the WebGL canvas that moves it), then the thread in two parts: the band with the knot, and the
-              loose ends. The band never moves; the knot swings. Hidden variants are lazy, so they are never fetched. */}
+              loose ends. The band and knot never move; the loose ends swing. Hidden variants are lazy, so they are never fetched. */}
           <Painting wide="/images/canvas.jpg" square="/images/canvas-sq.jpg" alt="" variant="dark" priority quality={55} squareQuality={55} className="hero-painting" />
           <Painting wide="/images/canvas-light.jpg" square="/images/canvas-sq-light.jpg" alt="" variant="light" quality={55} squareQuality={55} className="hero-painting" />
           <Painting wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" alt={paintingAlt} variant="dark" priority quality={70} squareQuality={80} className="hero-cutout hero-tree" />
           <Painting wide="/images/tree-cutout-light.webp" square="/images/tree-cutout-sq-light.webp" alt={paintingAlt} variant="light" quality={70} squareQuality={80} className="hero-cutout hero-tree" />
-          <Patch wide="/images/thread-band.png" square="/images/thread-band-sq.png" variant="dark" className="hero-cutout hero-thread-band" size={{ width: 82, height: 56 }} />
-          <Patch wide="/images/thread-band-light.png" square="/images/thread-band-sq-light.png" variant="light" className="hero-cutout hero-thread-band" size={{ width: 82, height: 56 }} />
-          <Patch wide="/images/tassel.png" square="/images/tassel-sq.png" variant="dark" className="hero-cutout hero-tassel" size={{ width: 108, height: 158 }} />
-          <Patch wide="/images/tassel-light.png" square="/images/tassel-sq-light.png" variant="light" className="hero-cutout hero-tassel" size={{ width: 108, height: 158 }} />
+          <Patch wide="/images/thread-band.png" square="/images/thread-band-sq.png" variant="dark" className="hero-cutout hero-thread-band" size={{ width: 160, height: 56 }} />
+          <Patch wide="/images/thread-band-light.png" square="/images/thread-band-sq-light.png" variant="light" className="hero-cutout hero-thread-band" size={{ width: 160, height: 56 }} />
+          <Patch wide="/images/tassel.png" square="/images/tassel-sq.png" variant="dark" className="hero-cutout hero-tassel" size={{ width: 150, height: 102 }} />
+          <Patch wide="/images/tassel-light.png" square="/images/tassel-sq-light.png" variant="light" className="hero-cutout hero-tassel" size={{ width: 150, height: 102 }} />
           <HeroLeaves />
         </div>
         <BilingualHeading

@@ -79,9 +79,9 @@
 .hero-art[data-sway] .hero-tree {
   opacity: 0;
 }
-/* The thread, in two layers. The band wrapped round the trunk (82x56 at x 1290, y 722 of the wide frame) never
-   moves: a thread tied round a trunk cannot. The knot with its loose ends (108x158 from x 1372) swings from where it
-   meets the band, still by default and alive with full motion, on phones too. */
+/* The thread, in two layers. The band with the knot (160x56 at x 1290, y 722 of the wide frame) never moves: a
+   thread tied round a trunk cannot. The loose ends (150x102 at x 1330, y 778) swing from the knot, still by default
+   and alive with full motion, on phones too. */
 .hero-thread-band,
 .hero-tassel {
   position: absolute;
@@ -90,29 +90,29 @@
 .hero-thread-band {
   left: 77.15%;
   top: 76.73%;
-  width: 4.9%;
+  width: 9.57%;
   z-index: 4;
 }
 .hero-tassel {
-  left: 82.06%;
-  top: 76.73%;
-  width: 6.46%;
+  left: 79.55%;
+  top: 82.68%;
+  width: 8.97%;
   z-index: 5;
-  transform-origin: 0 19%;
+  transform-origin: 50% 0;
 }
-/* The knot and its ends are tugged by the wind and settle back with a little overshoot, like something elastic. */
+/* The loose ends are tugged by the wind and settle back with a little overshoot, like something elastic. */
 @keyframes tassel-sway {
   0% {
-    transform: rotate(-6deg) translateX(-1px);
+    transform: rotate(-5deg) translateX(-1px);
   }
   38% {
-    transform: rotate(2.5deg) translateY(-1px);
+    transform: rotate(2deg) translateY(-1px);
   }
   62% {
     transform: rotate(-1deg);
   }
   100% {
-    transform: rotate(7deg) translateX(1px);
+    transform: rotate(6deg) translateX(1px);
   }
 }
 html[data-motion="full"] .hero-tassel {
@@ -235,13 +235,12 @@ html[data-motion="full"] .hero-leaves {
   .hero-thread-band {
     left: 78.55%;
     top: 70.33%;
-    width: 5.9%;
+    width: 11.16%;
   }
   .hero-tassel {
-    left: 84.45%;
-    top: 70.33%;
-    width: 9.25%;
-    transform-origin: 0 18%;
+    left: 84.13%;
+    top: 75.12%;
+    width: 9.57%;
   }
   .hero-leaf {
     left: var(--xs);
