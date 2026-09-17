@@ -73,20 +73,14 @@
 }
 /* The moving tree, drawn by WebGL through a grid of rigid bodies (src/lib/motion/tree.ts). It takes the tree's layer. */
 .hero-sway {
-  display: none;
   z-index: 3;
   pointer-events: none;
-}
-@media (min-width: 820px) {
-  .hero-sway {
-    display: block;
-  }
 }
 .hero-art[data-sway] .hero-tree {
   opacity: 0;
 }
 /* The thread. The band with the knot (a 190x56 patch at x 1290, y 722 of the frame) and the loose ends (150x102 at
-   x 1330, y 778). Both are still by default and spring to life with full motion on desktop. */
+   x 1330, y 778). Both are still by default and spring to life with full motion, on phones too. */
 .hero-thread-band,
 .hero-tassel {
   position: absolute;
@@ -136,41 +130,39 @@
     transform: rotate(9deg) translateX(1.5px);
   }
 }
-@media (min-width: 820px) {
-  html[data-motion="full"] .hero-thread-band {
-    animation: thread-settle 3.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite alternate;
-  }
-  html[data-motion="full"] .hero-tassel {
-    animation: tassel-sway 2.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite alternate;
-  }
+html[data-motion="full"] .hero-thread-band {
+  animation: thread-settle 3.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite alternate;
+}
+html[data-motion="full"] .hero-tassel {
+  animation: tassel-sway 2.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite alternate;
 }
 /*
   Falling leaves. Nine leaves start inside the canopy, behind the cut-out, so they come out of the tree, then are
   carried down and to the right as if on a breeze, across the headline and behind the trunk. Each has its own
   duration and delay so the loop never reads as a loop. Transform and opacity only. They exist only with full
-  motion on desktop: a leaf frozen mid-air would be wrong, so reduced motion removes them rather than pausing them.
+  motion (phones included): a leaf frozen mid-air would be wrong, so reduced motion removes them rather than
+  pausing them.
   Layers: canvas 0, headline 1, leaves 2, tree 3, thread band 4, thread ends 5.
 */
 .hero-leaves {
   display: none;
 }
-@media (min-width: 820px) {
-  html[data-motion="full"] .hero-leaves {
-    display: block;
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    overflow: hidden;
-  }
+html[data-motion="full"] .hero-leaves {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
 }
 .hero-leaf {
   position: absolute;
   left: var(--x);
   top: var(--y);
-  width: var(--size);
+  /* --size is unitless: the leaf's width on a 1250 px painting, scaled with the painting through cqw. */
+  width: calc(var(--size) * 0.08cqw);
   height: auto;
-  margin: calc(var(--size) * -0.28) 0 0 calc(var(--size) * -0.5);
+  margin: calc(var(--size) * -0.0224cqw) 0 0 calc(var(--size) * -0.04cqw);
   overflow: visible;
   opacity: 0;
   animation: leaf-fall var(--duration) linear var(--delay) infinite;

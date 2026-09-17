@@ -48,7 +48,7 @@ export function HeroLeaves() {
               {
                 "--x": `${l.x}cqw`,
                 "--y": `${l.y}cqw`,
-                "--size": `${l.size}px`,
+                "--size": l.size,
                 "--duration": `${l.duration}s`,
                 "--delay": `${l.delay}s`,
                 "--drift": `${l.drift}cqw`,

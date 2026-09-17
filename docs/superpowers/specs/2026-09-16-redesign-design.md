@@ -91,8 +91,8 @@ transition `(.4,0,.2,1)`, GSAP `expo.out` / `power2.out` / `none` for scrub; sta
    staggered 7.5 to 11 s loops (transform and opacity only); under reduced motion they are not rendered at all.
    The tree itself moves in the wind, stiffly: the cut-out is drawn by WebGL through a 48×28 grid in which three
    rigid bodies (the crown about the fork, the left bough about its base, the right branches about theirs) turn by
-   under 1.2°, blended only at the joints; the foliage alone trembles. The bare canvas sits behind, the still tree
-   remains for reduced motion, phones and no WebGL. The thread is its own two layers (band and knot; loose ends)
+   under 1.2°, blended only at the joints; the foliage alone trembles. The bare canvas sits behind; the still tree
+   remains for reduced motion and for browsers without WebGL. Phones get the same moving tree, leaves and thread. The thread is its own two layers (band and knot; loose ends)
    with a springy overshoot easing.
 4. **Story link hover/focus**: a red underline draws left to right like thread (pseudo-element `scaleX`).
 5. **Chips and buttons**: 150 ms colour and 1 px lift, press scale .98, always with a matching reverse.

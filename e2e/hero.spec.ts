@@ -48,7 +48,7 @@ test("the light theme shows the cream painting and its cut-out, and keeps the de
   expect(title!.width).toBeGreaterThan(art!.width * 0.3);
 });
 
-test("the thread's loose ends are their own layer and drift only with full motion on desktop", async ({ page }) => {
+test("the thread's loose ends are their own layer and drift only with full motion", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/en");
   await expect(page.locator("img.hero-tassel")).toHaveCount(2);
@@ -64,10 +64,10 @@ test("the thread's loose ends are their own layer and drift only with full motio
   expect(box!.y).toBeGreaterThan(art!.y + art!.height / 2);
   await page.setViewportSize({ width: 390, height: 800 });
   await expect(tassel).toBeVisible();
-  expect(await tassel.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+  expect(await tassel.evaluate((el) => getComputedStyle(el).animationName)).toBe("tassel-sway");
 });
 
-test("leaves fall across the headline with full motion on desktop, and do not exist otherwise", async ({ page, browser }) => {
+test("leaves fall across the headline with full motion, and do not exist under reduced motion", async ({ page, browser }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/en");
   await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
@@ -83,7 +83,7 @@ test("leaves fall across the headline with full motion on desktop, and do not ex
   expect(new Set(await leaves.evaluateAll((els) => els.map((e) => e.getAttribute("data-shape")))).size).toBeGreaterThanOrEqual(5);
   await expect(page.locator("[data-hero-leaves] .hero-leaf-wind")).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 800 });
-  await expect(page.locator("[data-hero-leaves]")).toBeHidden();
+  await expect(page.locator("[data-hero-leaves]")).toBeVisible();
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
   const quiet = await context.newPage();
   await quiet.goto("/en");
@@ -91,7 +91,7 @@ test("leaves fall across the headline with full motion on desktop, and do not ex
   await context.close();
 });
 
-test("the branches move in the wind on desktop with full motion, and the tips move more than the trunk", async ({ page, browser }) => {
+test("the branches move in the wind with full motion, and the tips move more than the trunk", async ({ page, browser }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.addInitScript(() => sessionStorage.setItem("va-hero", "1"));
   await page.goto("/en");
@@ -126,11 +126,11 @@ test("the branches move in the wind on desktop with full motion, and the tips mo
   await expect(band).toBeVisible();
   expect(await band.evaluate((el) => getComputedStyle(el).animationName)).toBe("thread-settle");
   expect(await band.evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10))).toBeGreaterThan(cutoutZ);
+  // Phones get the same moving tree and thread.
   await page.setViewportSize({ width: 390, height: 800 });
-  await expect(page.locator(".hero-art canvas.hero-sway")).toBeHidden();
-  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toBeVisible();
+  await expect(page.locator(".hero-art canvas.hero-sway")).toBeVisible();
   await expect(band).toBeVisible();
-  expect(await band.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+  expect(await band.evaluate((el) => getComputedStyle(el).animationName)).toBe("thread-settle");
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
   const quiet = await context.newPage();
   await quiet.goto("/en");
