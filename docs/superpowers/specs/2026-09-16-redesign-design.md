@@ -39,7 +39,7 @@ visitor, that the NGO can edit itself, and that passes an accessibility audit.
 
 ### Palette (primitive → semantic tokens; components never use hex)
 
-Dark (default): ground `#12211A`, ground-2 `#1A221D`, ink `#EDEFE8`, ink-2 `#AAB2AB`, sutra red `#C8322B` (thread,
+Dark (default): ground `#0C1710`, ground-2 `#14201A`, ink `#EDEFE8`, ink-2 `#AAB2AB`, sutra red `#C8322B` (thread,
 knots, underlines, primary action; never body text), gold `#E0B347` (dates, numerals, focus ring), moss `#2E3A32`
 rules, paper `#F3EEE2` reading sheets with paper-ink `#1D231E`.
 Light: ground `#E4EAE1` (pale sage, deliberately not cream), ground-2/moss `#D5DDD1`, ink `#10231A`, ink-2 `#3E4F45`,

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { PaintingDetail } from "@/components/painting/PaintingDetail";
+import { PhotoPanel } from "@/components/media/PhotoPanel";
 import { Lineage } from "@/components/thread-page/Lineage";
 import { NumbersBlock } from "@/components/thread-page/NumbersBlock";
 import { PageHeader } from "@/components/typography/PageHeader";
@@ -18,9 +18,8 @@ export default async function ThreadPage({ params }: { params: Promise<{ locale:
   const { locale: l } = await params;
   const locale = l as Locale;
   setRequestLocale(locale);
-  const [t, home, pair, lineageTitle] = await Promise.all([
+  const [t, pair, lineageTitle] = await Promise.all([
     getTranslations({ locale, namespace: "thread" }),
-    getTranslations({ locale, namespace: "home" }),
     bilingual(locale, "thread", "title"),
     bilingual(locale, "thread", "lineageTitle"),
   ]);
@@ -36,7 +35,7 @@ export default async function ThreadPage({ params }: { params: Promise<{ locale:
           <p>{t("p3")}</p>
         </div>
         <aside data-aside className="min-[1024px]:self-start">
-          <PaintingDetail crop="knot" ratio="4/3" zoom={1.9} alt={home("knotAlt")} sizes="(min-width: 1024px) 34vw, 100vw" />
+          <PhotoPanel name="thread" src="/images/thread-on-bark.jpg" alt={t("photoAlt")} ratio="4/3" position="50% 42%" sizes="(min-width: 1024px) 34vw, 100vw" />
         </aside>
       </div>
       <div className="page section">

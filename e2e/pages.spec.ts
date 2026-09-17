@@ -34,8 +34,9 @@ test("thread page: the aside sits beside the prose and does not hang far below i
   const prose = await page.locator("[data-prose]").boundingBox();
   const aside = await page.locator("[data-aside]").boundingBox();
   expect(aside!.x).toBeGreaterThan(prose!.x + prose!.width - 1);
-  // The aside shows the knot, and never repeats the sentence printed beside it.
-  await expect(page.locator("[data-aside] [data-painting-detail='knot']")).toHaveCount(1);
+  // The aside shows the raksha sutra on bark, and never repeats the sentence printed beside it.
+  await expect(page.locator("[data-aside] [data-photo='thread'] img")).toHaveAttribute("alt", /raksha sutra/);
+  await expect(page.locator("[data-aside] [data-painting-detail]")).toHaveCount(0);
   await expect(page.locator("[data-aside] [data-pull-quote]")).toHaveCount(0);
   expect(aside!.y + aside!.height).toBeLessThan(prose!.y + prose!.height + 160);
 });

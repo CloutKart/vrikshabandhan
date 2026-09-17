@@ -5,8 +5,8 @@
   parses this file and fails the build if a pair drops below its WCAG minimum.
 */
 :root {
-  --ground: #12211A;
-  --ground-2: #1A221D;
+  --ground: #0C1710;
+  --ground-2: #14201A;
   --ink: #EDEFE8;
   --ink-2: #AAB2AB;
   --sutra: #C8322B;

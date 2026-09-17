@@ -41,9 +41,7 @@
     "founderLead": "Sainik Shiromani Manoj Dhyani has spoken for the Himalaya for three decades, from the statehood movement of the 1990s to open letters to the Chief Minister.",
     "founderCta": "About the founder",
     "involveCta": "See how to help",
-    "knotAlt": "Detail of the painting: the red thread knotted round the white trunk",
-    "plantingAlt": "Manoj Dhyani, in white, kneeling to plant a sapling in freshly dug soil",
-    "canopyAlt": "Detail of the painting: the canopy of green, blue and gold leaves"
+    "plantingAlt": "Manoj Dhyani, in white, kneeling to plant a sapling in freshly dug soil"
   },
   "stories": {
     "title": "Stories from the field",
@@ -62,6 +60,7 @@
   },
   "thread": {
     "title": "Why a thread, why a tree",
+    "photoAlt": "A red and orange raksha sutra tied round the pale trunk of a tree",
     "p1": "On Raksha Bandhan a sister ties a thread and a brother promises protection. Vrikshabandhan turns that vow toward the tree. The thread goes round the trunk, and the promise is to keep the tree alive through its vulnerable early years, when most planted saplings in India die for want of water and watching.",
     "p2": "This is not a new idea in Uttarakhand. The state invented it. The Abhiyan stands in a line that runs from the Bishnoi villagers of Khejarli, through the women of Chipko, to the raksha sutra tied on trees marked for felling in the Bhilangana valley in 1994.",
     "p3": "Our founder says it at every gathering: the success of a plantation is the number of trees alive three monsoons later.",
