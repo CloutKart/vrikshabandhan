@@ -97,6 +97,15 @@ test.describe("layout shell", () => {
     await expect.poll(scale, { timeout: 2000 }).toBeLessThan(0.75);
   });
 
+  test("the header links to the editor without a language prefix", async ({ page }) => {
+    for (const locale of ["en", "hi"]) {
+      await page.goto(`/${locale}`);
+      const admin = page.locator("header nav a[href='/admin']:visible");
+      await expect(admin).toBeVisible();
+      await expect(admin).toHaveText(locale === "en" ? "Admin" : "एडमिन");
+    }
+  });
+
   test("no link uses a bare hash href", async ({ page }) => {
     await page.goto("/en");
     expect(await page.locator('a[href="#"]').count()).toBe(0);

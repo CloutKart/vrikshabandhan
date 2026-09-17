@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import NextLink from "next/link";
 import { Link } from "@/i18n/navigation";
 
 const items = [
@@ -21,6 +22,12 @@ export function NavLinks({ orientation }: { orientation: "row" | "column" }) {
           </Link>
         </li>
       ))}
+      {/* The editor lives outside the locale routes, so this is a plain link with no language prefix. */}
+      <li>
+        <NextLink href="/admin" className="inline-flex min-h-11 items-center font-sans">
+          <span className="u-thread">{t("admin")}</span>
+        </NextLink>
+      </li>
     </ul>
   );
 }

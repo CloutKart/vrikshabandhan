@@ -26,7 +26,7 @@ test.describe("keyboard", () => {
   test("header controls are reachable in order and focus is visible", async ({ page }) => {
     await page.goto("/en");
     const stops: Array<{ name: string; outline: string; width: number; tag: string }> = [];
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 10; i++) {
       await page.keyboard.press("Tab");
       const info = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement | null;
