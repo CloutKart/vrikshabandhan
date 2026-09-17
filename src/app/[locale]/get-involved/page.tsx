@@ -58,6 +58,11 @@ export default async function GetInvolvedPage({ params }: { params: Promise<{ lo
                 </a>
               </p>
               <p className="mt-3">
+                <a className={`${link} [overflow-wrap:anywhere]`} href={`mailto:${t("email2")}`}>
+                  {t("email2")}
+                </a>
+              </p>
+              <p className="mt-3">
                 <a className={link} href={tel(t("phone1"))}>
                   {t("phone1")}
                 </a>
@@ -67,13 +72,22 @@ export default async function GetInvolvedPage({ params }: { params: Promise<{ lo
                   {t("phone2")}
                 </a>
               </p>
-              <p className="mt-6 font-sans text-sm text-paper-ink-2">{t("contactNote")}</p>
             </address>
             <div>
               <p className="font-sans text-paper-ink-2">{t("followTitle")}</p>
               <p className="mt-3">
-                <a className={link} href="https://www.facebook.com/VrikshabandhanAbhiyan/" rel="noopener" target="_blank">
+                <a className={link} href={t("facebookUrl")} rel="noopener" target="_blank">
                   {t("facebook")}
+                </a>
+              </p>
+              <p className="mt-3">
+                <a className={link} href={t("youtubeUrl")} rel="noopener" target="_blank">
+                  {t("youtube")}
+                </a>
+              </p>
+              <p className="mt-3">
+                <a className={link} href={t("instagramUrl")} rel="noopener" target="_blank">
+                  {t("instagram")}
                 </a>
               </p>
               <p className="mt-3">{t("blog")}</p>

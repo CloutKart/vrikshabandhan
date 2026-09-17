@@ -36,6 +36,11 @@ export function Footer() {
             </a>
           </p>
           <p>
+            <a className={link} href={`mailto:${t("email2")}`}>
+              {t("email2")}
+            </a>
+          </p>
+          <p>
             <a className={link} href={tel(t("phone1"))}>
               {t("phone1")}
             </a>
@@ -49,8 +54,18 @@ export function Footer() {
         <div>
           <p className="text-ink">{t("followTitle")}</p>
           <p className="mt-1">
-            <a className={link} href="https://www.facebook.com/VrikshabandhanAbhiyan/" rel="noopener" target="_blank">
+            <a className={link} href={t("facebookUrl")} rel="noopener" target="_blank">
               {t("facebook")}
+            </a>
+          </p>
+          <p>
+            <a className={link} href={t("youtubeUrl")} rel="noopener" target="_blank">
+              {t("youtube")}
+            </a>
+          </p>
+          <p>
+            <a className={link} href={t("instagramUrl")} rel="noopener" target="_blank">
+              {t("instagram")}
             </a>
           </p>
           <p className="mt-2">{t("blog")}</p>

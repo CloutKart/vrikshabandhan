@@ -26,6 +26,11 @@ test("get involved: three ways with their own mail links, and a letter-style con
   expect(adopt).toMatch(/^mailto:.*subject=Register%20a%20tree/);
   const hrefs = await page.locator("main ol a[href^='mailto:']").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
   expect(new Set(hrefs).size).toBe(3);
+  for (const h of hrefs) expect(h).toMatch(/^mailto:VrikshabandhanAbhiyan@gmail\.com\?/);
+  const letterMail = await page.locator("[data-letter] a[href^='mailto:']").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+  expect(letterMail).toEqual(["mailto:VrikshabandhanAbhiyan@gmail.com", "mailto:36chardhamassociates@gmail.com"]);
+  const social = await page.locator("[data-letter] a[target='_blank']").evaluateAll((els) => els.map((e) => new URL(e.getAttribute("href")!).hostname));
+  expect(social).toEqual(["www.facebook.com", "www.youtube.com", "www.instagram.com"]);
 });
 
 test("thread page: the aside sits beside the prose and does not hang far below it", async ({ page }) => {
@@ -68,8 +73,10 @@ test("get involved on a phone: the e-mail stays inside the letter panel", async 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/en/get-involved");
   const panel = await page.locator("[data-letter]").boundingBox();
-  const mail = await page.locator("[data-letter] a[href^='mailto:']").boundingBox();
-  expect(mail!.x + mail!.width).toBeLessThanOrEqual(panel!.x + panel!.width);
+  for (const mail of await page.locator("[data-letter] a[href^='mailto:']").all()) {
+    const box = await mail.boundingBox();
+    expect(box!.x + box!.width).toBeLessThanOrEqual(panel!.x + panel!.width);
+  }
 });
 
 test("chapter actions read at text size, not as captions", async ({ page }) => {

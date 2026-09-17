@@ -153,3 +153,11 @@ test.describe("layout shell", () => {
     expect(await page.locator('a[href="#"]').count()).toBe(0);
   });
 });
+
+test("the footer lists both e-mails and the three social links", async ({ page }) => {
+  await page.goto("/en");
+  const mails = await page.locator("footer a[href^='mailto:']").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+  expect(mails).toEqual(["mailto:VrikshabandhanAbhiyan@gmail.com", "mailto:36chardhamassociates@gmail.com"]);
+  const hosts = await page.locator("footer a[target='_blank']").evaluateAll((els) => els.map((e) => new URL(e.getAttribute("href")!).hostname));
+  expect(hosts).toEqual(["www.facebook.com", "www.youtube.com", "www.instagram.com"]);
+});

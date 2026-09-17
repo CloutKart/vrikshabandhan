@@ -95,5 +95,6 @@ create policy "editors delete media" on storage.objects
 -- ---- editors (stored lower-case; the site compares addresses without regard to case)
 insert into public.editors (email) values
   ('ukrajyanirmansenanisangh@gmail.com'),
+  ('vrikshabandhanabhiyan@gmail.com'),
   ('shivam@clout-kart.com')
 on conflict (email) do nothing;
