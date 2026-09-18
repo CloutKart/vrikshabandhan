@@ -213,10 +213,10 @@ html[data-motion="full"] .hero-leaves {
     position: absolute;
     z-index: 1;
     left: 5cqw;
-    bottom: 4.6cqw;
+    bottom: 3.6cqw;
     margin: 0;
-    max-width: 52cqw;
-    font-size: 8.2cqw;
+    max-width: 50cqw;
+    font-size: 7.4cqw;
     line-height: 0.98;
     color: var(--stone-ink);
   }
@@ -254,8 +254,8 @@ html[data-motion="full"] .hero-leaves {
     left: 5cqw;
     bottom: 5cqw;
     margin: 0;
-    max-width: 66cqw;
-    font-size: 9.5cqw;
+    max-width: 64cqw;
+    font-size: 8.6cqw;
     line-height: 0.98;
     color: var(--stone-ink);
   }
