@@ -34,12 +34,18 @@
   [id] {
     scroll-margin-top: calc(var(--header-h) + 1rem);
   }
-  /* The italic is a separate face (no synthesis), loaded only when a page uses it. */
+  /* The italic is Tiro's own italic face, registered under the same family and chosen by font-style; it loads the
+     first time a page uses it. Tiro has one weight, so bold alone may be synthesised: without it, strong text would
+     read as regular. */
   em,
-  i,
-  cite {
+  i {
     font-family: var(--font-serif-italic);
-    font-style: normal;
+    font-style: italic;
+  }
+  strong,
+  b {
+    font-weight: 700;
+    font-synthesis: weight;
   }
   ::selection {
     background: var(--sutra);
@@ -299,7 +305,7 @@
 }
 .paper .prose blockquote {
   font-family: var(--font-serif-italic);
-  font-style: normal;
+  font-style: italic;
   font-weight: 400;
 }
 .paper .prose blockquote cite {
