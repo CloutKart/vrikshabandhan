@@ -53,5 +53,5 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
     }
   }
   const status = <NewsletterStatus postId={row.id} live={row.live && !row.deleted_at} sentAt={row.newsletter_sent_at} test={row.newsletter_test} count={count} deliveries={deliveries} on={Boolean(env)} testTo={env?.testTo ?? null} />;
-  return <PostEditor id={row.id} initial={initial} deletedAt={row.deleted_at} above={status} />;
+  return <PostEditor id={row.id} initial={initial} deletedAt={row.deleted_at} updatedAt={row.updated_at} above={status} />;
 }
