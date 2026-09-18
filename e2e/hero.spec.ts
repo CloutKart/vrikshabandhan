@@ -203,6 +203,49 @@ test.describe("latest stories in the hero", () => {
   });
 });
 
+test.describe("the latest story under the hero", () => {
+  for (const [width, height] of [
+    [2000, 960],
+    [1440, 900],
+    [390, 844],
+  ]) {
+    test(`at ${width} the newest story is a band right under the hero, above the promise`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto("/en");
+      const band = page.locator("[data-section='featured']");
+      await expect(band).toBeVisible();
+      await expect(band.locator("a[href^='/en/stories/']")).toHaveCount(2);
+      await expect(band.locator("h2 a")).toHaveAttribute("href", "/en/stories/silkyara-open-letter");
+      await expect(band.getByText("Latest story")).toBeVisible();
+      const art = await page.locator(".hero-art").boundingBox();
+      const box = await band.boundingBox();
+      const promise = await page.locator("[data-section='promise']").boundingBox();
+      expect(box!.y).toBeGreaterThan(art!.y + art!.height);
+      expect(box!.y + box!.height).toBeLessThanOrEqual(promise!.y + 1);
+      // The three-story list is untouched: still exactly one visible, wherever this width puts it.
+      await expect(page.locator("[data-story-list]:visible")).toHaveCount(1);
+    });
+  }
+
+  test("a story with a cover splits into two columns from 820 px and stacks on phones", async ({ page }) => {
+    // The newest built-in story has no cover, so the grid rule is checked on the attribute the band keys it on.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/en");
+    const article = page.locator("[data-section='featured'] article");
+    await expect(article).toHaveAttribute("data-cover", "false");
+    const single = await article.evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length);
+    expect(single).toBe(1);
+    const withCover = await article.evaluate((el) => {
+      el.setAttribute("data-cover", "true");
+      return getComputedStyle(el).gridTemplateColumns.split(" ").length;
+    });
+    expect(withCover).toBe(2);
+    await page.setViewportSize({ width: 390, height: 844 });
+    const phone = await article.evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length);
+    expect(phone).toBe(1);
+  });
+});
+
 test("a frame that reads wrong (a black texture, as Safari has produced) keeps the still tree in view", async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   await context.addInitScript(() => {

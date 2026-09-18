@@ -65,8 +65,9 @@ Theme: `data-theme` on `<html>`, defaults to light, honours a stored choice, `co
   text left, images right or full width. Chapters open with a 1 px moss hairline; red is kept for documents (the
   letterhead), the timeline and lineage spines, the underline draw and the header thread.
 - Hero: the painting shown whole (16:9, ≤86vh) with the headline tucked under the leaves as in v2, cutout tree in
-  front. Under it, in the first screen on desktop, the three latest stories as a list (date and place, title in both
-  scripts, cover thumb), no cards.
+  front. Under it, at every width, the latest story as a featured band (cover left, words right on desktop; cover
+  on top on phones), then the three latest stories as a list (date and place, title in both scripts, cover thumb),
+  no cards; on wide screens that list also fills the column beside the painting.
 - Lists everywhere instead of cards: story rows, the three ways to help, the lineage, the timeline. Rows are
   separated by hairlines; a row's title draws a red underline under the pointer or keyboard focus.
 - Reading pages: a paper sheet centred on the ground, 65ch, cover image above the title, body via

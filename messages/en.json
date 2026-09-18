@@ -34,6 +34,8 @@
   "home": {
     "latest": "Latest stories",
     "allStories": "All stories",
+    "featured": "Latest story",
+    "readStory": "Read the story",
     "whyTitle": "Why a thread",
     "whyText": "On Raksha Bandhan a sister ties a thread and a brother promises protection. We tie the same thread round a tree and make the same promise: to keep it alive through its first three monsoons, when most planted saplings in India die for want of water.",
     "whyLink": "Read about the thread",

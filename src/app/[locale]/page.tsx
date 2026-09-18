@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/hero/Hero";
+import { FeaturedStory } from "@/components/home/FeaturedStory";
 import { FounderTeaser } from "@/components/home/FounderTeaser";
 import { InvolveTeaser } from "@/components/home/InvolveTeaser";
 import { LineageStrip } from "@/components/home/LineageStrip";
@@ -29,6 +30,7 @@ export default async function HomePage({ params }: Props) {
   return (
     <main id="content" className="pb-12">
       <Hero locale={l} aside={<LatestStories locale={l} posts={latest} variant="compact" />} />
+      <FeaturedStory locale={l} post={latest[0] ?? null} />
       <PromiseSection locale={l} />
       <LineageStrip locale={l} />
       <LatestStories locale={l} posts={latest} />

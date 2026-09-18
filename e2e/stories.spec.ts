@@ -35,6 +35,14 @@ test.describe("stories index", () => {
     await expect(page.getByRole("heading", { name: "Latest stories" })).toBeVisible();
     await expect(page.locator("[data-story-list]:visible a[href^='/en/stories/']")).toHaveCount(3);
   });
+  test("the home page features the latest story in both languages", async ({ page }) => {
+    await page.goto("/hi");
+    const band = page.locator("[data-section='featured']");
+    await expect(band.getByText("ताज़ा कहानी")).toBeVisible();
+    await expect(band.locator("h2 a")).toHaveAttribute("lang", "hi");
+    await expect(band.locator("time").first()).toHaveText("11 दिसंबर 2023");
+    await expect(band.getByRole("link", { name: "कहानी पढ़ें" })).toHaveAttribute("href", "/hi/stories/silkyara-open-letter");
+  });
 });
 
 test.describe("story page", () => {
