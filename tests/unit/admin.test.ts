@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { emptyDraft, localDate, parseTags, validateDraft } from "@/lib/content/admin";
+import { emptyDraft, localDate, parseTags, savePayload, validateDraft } from "@/lib/content/admin";
 
 describe("parseTags", () => {
   it("splits on commas, trims and drops empties and duplicates", () => {
@@ -34,5 +34,17 @@ describe("localDate", () => {
     // 01:30 on 2 June local time, whatever the zone: the UTC date may still be 1 June.
     const d = new Date(2024, 5, 2, 1, 30);
     expect(localDate(d)).toBe("2024-06-02");
+  });
+});
+
+describe("savePayload", () => {
+  it("leaves a post that is not deleted alone", () => {
+    const d = { ...emptyDraft(), title_en: "T" };
+    expect(savePayload(d, null)).toEqual(d);
+    expect("deleted_at" in savePayload(d, null)).toBe(false);
+  });
+  it("brings a deleted post back when it is saved", () => {
+    const d = { ...emptyDraft(), title_en: "T", live: false };
+    expect(savePayload(d, "2026-09-18T10:00:00Z")).toEqual({ ...d, deleted_at: null });
   });
 });

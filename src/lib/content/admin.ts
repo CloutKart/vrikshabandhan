@@ -44,6 +44,11 @@ export function emptyDraft(): Draft {
   };
 }
 
+/** What a save writes: the draft, and for a deleted post the end of its deletion, so saving brings it back. */
+export function savePayload(draft: Draft, deletedAt: string | null): Draft | (Draft & { deleted_at: null }) {
+  return deletedAt ? { ...draft, deleted_at: null } : draft;
+}
+
 export function parseTags(input: string): string[] {
   const out: string[] = [];
   for (const raw of input.split(",")) {

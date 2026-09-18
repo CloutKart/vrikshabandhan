@@ -11,7 +11,7 @@ import { StoryBody } from "@/components/story/StoryBody";
 import { Button } from "@/components/ui/Button";
 import { Field, inputClass } from "@/components/ui/Field";
 import { toast } from "@/components/ui/Toast";
-import { emptyDraft, parseTags, validateDraft, type Draft, type DraftErrors } from "@/lib/content/admin";
+import { emptyDraft, parseTags, savePayload, validateDraft, type Draft, type DraftErrors } from "@/lib/content/admin";
 import { slugify } from "@/lib/content/slug";
 import { ytId } from "@/lib/content/youtube";
 import { browserClient } from "@/lib/supabase/browser";
@@ -70,7 +70,8 @@ export function PostEditor({ id, initial, deletedAt, above }: Props) {
     try {
       if (id) {
         // .select().single() makes a silent no-op (expired session, policy) an error instead of a false success.
-        const { error } = await sb.from("posts").update(next).eq("id", id).select("id").single();
+        // A deleted post comes back when it is saved, as a draft or live as the checkbox says.
+        const { error } = await sb.from("posts").update(savePayload(next, deletedAt ?? null)).eq("id", id).select("id").single();
         if (error) throw error;
         savedId = id;
       } else {
@@ -122,7 +123,7 @@ export function PostEditor({ id, initial, deletedAt, above }: Props) {
       {above ? <div className="mt-8">{above}</div> : null}
       {deletedAt ? (
         <p role="alert" className="mt-6 font-sans text-sutra">
-          This post is deleted and hidden from the site.{" "}
+          This post is deleted and hidden from the site. Saving it brings it back.{" "}
           <button type="button" className="u-thread" onClick={() => void setDeleted(null)}>
             Restore it
           </button>
@@ -204,7 +205,7 @@ export function PostEditor({ id, initial, deletedAt, above }: Props) {
 
         <div className="flex flex-wrap items-center gap-4">
           <Button type="submit" disabled={busy}>
-            {busy ? "Saving" : draft.live ? "Publish" : "Save draft"}
+            {busy ? "Saving" : deletedAt ? (draft.live ? "Restore and publish" : "Restore as draft") : draft.live ? "Publish" : "Save draft"}
           </Button>
           {id && !deletedAt ? (
             <Button type="button" variant="line" onClick={() => void remove()} disabled={busy}>
