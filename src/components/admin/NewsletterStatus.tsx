@@ -25,7 +25,7 @@ export function NewsletterStatus({ postId, live, sentAt, test, count, deliveries
   let promote = false;
   let retry = false;
   if (!on) text = "E-mail is not set up on this deployment yet, so publishing does not mail anyone. See docs/deploy.md.";
-  else if (!sentAt) text = live ? `Live, not yet sent to subscribers. Saving again does not mail it either; a story goes out once, on its first publish.` : `Not yet sent to subscribers. Publishing sends it to ${count} confirmed subscriber${count === 1 ? "" : "s"}, once.`;
+  else if (!sentAt) text = `Not yet sent to subscribers. ${live ? "Saving it again" : "Publishing"} sends it to ${count} confirmed subscriber${count === 1 ? "" : "s"}, once.`;
   else if (test) {
     text = `Test mode: sent to ${testTo ?? "the test address"} on ${when(sentAt)}. No subscriber has received it.`;
     promote = !testTo && live;
@@ -41,8 +41,8 @@ export function NewsletterStatus({ postId, live, sentAt, test, count, deliveries
       <p className="mt-1 max-w-[70ch] text-ink-2">{text}</p>
       {deliveries.failures.length ? (
         <ul className="mt-2 max-w-[70ch] text-ink-2">
-          {deliveries.failures.slice(0, 10).map((f) => (
-            <li key={f.email}>
+          {deliveries.failures.slice(0, 10).map((f, i) => (
+            <li key={`${i}-${f.email}`}>
               Could not send to {f.email}: {f.error.toLowerCase()}
             </li>
           ))}

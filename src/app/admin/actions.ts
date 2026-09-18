@@ -31,6 +31,7 @@ export async function sendStoryNewsletter(postId: string, opts: { fromTest?: boo
   const { sb } = await requireEditor();
   const env = newsletterEnv();
   if (!env) return OFF;
+  if (opts.fromTest && env.testTo) return { ...OFF, status: "error", reason: "test mode is still on (NEWSLETTER_TEST_TO is set)" };
   return sendStory(sb, env, postId, opts);
 }
 

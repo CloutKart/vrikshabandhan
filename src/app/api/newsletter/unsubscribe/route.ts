@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { rpcUnsubscribe } from "@/lib/newsletter/db";
 import { isToken } from "@/lib/newsletter/validate";
+import { siteUrl } from "@/lib/site";
 
 /**
  * RFC 8058 one-click unsubscribe, the address in every story mail's
@@ -25,5 +26,5 @@ export async function POST(request: NextRequest) {
 export function GET(request: NextRequest) {
   const t = request.nextUrl.searchParams.get("t") ?? "";
   const l = request.nextUrl.searchParams.get("l") === "hi" ? "hi" : "en";
-  return NextResponse.redirect(new URL(`/${l}/newsletter/unsubscribe?t=${encodeURIComponent(t)}`, request.nextUrl), 302);
+  return NextResponse.redirect(new URL(`/${l}/newsletter/unsubscribe?t=${encodeURIComponent(t)}`, siteUrl()), 302);
 }

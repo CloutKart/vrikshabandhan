@@ -35,7 +35,8 @@ describe("personalise", () => {
     const edition = { subject: "S", html: `<p>${EMAIL}</p><a href="${UNSUBSCRIBE_URL}">u</a>`, text: `${EMAIL} ${UNSUBSCRIBE_URL}` };
     const odd = { ...r(1), email: "a$&b@example.org" };
     const m = personalise(edition, odd, { from: "s@x.in", replyTo: "r@x.in", siteUrl: "https://x.in" });
-    expect(m.html).toContain("a$&b@example.org");
+    expect(m.html).toContain("a$&amp;b@example.org");
+    expect(m.text).toContain("a$&b@example.org");
     expect(m.html).toContain(`https://x.in/hi/newsletter/unsubscribe?t=${"t".repeat(64)}`);
     expect(m.headers?.["List-Unsubscribe"]).toContain("/api/newsletter/unsubscribe?t=");
     expect(m.to).toEqual(["a$&b@example.org"]);

@@ -16,7 +16,7 @@ import type { Mail, Recipient, Rendered, SendReport } from "./types";
  * (row-level security decides what it may touch). The claim on the post row is
  * the idempotency key: a story is mailed once, whatever races.
  */
-const FROM_NAME = "Vrikshabandhan Abhiyan";
+const FROM_NAME = mailStrings("en").brandName;
 
 type Editions = Record<Locale, Rendered>;
 type DeliveryInsert = { post_id: string; subscriber_id: string; batch_no: number; locale: Locale; status: "queued" | "sent" | "failed"; attempts: number; provider_id?: string | null; error?: string | null };
@@ -43,13 +43,16 @@ const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const errorText = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
 /** One batch: the batch endpoint first; if it refuses the shape, one mail at a time. Returns per-recipient outcomes. */
-async function deliverBatch(env: NewsletterEnv, postId: string, batchNo: number, mails: Mail[], recipients: Recipient[], retry: number): Promise<Array<{ ok: true; id: string } | { ok: false; error: string }>> {
+async function deliverBatch(sb: SupabaseClient, env: NewsletterEnv, postId: string, batchNo: number, mails: Mail[], recipients: Recipient[], retry: number): Promise<Array<{ ok: true; id: string } | { ok: false; error: string }>> {
   try {
     const ids = await sendBatch(env.apiKey, mails, idempotencyKey(postId, batchNo, retry));
     return mails.map((_, i) => ({ ok: true as const, id: ids[i] ?? "" }));
   } catch (e) {
-    if (e instanceof ResendError && e.retryable) return mails.map(() => ({ ok: false as const, error: e.message }));
-    // A refusal of the whole request (payload shape, an address the provider rejects): try each mail alone.
+    // Anything but a definite refusal (a lost connection, a broken response) leaves the outcome unknown; those
+    // rows go to "Retry the failed" rather than being sent again here, so nobody can get the story twice.
+    if (!(e instanceof ResendError) || e.retryable) return mails.map(() => ({ ok: false as const, error: errorText(e) }));
+    // A refusal of the whole request (payload shape, an address the provider rejects): try each mail alone,
+    // recording each result as it happens so a timeout cannot lose what was sent.
     const out: Array<{ ok: true; id: string } | { ok: false; error: string }> = [];
     for (let i = 0; i < mails.length; i++) {
       try {
@@ -57,6 +60,8 @@ async function deliverBatch(env: NewsletterEnv, postId: string, batchNo: number,
       } catch (err) {
         out.push({ ok: false, error: errorText(err) });
       }
+      const res = out[i];
+      await recordDeliveries(sb, [{ post_id: postId, subscriber_id: recipients[i].id, batch_no: batchNo, locale: recipients[i].locale, status: res.ok ? "sent" : "failed", attempts: retry + 1, provider_id: res.ok ? res.id : null, error: res.ok ? null : res.error }]);
       if (i < mails.length - 1) await pause(BATCH_PAUSE_MS);
     }
     return out;
@@ -88,20 +93,28 @@ export async function sendStory(sb: SupabaseClient, env: NewsletterEnv, postId: 
     return { ...none, status: "already", sentAt: row.newsletter_sent_at ?? undefined };
   }
   const row = claimed as PostRow;
+  // Until the delivery rows exist (or the test mails went out), a failure hands the claim back so the next save
+  // can try again; after that point "Retry the failed" is the way, and the claim stays.
+  const release = async () => {
+    await sb.from("posts").update({ newsletter_sent_at: null, newsletter_test: false }).eq("id", postId);
+  };
 
   let recipients: Recipient[];
+  let editions: Editions;
   try {
     recipients = await confirmedRecipients(sb);
+    editions = editionsFor(row, env);
   } catch (e) {
+    await release();
     return { ...none, status: "error", reason: errorText(e) };
   }
-  const editions = editionsFor(row, env);
 
   if (env.testTo) {
     const test = applyTestMode(recipients, env.testTo);
     try {
       for (const r of test.recipients) await sendOne(env.apiKey, mailFor(editions, r, env, test.prefix));
     } catch (e) {
+      await release();
       return { ...none, status: "error", total: recipients.length, reason: errorText(e) };
     }
     return { ...none, status: "test", total: recipients.length, testTo: env.testTo };
@@ -109,16 +122,19 @@ export async function sendStory(sb: SupabaseClient, env: NewsletterEnv, postId: 
   if (!recipients.length) return { ...none, status: "none" };
 
   const batches = planBatches(recipients);
-  await recordDeliveries(
-    sb,
-    batches.flatMap((b, batchNo) => b.map((r) => ({ post_id: postId, subscriber_id: r.id, batch_no: batchNo, locale: r.locale, status: "queued" as const, attempts: 0 }))),
-  );
+  const { error: queueError } = await sb
+    .from("newsletter_deliveries")
+    .upsert(batches.flatMap((b, batchNo) => b.map((r) => ({ post_id: postId, subscriber_id: r.id, batch_no: batchNo, locale: r.locale, status: "queued" as const, attempts: 0 }))), { onConflict: "post_id,subscriber_id" });
+  if (queueError) {
+    await release();
+    return { ...none, status: "error", total: recipients.length, reason: `could not record the deliveries: ${queueError.message}` };
+  }
   let sent = 0;
   let failed = 0;
   let reason: string | undefined;
   for (let batchNo = 0; batchNo < batches.length; batchNo++) {
     const batch = batches[batchNo];
-    const results = await deliverBatch(env, postId, batchNo, batch.map((r) => mailFor(editions, r, env)), batch, 0);
+    const results = await deliverBatch(sb, env, postId, batchNo, batch.map((r) => mailFor(editions, r, env)), batch, 0);
     await recordDeliveries(
       sb,
       batch.map((r, i) => {
@@ -141,6 +157,8 @@ export async function retryFailed(sb: SupabaseClient, env: NewsletterEnv, postId
   const none = { total: 0, sent: 0, failed: 0 };
   const { data: post, error: postError } = await sb.from("posts").select("*").eq("id", postId).maybeSingle();
   if (postError || !post) return { ...none, status: "error", reason: postError?.message ?? "the post was not found" };
+  const p = post as PostRow;
+  if (!p.live || p.deleted_at || !p.newsletter_sent_at || p.newsletter_test) return { ...none, status: "not-live" };
   const { data, error } = await sb
     .from("newsletter_deliveries")
     .select("subscriber_id, batch_no, attempts, status, subscribers(id, email, locale, unsubscribe_token, confirmed_at, unsubscribed_at)")
@@ -148,7 +166,11 @@ export async function retryFailed(sb: SupabaseClient, env: NewsletterEnv, postId
     .in("status", ["failed", "queued"]);
   if (error) return { ...none, status: "error", reason: error.message };
   type Row = { subscriber_id: string; batch_no: number; attempts: number; status: string; subscribers: { id: string; email: string; locale: Locale; unsubscribe_token: string; confirmed_at: string | null; unsubscribed_at: string | null } | null };
-  const rows = ((data ?? []) as unknown as Row[]).filter((r) => r.subscribers && r.subscribers.confirmed_at && !r.subscribers.unsubscribed_at);
+  const all = (data ?? []) as unknown as Row[];
+  const rows = all.filter((r) => r.subscribers && r.subscribers.confirmed_at && !r.subscribers.unsubscribed_at);
+  // Someone who left the list since the send is not owed the story; close their row so the status stops counting it.
+  const gone = all.filter((r) => !rows.includes(r));
+  if (gone.length) await recordDeliveries(sb, gone.map((r) => ({ post_id: postId, subscriber_id: r.subscriber_id, batch_no: r.batch_no, locale: (r.subscribers?.locale ?? "en") as Locale, status: "failed", attempts: r.attempts, error: "unsubscribed before delivery" })));
   if (!rows.length) return { ...none, status: "none" };
   const editions = editionsFor(post as PostRow, env);
   let sent = 0;

@@ -11,7 +11,7 @@ import type { ConfirmState, SubscribeState, UnsubscribeState } from "@/lib/newsl
 import { cleanLocale, isToken, parseSubscribeInput } from "@/lib/newsletter/validate";
 import { publicClient } from "@/lib/supabase/public";
 
-const FROM_NAME = "Vrikshabandhan Abhiyan";
+const FROM_NAME = mailStrings("en").brandName;
 
 async function clientIp(): Promise<string> {
   const h = await headers();

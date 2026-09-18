@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/routing";
 import { BATCH_SIZE } from "./constants";
-import { fill } from "./html";
+import { escapeHtml, fill } from "./html";
 import { EMAIL, ONECLICK_URL, UNSUBSCRIBE_URL, buildHeaders } from "./render";
 import type { Mail, Recipient, Rendered } from "./types";
 
@@ -29,14 +29,14 @@ export function idempotencyKey(postId: string, batchNo: number, retry = 0): stri
 export function personalise(edition: Rendered, r: Recipient, opts: { from: string; replyTo: string; siteUrl: string; subjectPrefix?: string }): Mail {
   const unsubscribeUrl = `${opts.siteUrl}/${r.locale}/newsletter/unsubscribe?t=${r.unsubscribe_token}`;
   const oneClickUrl = `${opts.siteUrl}/api/newsletter/unsubscribe?t=${r.unsubscribe_token}&l=${r.locale}`;
-  const swap = (s: string) => fill(fill(fill(s, UNSUBSCRIBE_URL, unsubscribeUrl), ONECLICK_URL, oneClickUrl), EMAIL, r.email);
+  const swap = (s: string, email: string) => fill(fill(fill(s, UNSUBSCRIBE_URL, unsubscribeUrl), ONECLICK_URL, oneClickUrl), EMAIL, email);
   return {
     from: opts.from,
     to: [r.email],
     reply_to: opts.replyTo,
     subject: `${opts.subjectPrefix ?? ""}${edition.subject}`,
-    html: swap(edition.html),
-    text: swap(edition.text),
+    html: swap(edition.html, escapeHtml(r.email)),
+    text: swap(edition.text, r.email),
     headers: buildHeaders(oneClickUrl),
   };
 }
