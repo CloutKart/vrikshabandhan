@@ -11,12 +11,22 @@ export function planBatches<T>(items: T[], size = BATCH_SIZE): T[][] {
   return out;
 }
 
-/** In test mode every mail goes to the owner: one English and one Hindi edition, with the real count in the subject. */
+/**
+ * In test mode every mail goes to the owner: one English and one Hindi edition, with the real count in the subject.
+ * When the owner is a subscriber, the stand-ins carry their real unsubscribe token so the links in the mail work;
+ * otherwise a placeholder, which the unsubscribe page reports as invalid.
+ */
 export function applyTestMode(recipients: Recipient[], testTo: string): { recipients: Recipient[]; prefix: string } {
   const prefix = `[Test, ${recipients.length} subscriber${recipients.length === 1 ? "" : "s"}] `;
+  const owner = recipients.find((r) => r.email.toLowerCase() === testTo.trim().toLowerCase());
   return {
     prefix,
-    recipients: (["en", "hi"] as Locale[]).map((locale) => ({ id: `test-${locale}`, email: testTo, locale, unsubscribe_token: "test" })),
+    recipients: (["en", "hi"] as Locale[]).map((locale) => ({
+      id: owner?.id ?? `test-${locale}`,
+      email: testTo,
+      locale,
+      unsubscribe_token: owner?.unsubscribe_token ?? "test",
+    })),
   };
 }
 

@@ -17,6 +17,13 @@ describe("send planning", () => {
     const t = applyTestMode(Array.from({ length: 7 }, (_, i) => r(i)), "owner@example.org");
     expect(t.recipients.map((x) => [x.email, x.locale])).toEqual([["owner@example.org", "en"], ["owner@example.org", "hi"]]);
     expect(t.prefix).toBe("[Test, 7 subscribers] ");
+    expect(t.recipients.map((x) => x.unsubscribe_token)).toEqual(["test", "test"]);
+  });
+  it("gives the stand-ins the owner's own token when the owner is a subscriber", () => {
+    const owner: Recipient = { id: "own", email: "owner@example.org", locale: "hi", unsubscribe_token: "a".repeat(64) };
+    const t = applyTestMode([r(0), owner, r(2)], "Owner@Example.org");
+    expect(t.recipients.map((x) => [x.id, x.locale, x.unsubscribe_token])).toEqual([["own", "en", "a".repeat(64)], ["own", "hi", "a".repeat(64)]]);
+    expect(t.recipients.every((x) => x.email === "Owner@Example.org")).toBe(true);
   });
   it("keys the first attempt and retries differently", () => {
     expect(idempotencyKey("p", 2)).toBe("nl-p-2");

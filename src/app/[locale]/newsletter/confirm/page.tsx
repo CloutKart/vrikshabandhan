@@ -11,6 +11,8 @@ import { confirm, subscribe } from "../actions";
 
 export const dynamic = "force-dynamic";
 
+const HEADING = "text-[clamp(2rem,3vw,2.75rem)] leading-tight";
+
 type Props = { params: Promise<{ locale: string }>; searchParams: Promise<{ t?: string | string[] }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -26,7 +28,11 @@ export default async function ConfirmPage({ params, searchParams }: Props) {
   const sp = await searchParams;
   const raw = Array.isArray(sp.t) ? sp.t[0] : sp.t;
   const token = isToken(raw) ? raw : null;
-  const [t, pair] = await Promise.all([getTranslations({ locale, namespace: "newsletter" }), bilingual(locale, "newsletter", "confirmTitle")]);
+  const [t, pair, donePair] = await Promise.all([
+    getTranslations({ locale, namespace: "newsletter" }),
+    bilingual(locale, "newsletter", "confirmTitle"),
+    bilingual(locale, "newsletter", "confirmDoneTitle"),
+  ]);
   const copy = {
     text: t("confirmText"),
     cta: t("confirmCta"),
@@ -40,12 +46,16 @@ export default async function ConfirmPage({ params, searchParams }: Props) {
   return (
     <main id="content" className="page pb-24 pt-10 min-[820px]:pt-16">
       <div data-token-card className="paper mx-auto w-full max-w-[42rem] rounded-[var(--radius-panel)]">
-        <div className="border-b-2 border-sutra pb-6">
-          <BilingualHeading as="h1" {...pair} className="text-[clamp(2rem,3vw,2.75rem)] leading-tight" secondaryClassName="text-paper-ink-2" />
-        </div>
-        <div className="mt-8">
-          <ConfirmCard token={token} locale={locale} copy={copy} labels={newsletterLabels(t)} action={confirm} subscribeAction={subscribe} />
-        </div>
+        <ConfirmCard
+          token={token}
+          locale={locale}
+          copy={copy}
+          labels={newsletterLabels(t)}
+          heading={<BilingualHeading as="h1" {...pair} className={HEADING} secondaryClassName="text-paper-ink-2" />}
+          doneHeading={<BilingualHeading as="h1" {...donePair} className={HEADING} secondaryClassName="text-paper-ink-2" />}
+          action={confirm}
+          subscribeAction={subscribe}
+        />
       </div>
     </main>
   );
