@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PhotoPanel } from "@/components/media/PhotoPanel";
 import { StoryList } from "@/components/stories/StoryList";
@@ -15,7 +16,7 @@ type Props = { params: Promise<{ locale: string }>; searchParams: Promise<{ tag?
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "stories" });
-  return { title: t("title"), description: t("lede") };
+  return pageMeta({ locale: locale as Locale, path: "/stories", title: t("title"), description: t("lede") });
 }
 
 export default async function StoriesPage({ params, searchParams }: Props) {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Timeline } from "@/components/founder/Timeline";
@@ -11,7 +12,7 @@ import { bilingual } from "@/lib/i18n/bilingual";
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "founder" });
-  return { title: `${t("title")}: ${t("name")}` };
+  return pageMeta({ locale: locale as Locale, path: "/founder", title: `${t("title")}: ${t("name")}`, description: t("p1").split(". ")[0] + "." });
 }
 
 export default async function FounderPage({ params }: { params: Promise<{ locale: string }> }) {

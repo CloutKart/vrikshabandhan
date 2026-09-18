@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { BilingualHeading } from "@/components/typography/BilingualHeading";
 import { PageHeader } from "@/components/typography/PageHeader";
@@ -9,7 +10,7 @@ import { bilingual } from "@/lib/i18n/bilingual";
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "involve" });
-  return { title: t("title"), description: t("lede") };
+  return pageMeta({ locale: locale as Locale, path: "/get-involved", title: t("title"), description: t("lede") });
 }
 
 const ways = ["adopt", "host", "support"] as const;

@@ -10,6 +10,9 @@ import { otherLocale, routing, type Locale } from "@/i18n/routing";
 import { builtinPosts } from "@/lib/content/builtin";
 import { getPost, mediaUrl, pick } from "@/lib/content/posts";
 import { formatStoryDate } from "@/lib/i18n/format";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { pageMeta } from "@/lib/seo";
+import { absoluteUrl, siteUrl } from "@/lib/site";
 
 export const revalidate = 60;
 
@@ -25,10 +28,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await getPost(slug);
   if (!post) return {};
   const cover = post.media.find((m) => m.type === "image");
-  return {
+  return pageMeta({
+    locale,
+    path: `/stories/${slug}`,
     title: pick(post, "title", locale).text,
     description: pick(post, "summary", locale).text,
-    openGraph: cover ? { images: [{ url: mediaUrl(cover) }] } : undefined,
+    image: cover ? mediaUrl(cover) : undefined,
+    type: "article",
+    publishedTime: post.date,
+  });
+}
+
+/** The story as an article, for search engines: headline, language, date, picture, the Abhiyan as publisher. */
+function article(post: NonNullable<Awaited<ReturnType<typeof getPost>>>, locale: Locale, slug: string) {
+  const base = siteUrl();
+  const cover = post.media.find((m) => m.type === "image");
+  return {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: pick(post, "title", locale).text,
+    description: pick(post, "summary", locale).text,
+    inLanguage: pick(post, "body", locale).lang,
+    datePublished: post.date,
+    ...(cover ? { image: [absoluteUrl(mediaUrl(cover))] } : {}),
+    mainEntityOfPage: `${base}/${locale}/stories/${slug}`,
+    author: { "@id": `${base}/#organization` },
+    publisher: { "@id": `${base}/#organization` },
+    ...(post.place ? { contentLocation: { "@type": "Place", name: post.place } } : {}),
+    keywords: post.tags.join(", "),
   };
 }
 
@@ -47,6 +74,7 @@ export default async function StoryPage({ params }: Props) {
 
   return (
     <main id="content" className="page pb-24 pt-10 min-[820px]:pt-16">
+      <JsonLd data={article(post, locale, slug)} />
       <PaperSheet>
         {cover ? (
           <div data-flip-id={post.slug} className="-mx-[clamp(1.25rem,5vw,4rem)] -mt-[clamp(1.25rem,5vw,4rem)] mb-8 overflow-hidden rounded-t-[var(--radius-panel)]">

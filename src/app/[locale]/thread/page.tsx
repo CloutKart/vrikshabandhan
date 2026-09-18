@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PhotoPanel } from "@/components/media/PhotoPanel";
 import { Lineage } from "@/components/thread-page/Lineage";
@@ -11,7 +12,7 @@ import { bilingual } from "@/lib/i18n/bilingual";
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "thread" });
-  return { title: t("title") };
+  return pageMeta({ locale: locale as Locale, path: "/thread", title: t("title"), description: t("p3") });
 }
 
 export default async function ThreadPage({ params }: { params: Promise<{ locale: string }> }) {

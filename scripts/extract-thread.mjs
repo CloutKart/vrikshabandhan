@@ -129,7 +129,6 @@ async function run(frame, variant) {
     }
   };
   const band = maskFor(BAND, true);
-  const bandOnly = maskFor(BAND, false);
   const ends = maskFor(ENDS, false);
   // Two layers. The band with the knot never moves, so its layer is simply the painting's own pixels for the whole
   // box (bark, thread and ground alike): drawn on top, it hides the fill beneath exactly. The loose ends swing, so

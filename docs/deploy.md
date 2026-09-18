@@ -27,11 +27,21 @@ editor and new stories once a Supabase project is attached.
 
 1. Import the repository. Framework preset: Next.js. Build command `npm run build`, no overrides needed.
 2. Environment variables (Production and Preview):
+   - `SITE_URL` = `https://vrikshabandhanabhiyan.in` (no trailing slash). Canonical links, share cards, the
+     sitemap and the links inside e-mails are built from it; without it Vercel's production URL is used.
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   Nothing else. Without these the site deploys fine and the editor shows "Editor not configured".
-3. Add the domain under Settings, Domains, and point DNS at Vercel (CNAME `cname.vercel-dns.com` for a subdomain,
-   the A record Vercel shows for an apex).
+   Without the Supabase pair the site deploys fine and the editor shows "Editor not configured".
+3. The domain, vrikshabandhanabhiyan.in. Under Settings, Domains add `vrikshabandhanabhiyan.in` and
+   `www.vrikshabandhanabhiyan.in`; at the registrar create an A record for the apex pointing at `76.76.21.21` and a
+   CNAME for `www` pointing at `cname.vercel-dns.com`. In Vercel set `www` to redirect to the apex, and once the apex
+   is live edit the `vrikshabandhan.vercel.app` entry to redirect to it as well, so the old address keeps working.
+   Then in Supabase (Authentication, URL configuration) set the Site URL to `https://vrikshabandhanabhiyan.in` and
+   add `https://vrikshabandhanabhiyan.in/admin/auth/callback` to the redirect allow list.
+   Search engines: in Google Search Console add the domain property (DNS TXT record), submit
+   `https://vrikshabandhanabhiyan.in/sitemap.xml`, and do the same in Bing Webmaster Tools. Every page carries a
+   canonical link, hreflang links between its English and Hindi versions, Open Graph and Twitter cards with the
+   painting as the share image (stories use their cover), and structured data for the organisation and each story.
 4. `next.config.ts` allows images from the Supabase host automatically, derived from `NEXT_PUBLIC_SUPABASE_URL`
    at build time, so the variable must be set before the build runs (it is, on Vercel).
 
