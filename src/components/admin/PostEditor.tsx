@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 import { useState } from "react";
-import { revalidateStories } from "@/app/admin/actions";
+import { retryFailedDeliveries, revalidateStories, sendStoryNewsletter } from "@/app/admin/actions";
+import { describeSend } from "@/lib/newsletter/report";
+import type { SendReport } from "@/lib/newsletter/types";
 import { StoryBody } from "@/components/story/StoryBody";
 import { Button } from "@/components/ui/Button";
 import { Field, inputClass } from "@/components/ui/Field";
@@ -15,14 +18,14 @@ import { browserClient } from "@/lib/supabase/browser";
 import { MediaUploader } from "./MediaUploader";
 import { explain } from "@/lib/supabase/explain";
 
-type Props = { id?: string; initial?: Draft; deletedAt?: string | null };
+type Props = { id?: string; initial?: Draft; deletedAt?: string | null; above?: ReactNode };
 
 /**
  * Create or edit a post. Saves go straight to Supabase under row-level
  * security (the signed-in editor's session), then the public pages are
  * revalidated. Delete is soft and can be undone from the toast.
  */
-export function PostEditor({ id, initial, deletedAt }: Props) {
+export function PostEditor({ id, initial, deletedAt, above }: Props) {
   const router = useRouter();
   const [draft, setDraft] = useState<Draft>(initial ?? emptyDraft());
   const [tagsInput, setTagsInput] = useState((initial?.tags ?? []).join(", "));
@@ -40,6 +43,15 @@ export function PostEditor({ id, initial, deletedAt }: Props) {
       await revalidateStories();
     } catch {
       toast("Saved, but the public pages could not be refreshed yet. They refresh on their own within a minute.");
+    }
+  }
+
+  /** A live save offers the story to the subscribers; the database decides whether it is the first publish. */
+  async function notify(postId: string): Promise<SendReport> {
+    try {
+      return await sendStoryNewsletter(postId);
+    } catch (e) {
+      return { status: "error", total: 0, sent: 0, failed: 0, reason: explain(e) };
     }
   }
 
@@ -72,10 +84,14 @@ export function PostEditor({ id, initial, deletedAt }: Props) {
       return;
     }
     await revalidate();
-    toast(next.live ? "Published." : "Saved as a draft.");
+    const report = next.live && savedId ? await notify(savedId) : null;
+    const retry = report?.status === "partial" && savedId ? { label: "Retry the failed", onClick: () => void retryFailedDeliveries(savedId).then((r) => toast(describeSend(r).replace(/^Published\. /, "Retried. "), undefined, 8000)) } : undefined;
+    toast(describeSend(report), retry, report && (report.status === "partial" || report.status === "error") ? 8000 : undefined);
     setBusy(false);
-    if (id) setDraft(next);
-    else router.push(`/admin/posts/${savedId}`);
+    if (id) {
+      setDraft(next);
+      router.refresh();
+    } else router.push(`/admin/posts/${savedId}`);
   }
 
   async function setDeleted(value: string | null) {
@@ -103,6 +119,7 @@ export function PostEditor({ id, initial, deletedAt }: Props) {
           All posts
         </Link>
       </div>
+      {above ? <div className="mt-8">{above}</div> : null}
       {deletedAt ? (
         <p role="alert" className="mt-6 font-sans text-sutra">
           This post is deleted and hidden from the site.{" "}

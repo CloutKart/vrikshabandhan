@@ -8,7 +8,10 @@ export function NotConfigured() {
         migrations in supabase/migrations, add editor e-mail addresses to the editors table, and deploy again. The
         public site keeps working without it and shows the built-in stories.
       </p>
-      <p className="mt-4 font-sans text-sm text-ink-2">See docs/deploy.md for the full runbook.</p>
+      <p className="mt-4 max-w-[60ch] font-sans text-sm text-ink-2">
+        The newsletter needs three more variables, RESEND_API_KEY, NEWSLETTER_SECRET and NEWSLETTER_FROM; until they are
+        set, publishing mails nobody and the subscribe form on the site says so. See docs/deploy.md for the full runbook.
+      </p>
     </main>
   );
 }

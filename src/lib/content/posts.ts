@@ -22,7 +22,7 @@ export function mediaUrl(m: MediaItem): string {
   return m.url ?? storagePublicUrl(m.path) ?? `/${m.path}`;
 }
 
-function fromRow(r: PostRow): Post {
+export function fromRow(r: PostRow): Post {
   return {
     id: r.id,
     slug: r.slug,

@@ -22,15 +22,24 @@ function matches(p: PostRow, show: Show) {
 
 function status(p: PostRow) {
   if (p.deleted_at) return "Deleted";
-  return p.live ? "Live" : "Draft";
+  if (!p.live) return "Draft";
+  if (!p.newsletter_sent_at) return "Live, not mailed";
+  return p.newsletter_test ? "Live, test mailed" : "Live, mailed";
 }
 
-export function PostList({ posts, show }: { posts: PostRow[]; show: Show }) {
+export function PostList({ posts, show, subscribers }: { posts: PostRow[]; show: Show; subscribers?: number | null }) {
   const visible = posts.filter((p) => matches(p, show));
   return (
     <main id="content" className="page py-16 font-sans">
       <div className="flex flex-wrap items-end justify-between gap-6">
-        <h1 className="font-serif text-[2.5rem] leading-tight">Posts</h1>
+        <div>
+          <h1 className="font-serif text-[2.5rem] leading-tight">Posts</h1>
+          {typeof subscribers === "number" ? (
+            <p data-subscriber-count className="mt-1 text-sm text-ink-2">
+              {subscribers} confirmed subscriber{subscribers === 1 ? "" : "s"}
+            </p>
+          ) : null}
+        </div>
         <Link href="/admin/posts/new" className={buttonClass()}>
           New post
         </Link>
