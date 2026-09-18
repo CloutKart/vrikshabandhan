@@ -15,8 +15,8 @@
   --paper: #F3EEE2;
   --paper-ink: #1D231E;
   --paper-ink-2: #4B5449;
-  --stone: #8B8A86;
-  --stone-ink: #1D231E;
+  --stone: #776D66; /* the grey canvas as measured where the headline sits */
+  --stone-ink: #EDE1CF; /* the headline's ink on the painting: cream at night, near-black by day */
   --leaf-green: #5B9A3C;
   --leaf-blue: #2F4F8F;
   --leaf-gold: #D8A62A;
