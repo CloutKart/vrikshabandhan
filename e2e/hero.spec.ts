@@ -5,7 +5,7 @@ test("the hero has one bilingual h1 with a lang on each line", async ({ page }) 
   const h1 = page.locator("h1");
   await expect(h1).toHaveCount(1);
   await expect(h1.locator('[lang="en"]')).toHaveText("A thread tied to a tree");
-  await expect(h1.locator('[lang="hi"]')).toHaveText("पेड़ से बँधा एक धागा");
+  await expect(h1.locator('[lang="hi"]')).toHaveText("पेड़ से बँधा एक रक्षा सूत्र");
 });
 
 test("the Hindi home page leads with the Hindi line", async ({ page }) => {
@@ -333,13 +333,13 @@ test("the word thread in the headline wears the thread's red, in both languages 
   const accents = page.locator(".hero-title [data-accent]");
   await expect(accents).toHaveCount(2);
   await expect(accents.nth(0)).toHaveText("thread");
-  await expect(accents.nth(1)).toHaveText("धागा");
+  await expect(accents.nth(1)).toHaveText("रक्षा सूत्र");
   for (const el of await accents.all()) expect(await el.evaluate((e) => getComputedStyle(e).color)).toBe("rgb(175, 71, 44)");
   // The split entrance keeps the word's colour on every character.
   const charColours = await page.locator(".hero-title [data-accent] *").evaluateAll((els) => els.map((e) => getComputedStyle(e).color));
   for (const c of charColours) expect(c).toBe("rgb(175, 71, 44)");
   await page.goto("/hi");
-  await expect(page.locator(".hero-title [data-accent]").nth(0)).toHaveText("धागा");
+  await expect(page.locator(".hero-title [data-accent]").nth(0)).toHaveText("रक्षा सूत्र");
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator(".hero-title [data-accent]").nth(0)).toBeVisible();
 });

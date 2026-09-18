@@ -223,8 +223,10 @@ html[data-motion="full"] .hero-leaves {
   .hero-title [lang="hi"] {
     line-height: 1.2;
   }
+  /* On the Hindi page the headline is the Devanagari line, and "रक्षा सूत्र" is long: this size keeps it to one
+     line inside the painting, clear of the canopy. */
   .hero-title [lang="hi"]:first-child {
-    font-size: 0.92em;
+    font-size: 0.78em;
   }
 }
 /* Phones show the square painting (its own canvas, tree and thread patches, chosen by <picture>), so the art is a
