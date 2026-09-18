@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { PhotoPanel } from "@/components/media/PhotoPanel";
 import { getTranslations } from "next-intl/server";
 import { SectionHeading } from "@/components/typography/SectionHeading";
 import { Button } from "@/components/ui/Button";
@@ -16,9 +16,7 @@ export async function FounderTeaser({ locale }: { locale: Locale }) {
     <section data-section="founder" className="page section" aria-labelledby="founder-title">
       <SectionHeading pair={pair} />
       <div className="mt-10 grid gap-10 min-[1024px]:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] min-[1024px]:gap-16 min-[1024px]:items-center">
-        <div data-reveal="mask" className="framed overflow-hidden rounded-[var(--radius-panel)]">
-          <Image src="/images/founder.jpg" alt={t("portraitAlt")} width={1199} height={902} sizes="(min-width: 1024px) 40vw, 100vw" className="w-full" />
-        </div>
+        <PhotoPanel name="founder" src="/images/founder.jpg" alt={t("portraitAlt")} ratio="4/5" phoneRatio="4/5" position="50% 32%" sizes="(min-width: 1024px) 40vw, 100vw" quality={78} />
         <div>
           <p className="font-sans text-ink-2">{t("honorific")}</p>
           <p className="text-[clamp(2rem,3.5vw,3.25rem)] leading-tight">{t("name")}</p>

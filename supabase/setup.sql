@@ -286,6 +286,7 @@ grant execute on function public.newsletter_unsubscribe(text, text) to anon, aut
 insert into public.editors (email) values
   ('ukrajyanirmansenanisangh@gmail.com'),
   ('vrikshabandhanabhiyan@gmail.com'),
+  ('36chardhamassociates@gmail.com'),
   ('shivam@clout-kart.com')
 on conflict (email) do nothing;
 

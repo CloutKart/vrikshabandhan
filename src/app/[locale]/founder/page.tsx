@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { pageMeta } from "@/lib/seo";
-import Image from "next/image";
+import { PhotoPanel } from "@/components/media/PhotoPanel";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Timeline } from "@/components/founder/Timeline";
 import { PullQuote } from "@/components/story/PullQuote";
@@ -27,17 +27,18 @@ export default async function FounderPage({ params }: { params: Promise<{ locale
     <main id="content" className="pb-12">
       <PageHeader pair={pair} />
       <div className="page grid gap-12 min-[820px]:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] min-[820px]:grid-rows-[auto_1fr] min-[820px]:gap-x-16 min-[820px]:gap-y-8">
-        <div data-reveal="mask" className="framed overflow-hidden rounded-[var(--radius-panel)] min-[820px]:col-start-1 min-[820px]:row-start-1">
-            <Image
-              src="/images/founder.jpg"
-              alt={t("portraitAlt")}
-              width={1199}
-              height={902}
-              sizes="(min-width: 820px) 40vw, 100vw"
-              className="w-full"
-              priority
-            />
-        </div>
+        <PhotoPanel
+          name="founder"
+          src="/images/founder.jpg"
+          alt={t("portraitAlt")}
+          ratio="2/3"
+          phoneRatio="4/5"
+          position="50% 32%"
+          sizes="(min-width: 820px) 40vw, 100vw"
+          quality={78}
+          priority
+          className="min-[820px]:col-start-1 min-[820px]:row-start-1"
+        />
         <div className="min-[820px]:col-start-2 min-[820px]:row-span-2">
           <p className="font-sans text-ink-2">{t("honorific")}</p>
           <p className="text-[clamp(2rem,3.5vw,3.25rem)] leading-tight">{t("name")}</p>

@@ -1,8 +1,8 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 
-type Ratio = "4/5" | "4/3" | "16/9" | "3/2" | "1/1";
-const RATIO: Record<Ratio, string> = { "4/5": "4 / 5", "4/3": "4 / 3", "16/9": "16 / 9", "3/2": "3 / 2", "1/1": "1 / 1" };
+type Ratio = "2/3" | "4/5" | "4/3" | "16/9" | "3/2" | "1/1";
+const RATIO: Record<Ratio, string> = { "2/3": "2 / 3", "4/5": "4 / 5", "4/3": "4 / 3", "16/9": "16 / 9", "3/2": "3 / 2", "1/1": "1 / 1" };
 
 /**
  * A field photograph in a rounded panel that reveals once it is in view.
@@ -18,6 +18,7 @@ export function PhotoPanel({
   sizes = "(min-width: 1024px) 40vw, 100vw",
   quality = 70,
   className = "",
+  priority = false,
 }: {
   name: string;
   src: string;
@@ -28,6 +29,8 @@ export function PhotoPanel({
   sizes?: string;
   quality?: number;
   className?: string;
+  /** The page's first image, such as the founder portrait. */
+  priority?: boolean;
 }) {
   return (
     <div
@@ -36,7 +39,7 @@ export function PhotoPanel({
       className={`painting-detail framed relative overflow-hidden rounded-[var(--radius-panel)] bg-stone ${className}`}
       style={{ "--ratio": RATIO[ratio], "--ratio-phone": RATIO[phoneRatio] } as CSSProperties}
     >
-      <Image src={src} alt={alt} fill sizes={sizes} quality={quality} className="object-cover" style={{ objectPosition: position }} />
+      <Image src={src} alt={alt} fill sizes={sizes} quality={quality} priority={priority} className="object-cover" style={{ objectPosition: position }} />
     </div>
   );
 }
