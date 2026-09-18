@@ -17,6 +17,8 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
     command: "npm run start",
+    // The editor demo route exists only for these tests and local checks.
+    env: { EDITOR_DEMO: "1" },
     url: `http://localhost:${port}/en`,
     reuseExistingServer: true,
     timeout: 300_000,
