@@ -49,6 +49,21 @@ test.describe("the story editor", () => {
     await expect.poll(() => savedEn(page)).not.toContain("Added **bold**");
   });
 
+  test("words selected with the mouse take Bold and Italic from the toolbar buttons", async ({ page }) => {
+    const box = await open(page);
+    const h2 = box.locator("h2");
+    const b = (await h2.boundingBox())!;
+    await page.mouse.move(b.x + 2, b.y + b.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(b.x + b.width - 2, b.y + b.height / 2, { steps: 6 });
+    await page.mouse.up();
+    await page.getByRole("button", { name: "Bold", exact: true }).click();
+    await expect(h2.locator("strong")).toHaveText("What is a seed bomb");
+    await page.getByRole("button", { name: "Italic", exact: true }).click();
+    await expect(h2.locator("em")).toHaveCount(1);
+    await expect.poll(() => savedEn(page)).toMatch(/## (\*\*_|_\*\*)What is a seed bomb(_\*\*|\*\*_)/);
+  });
+
   test("a Word-style paste keeps headings, bold, italic, links and lists and drops the rest", async ({ page }) => {
     const box = await open(page);
     await box.locator("p").first().click();
@@ -63,6 +78,38 @@ test.describe("the story editor", () => {
     });
     await expect.poll(() => savedEn(page)).toContain("## Pasted title\n**Bold** and _slanted_ and [a link](https://example.org/x)\n- one\n- two\ncell");
     expect(await savedEn(page)).not.toMatch(/style=|Calibri|<table/);
+  });
+
+  test("a plain-text paste written in the story format becomes real headings, lists, marks and links", async ({ page }) => {
+    const box = await open(page);
+    await box.click();
+    await page.keyboard.press("Control+a");
+    await page.keyboard.press("Delete");
+    const text = "Intro with **bold** words.\n## Choose the tree\n- One\n- Two\n> Be careful. — Manoj Dhyani\nSee [the thread](https://vrikshabandhanabhiyan.in/en/thread) now.\n@youtube(https://youtu.be/XTmHXvDXcI0)";
+    await page.evaluate((t) => {
+      const dt = new DataTransfer();
+      dt.setData("text/plain", t);
+      document.querySelector("[role='textbox']")!.dispatchEvent(new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true }));
+    }, text);
+    await expect(box.locator("h2")).toHaveText("Choose the tree");
+    await expect(box.locator("strong")).toHaveText("bold");
+    await expect(box.locator("ul li")).toHaveCount(2);
+    await expect(box.locator("blockquote cite")).toHaveText("Manoj Dhyani");
+    await expect(box.locator("a[href='https://vrikshabandhanabhiyan.in/en/thread']")).toHaveText("the thread");
+    await expect(box.locator("[data-story-film]")).toHaveCount(1);
+    await expect.poll(() => savedEn(page)).toBe(text);
+  });
+
+  test("a plain-text paste of one ordinary line goes in as words, not as a new paragraph", async ({ page }) => {
+    const box = await open(page);
+    await box.locator("p").first().click();
+    await page.keyboard.press("End");
+    await page.evaluate(() => {
+      const dt = new DataTransfer();
+      dt.setData("text/plain", " and more");
+      document.querySelector("[role='textbox']")!.dispatchEvent(new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true }));
+    });
+    await expect.poll(() => savedEn(page)).toContain("Seed bombs are made **before the monsoon**. and more\n## What is a seed bomb");
   });
 
   test("pasted files are refused with a pointer to the uploads", async ({ page }) => {
@@ -142,6 +189,7 @@ test.describe("the story editor", () => {
     await box.locator("h2").click();
     await page.keyboard.press("Home");
     await page.keyboard.press("Shift+End");
+    await expect.poll(() => page.evaluate(() => getSelection()?.toString())).toBe("What is a seed bomb");
     await page.keyboard.press("Control+k");
     const dialog = page.locator("dialog[open]");
     await dialog.locator("#link-href").fill("https://example.org/seed");
@@ -153,7 +201,17 @@ test.describe("the story editor", () => {
     await page.keyboard.press("Enter");
     await page.keyboard.type("Plain line");
     await page.getByRole("button", { name: "Source", exact: true }).click();
-    await page.waitForTimeout(150);
+    // The new source line exists (the fixture quote already has one) and holds the cursor before we type into it.
+    await expect(box.locator("blockquote cite")).toHaveCount(2);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const n = getSelection()?.anchorNode;
+          const el = n && n.nodeType === Node.ELEMENT_NODE ? (n as Element) : n?.parentElement;
+          return Boolean(el?.closest("cite"));
+        }),
+      )
+      .toBe(true);
     await page.keyboard.type("Who");
     await expect.poll(() => savedEn(page)).toContain("> Plain line — Who");
   });

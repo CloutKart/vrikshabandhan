@@ -28,6 +28,8 @@ const LANG_LABEL: Record<Locale, string> = { en: "English", hi: "हिंदी
 const PLACEHOLDER: Record<Locale, string> = { en: "Write the story. One idea per paragraph.", hi: "कहानी लिखें। हर अनुच्छेद में एक बात।" };
 
 const toDoc = (text: string): DocNode => blocksToDoc(parseBody(text));
+/** A line that carries any of the story format's markers. */
+const STORY_MARKUP = /(^|\n)(## |> |- |\d+\. |!\[|@youtube\()|\*\*|\[[^\]]+\]\(/;
 const toText = (editor: Editor): string => serializeBody(docToBlocks(editor.getJSON() as DocNode));
 
 function editorAttributes(lang: Locale) {
@@ -52,6 +54,7 @@ export default function StoryEditor({ en, hi, media, version = 0, onChange }: Pr
   const [initial] = useState<Record<Locale, DocNode>>(() => ({ en: toDoc(en), hi: toDoc(hi) }));
   const docs = useRef<Record<Locale, DocNode>>(initial);
   const langRef = useRef<Locale>("en");
+  const editorRef = useRef<Editor | null>(null);
   const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
   const linkDialog = useRef<HTMLDialogElement>(null);
   const filmDialog = useRef<HTMLDialogElement>(null);
@@ -92,8 +95,17 @@ export default function StoryEditor({ en, hi, media, version = 0, onChange }: Pr
     editorProps: {
       attributes: () => editorAttributes(langRef.current),
       handlePaste: (_view, event) => {
-        if (event.clipboardData?.files.length) {
+        const data = event.clipboardData;
+        if (data?.files.length) {
           toast("Photos go through the uploads below, so they get a description and a place in the gallery.");
+          return true;
+        }
+        // Plain text written in the story format (from a handover file, a note, an older post) becomes real
+        // blocks; a single ordinary line stays a plain insertion. Rich pastes (Word, Docs) keep their own path.
+        const text = data?.getData("text/plain") ?? "";
+        if (!data?.getData("text/html") && text && (text.includes("\n") || STORY_MARKUP.test(text))) {
+          const doc = blocksToDoc(parseBody(text));
+          editorRef.current?.chain().focus().insertContent(doc.content ?? []).run();
           return true;
         }
         return false;
@@ -124,6 +136,8 @@ export default function StoryEditor({ en, hi, media, version = 0, onChange }: Pr
       }, 300);
     },
   });
+
+  editorRef.current = editor;
 
   /** Write the current language back now, ahead of a switch or a reload. */
   function flush() {
@@ -355,6 +369,8 @@ function Tool({ label, pressed, shortcut, onClick, disabled, children }: { label
       title={shortcut ? `${label} (${shortcut})` : label}
       aria-pressed={pressed === undefined ? undefined : pressed}
       disabled={disabled}
+      // Pressing a tool must not take the selection away from the sheet, or there is nothing to format.
+      onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       className={`min-h-11 min-w-11 rounded-sm px-3 text-paper-ink transition-colors duration-150 hover:bg-ground-2/60 disabled:opacity-40 aria-pressed:bg-paper-ink aria-pressed:text-paper ${pressed ? "" : ""}`}
     >
