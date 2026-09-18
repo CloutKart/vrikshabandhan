@@ -192,6 +192,37 @@
   .sheet::backdrop {
     background: var(--ground);
   }
+  /* The story editor: the paper sheet as the page the writer works on. */
+  .story-editor .ProseMirror {
+    caret-color: var(--sutra);
+  }
+  .story-editor .ProseMirror :is(p, h2, li, cite).is-empty::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    color: var(--paper-ink-2);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .story-editor .ProseMirror cite {
+    display: block;
+    margin-top: 0.5em;
+    font-family: var(--font-sans);
+    font-style: normal;
+    font-size: 0.8em;
+    color: var(--paper-ink-2);
+  }
+  .story-editor .ProseMirror .story-node {
+    margin: 1.5em 0;
+  }
+  .story-editor .ProseMirror .ProseMirror-selectednode {
+    outline: 2px solid var(--gold);
+    outline-offset: 4px;
+    border-radius: var(--radius-sm);
+  }
+  .story-editor .ProseMirror a {
+    text-decoration-color: var(--sutra);
+  }
   /* The subscribe invitation: a panel on desktop, a bottom sheet on phones; the ground colour, a thread on top. */
   .ask {
     margin: auto;

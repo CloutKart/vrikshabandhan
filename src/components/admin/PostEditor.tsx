@@ -1,37 +1,78 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { retryFailedDeliveries, revalidateStories, sendStoryNewsletter } from "@/app/admin/actions";
 import { describeSend } from "@/lib/newsletter/report";
 import type { SendReport } from "@/lib/newsletter/types";
-import { StoryBody } from "@/components/story/StoryBody";
 import { Button } from "@/components/ui/Button";
 import { Field, inputClass } from "@/components/ui/Field";
 import { toast } from "@/components/ui/Toast";
 import { emptyDraft, parseTags, savePayload, validateDraft, type Draft, type DraftErrors } from "@/lib/content/admin";
 import { slugify } from "@/lib/content/slug";
 import { ytId } from "@/lib/content/youtube";
+import type { Locale } from "@/i18n/routing";
 import { browserClient } from "@/lib/supabase/browser";
 import { MediaUploader } from "./MediaUploader";
 import { explain } from "@/lib/supabase/explain";
+import { clearCopy, copyKey, readCopy, shouldOffer, writeCopy, type DraftCopy } from "@/lib/editor/recovery";
 
-type Props = { id?: string; initial?: Draft; deletedAt?: string | null; above?: ReactNode };
+type Props = { id?: string; initial?: Draft; deletedAt?: string | null; updatedAt?: string | null; above?: ReactNode };
+
+/** The document editor arrives after hydration, only here; until then a quiet box holds its place. */
+const StoryEditor = dynamic(() => import("./StoryEditor"), {
+  ssr: false,
+  loading: () => (
+    <div aria-busy="true" className="paper min-h-[28rem] rounded-[var(--radius-panel)] font-sans text-sm text-paper-ink-2">
+      Loading the editor
+    </div>
+  ),
+});
 
 /**
  * Create or edit a post. Saves go straight to Supabase under row-level
  * security (the signed-in editor's session), then the public pages are
  * revalidated. Delete is soft and can be undone from the toast.
  */
-export function PostEditor({ id, initial, deletedAt, above }: Props) {
+export function PostEditor({ id, initial, deletedAt, updatedAt, above }: Props) {
   const router = useRouter();
   const [draft, setDraft] = useState<Draft>(initial ?? emptyDraft());
   const [tagsInput, setTagsInput] = useState((initial?.tags ?? []).join(", "));
   const [errors, setErrors] = useState<DraftErrors>({});
   const [busy, setBusy] = useState(false);
-  const [preview, setPreview] = useState(false);
+  const [editorVersion, setEditorVersion] = useState(0);
+  const [recovered, setRecovered] = useState<DraftCopy | null>(null);
+  const key = copyKey(id);
+
+  // A copy of unsaved work from this device, offered once when it holds more than the row does.
+  useEffect(() => {
+    // After the first paint, so the page never blocks on the read and the server render matches.
+    const t = setTimeout(() => {
+      const copy = readCopy(localStorage, key);
+      if (shouldOffer(copy, initial ?? emptyDraft(), updatedAt)) setRecovered(copy);
+    }, 0);
+    return () => clearTimeout(t);
+  }, [key, initial, updatedAt]);
+
+  // Every change is copied to this device two seconds later; a save clears the copy.
+  useEffect(() => {
+    const t = setTimeout(() => writeCopy(localStorage, key, { ...draft, tags: parseTags(tagsInput) }), 2000);
+    return () => clearTimeout(t);
+  }, [draft, tagsInput, key]);
+
+  function restore(copy: DraftCopy) {
+    setDraft(copy.draft);
+    setTagsInput(copy.draft.tags.join(", "));
+    setEditorVersion((v) => v + 1);
+    setRecovered(null);
+  }
+  function discard() {
+    clearCopy(localStorage, key);
+    setRecovered(null);
+  }
 
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) => setDraft((d) => ({ ...d, [key]: value }));
   // Uploads are filed under the row id once it exists, so renaming a post never strands its files.
@@ -84,6 +125,7 @@ export function PostEditor({ id, initial, deletedAt, above }: Props) {
       setBusy(false);
       return;
     }
+    clearCopy(localStorage, key);
     await revalidate();
     const report = next.live && savedId ? await notify(savedId) : null;
     const retry = report?.status === "partial" && savedId ? { label: "Retry the failed", onClick: () => void retryFailedDeliveries(savedId).then((r) => toast(describeSend(r).replace(/^Published\. /, "Retried. "), undefined, 8000)) } : undefined;
@@ -121,6 +163,17 @@ export function PostEditor({ id, initial, deletedAt, above }: Props) {
         </Link>
       </div>
       {above ? <div className="mt-8">{above}</div> : null}
+      {recovered ? (
+        <div data-recovery role="status" className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-[var(--radius-panel)] border border-gold px-5 py-4 font-sans text-sm">
+          <span>Unsaved changes from {new Date(recovered.savedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })} were found on this device.</span>
+          <button type="button" className="u-thread min-h-11" onClick={() => restore(recovered)}>
+            Restore them
+          </button>
+          <button type="button" className="u-thread min-h-11 text-ink-2" onClick={discard}>
+            Discard
+          </button>
+        </div>
+      ) : null}
       {deletedAt ? (
         <p role="alert" className="mt-6 font-sans text-sutra">
           This post is deleted and hidden from the site. Saving it brings it back.{" "}
@@ -156,7 +209,7 @@ export function PostEditor({ id, initial, deletedAt, above }: Props) {
           <Field id="tags" label="Tags" hint="Separate with commas: Raksha Bandhan, School drive, Open letter">
             <input id="tags" value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} className={inputClass} />
           </Field>
-          <Field id="yt" label="YouTube video (optional)" hint="Paste a youtube.com or youtu.be link. The film plays on the story page, below the text." error={errors.yt}>
+          <Field id="yt" label="YouTube video (optional)" hint="Optional. A film here plays below the whole text; to place one within the text, use Film in the editor's toolbar." error={errors.yt}>
             <input id="yt" type="url" value={draft.yt} onChange={(e) => set("yt", e.target.value)} className={inputClass} placeholder="https://youtu.be/" aria-invalid={Boolean(errors.yt)} aria-describedby={errors.yt ? "yt-error" : undefined} />
           </Field>
           <Field id="summary_en" label="Summary (English)" hint="One or two lines, shown in the list.">
@@ -176,23 +229,13 @@ export function PostEditor({ id, initial, deletedAt, above }: Props) {
           </div>
         ) : null}
 
-        <div className="grid gap-6 min-[820px]:grid-cols-2">
-          <Field id="body_en" label="Text (English)" hint='One paragraph per line. Start a line with "## " for a subheading, "> " for a quote, and end a quote with " — Name" to credit it.'>
-            <textarea id="body_en" value={draft.body_en} onChange={(e) => set("body_en", e.target.value)} className={`${inputClass} min-h-[18rem] font-serif`} />
-          </Field>
-          <Field id="body_hi" label="पाठ (हिंदी)" lang="hi" hint="Optional. Leave empty to show the English text on the Hindi page.">
-            <textarea id="body_hi" lang="hi" value={draft.body_hi} onChange={(e) => set("body_hi", e.target.value)} className={`${inputClass} min-h-[18rem] font-serif`} />
-          </Field>
-        </div>
-
-        <div>
-          <button type="button" className="u-thread font-sans" onClick={() => setPreview((p) => !p)} aria-expanded={preview} aria-controls="preview">
-            {preview ? "Hide preview" : "Preview the text"}
-          </button>
-          {preview ? (
-            <div id="preview" className="paper mt-4 max-w-[calc(65ch+2*clamp(1.25rem,5vw,4rem))]">
-              <StoryBody body={draft.body_en} lang="en" />
-            </div>
+        <div className="grid gap-2">
+          <p className="font-sans text-sm text-ink-2">Story text. Write in either language; the other can follow later. Bold, links, lists, photos and films go in from the toolbar.</p>
+          <StoryEditor en={draft.body_en} hi={draft.body_hi} media={draft.media} version={editorVersion} onChange={(lang: Locale, text: string) => set(lang === "en" ? "body_en" : "body_hi", text)} />
+          {errors.body_en || errors.body_hi ? (
+            <p role="alert" className="font-sans text-sm text-sutra">
+              {errors.body_en ?? errors.body_hi}
+            </p>
           ) : null}
         </div>
 

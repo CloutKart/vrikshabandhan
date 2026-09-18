@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { emptyDraft, localDate, parseTags, savePayload, validateDraft } from "@/lib/content/admin";
+import { emptyDraft, localDate, missingPhotos, parseTags, savePayload, validateDraft } from "@/lib/content/admin";
 
 describe("parseTags", () => {
   it("splits on commas, trims and drops empties and duplicates", () => {
@@ -46,5 +46,18 @@ describe("savePayload", () => {
   it("brings a deleted post back when it is saved", () => {
     const d = { ...emptyDraft(), title_en: "T", live: false };
     expect(savePayload(d, "2026-09-18T10:00:00Z")).toEqual({ ...d, deleted_at: null });
+  });
+});
+
+describe("photos placed in the text", () => {
+  const media = [{ path: "posts/x/a.jpg", type: "image" as const, alt_en: "A", alt_hi: "" }];
+  it("names the ones no longer among the uploads", () => {
+    expect(missingPhotos("Text\n![c](media:posts/x/a.jpg)\n![c](media:posts/x/gone.jpg)", media)).toEqual(["posts/x/gone.jpg"]);
+    expect(missingPhotos("Text", [])).toEqual([]);
+  });
+  it("block publishing, not saving a draft", () => {
+    const d = { ...emptyDraft(), title_en: "T", media, body_en: "![c](media:posts/x/gone.jpg)" };
+    expect(validateDraft({ ...d, live: false })).toEqual({});
+    expect(validateDraft({ ...d, live: true }).body_en).toMatch(/removed from the uploads/);
   });
 });

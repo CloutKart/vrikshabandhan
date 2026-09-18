@@ -1,4 +1,5 @@
 import type { MediaItem } from "./types";
+import { parseBody } from "./markup";
 import { ytId } from "./youtube";
 
 /** What the editor form holds. Same shape as a row minus the server-managed columns. */
@@ -66,5 +67,18 @@ export function validateDraft(d: Draft): DraftErrors {
   if (d.yt.trim() && !ytId(d.yt)) errors.yt = "Paste a youtube.com or youtu.be link to the video.";
   if (d.live && d.media.some((m) => m.type === "image" && !m.alt_en.trim()))
     errors.media = "Every photo needs an English description before the post goes live.";
+  if (d.live) {
+    for (const field of ["body_en", "body_hi"] as const) {
+      if (missingPhotos(d[field], d.media).length) errors[field] = "A photo in the text has been removed from the uploads. Remove it from the text or upload it again.";
+    }
+  }
   return errors;
+}
+
+/** Paths of photos placed in the text that are no longer among the uploads. */
+export function missingPhotos(body: string, media: MediaItem[]): string[] {
+  const have = new Set(media.filter((m) => m.type === "image").map((m) => m.path));
+  return parseBody(body)
+    .filter((b) => b.kind === "image" && !have.has(b.path))
+    .map((b) => (b.kind === "image" ? b.path : ""));
 }
