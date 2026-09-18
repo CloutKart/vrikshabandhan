@@ -240,6 +240,7 @@
   background: var(--paper);
   color: var(--paper-ink);
   padding: clamp(1.25rem, 5vw, 4rem);
+  border-radius: var(--radius-panel);
 }
 .paper .prose {
   --tw-prose-body: var(--paper-ink);
