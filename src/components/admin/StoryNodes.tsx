@@ -59,6 +59,13 @@ function StoryImageView({ node, updateAttributes, deleteNode }: NodeViewProps) {
           value={caption}
           placeholder={m?.alt_en || "Caption (optional)"}
           onChange={(e) => updateAttributes({ caption: e.target.value })}
+          // The post form surrounds the editor; Enter here must not submit it.
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              e.currentTarget.blur();
+            }
+          }}
           className="field-input min-h-11 flex-1 rounded-sm border border-moss bg-transparent px-3 font-sans text-sm text-paper-ink placeholder:text-paper-ink-2/70"
         />
         <button type="button" onClick={deleteNode} className="u-thread min-h-11 font-sans text-sm text-sutra">

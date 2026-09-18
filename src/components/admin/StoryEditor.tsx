@@ -2,8 +2,9 @@
 
 import { EditorContent, useEditor, useEditorState, type Editor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
+import { NodeSelection } from "@tiptap/pm/state";
 import { CharacterCount, Placeholder, TrailingNode } from "@tiptap/extensions";
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { inputClass } from "@/components/ui/Field";
 import { toast } from "@/components/ui/Toast";
@@ -31,6 +32,20 @@ const toDoc = (text: string): DocNode => blocksToDoc(parseBody(text));
 /** A line that carries any of the story format's markers. */
 const STORY_MARKUP = /(^|\n)(## |> |- |\d+\. |!\[|@youtube\()|\*\*|\[[^\]]+\]\(/;
 const toText = (editor: Editor): string => serializeBody(docToBlocks(editor.getJSON() as DocNode));
+
+/** Enter in a dialog field applies it, and never reaches the post form outside the editor. */
+const onEnter = (apply: () => void) => (e: KeyboardEvent<HTMLInputElement>) => {
+  if (e.key !== "Enter") return;
+  e.preventDefault();
+  e.stopPropagation();
+  apply();
+};
+
+/** Where a placed photo or film goes: after a selected block (a film just placed stays selected), else at the cursor. */
+function placeAt(editor: Editor) {
+  const { selection } = editor.state;
+  return selection instanceof NodeSelection ? selection.to : { from: selection.from, to: selection.to };
+}
 
 function editorAttributes(lang: Locale) {
   return {
@@ -189,21 +204,25 @@ export default function StoryEditor({ en, hi, media, version = 0, onChange }: Pr
     }),
   });
 
+  /** ProseMirror reads a fresh mouse or keyboard selection from the DOM a moment later; a tool needs it now. */
+  function syncSelection(ed: Editor) {
+    (ed.view as unknown as { domObserver?: { flush(): void } }).domObserver?.flush();
+  }
+
   function openLink() {
     if (!editor) return;
+    syncSelection(editor);
     setLinkValue(String(editor.getAttributes("link").href ?? ""));
     linkDialog.current?.showModal();
   }
-  function submitLink(e: FormEvent) {
-    e.preventDefault();
+  function submitLink() {
     if (!editor) return;
     const href = linkValue.trim();
     if (href) editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
     else editor.chain().focus().extendMarkRange("link").unsetLink().run();
     linkDialog.current?.close();
   }
-  function submitFilm(e: FormEvent) {
-    e.preventDefault();
+  function submitFilm() {
     if (!editor) return;
     const url = filmValue.trim();
     const id = ytId(url);
@@ -211,13 +230,13 @@ export default function StoryEditor({ en, hi, media, version = 0, onChange }: Pr
       setFilmError("Paste a youtube.com or youtu.be link to the video.");
       return;
     }
-    editor.chain().focus().insertContent({ type: "storyYoutube", attrs: { url, id } }).run();
+    editor.chain().focus().insertContentAt(placeAt(editor), { type: "storyYoutube", attrs: { url, id } }).run();
     setFilmValue("");
     setFilmError("");
     filmDialog.current?.close();
   }
   function insertPhoto(m: MediaItem) {
-    editor?.chain().focus().insertContent({ type: "storyImage", attrs: { path: m.path, caption: "" } }).run();
+    editor?.chain().focus().insertContentAt(placeAt(editor), { type: "storyImage", attrs: { path: m.path, caption: "" } }).run();
     photoDialog.current?.close();
   }
   /** A source line at the end of the quote the cursor is in, or the cursor moved into the one it has. */
@@ -252,7 +271,11 @@ export default function StoryEditor({ en, hi, media, version = 0, onChange }: Pr
   }
 
   const photos = media.filter((m) => m.type === "image");
-  const run = (fn: (chain: ReturnType<Editor["chain"]>) => ReturnType<Editor["chain"]>) => () => editor && fn(editor.chain().focus()).run();
+  const run = (fn: (chain: ReturnType<Editor["chain"]>) => ReturnType<Editor["chain"]>) => () => {
+    if (!editor) return;
+    syncSelection(editor);
+    fn(editor.chain().focus()).run();
+  };
 
   return (
     <MediaContext.Provider value={media}>
@@ -288,45 +311,51 @@ export default function StoryEditor({ en, hi, media, version = 0, onChange }: Pr
           </div>
         </div>
 
+        {/* The dialogs are not forms: the editor sits inside the post's own form, and a nested submit would save
+            and reload the post. Enter in the field applies, as a form would. */}
         <dialog ref={linkDialog} className="ask" aria-labelledby="link-title">
-          <form onSubmit={submitLink} className="grid gap-4">
+          <div className="grid gap-4">
             <p id="link-title" className="text-xl">
               Link
             </p>
             <label htmlFor="link-href" className="font-sans text-sm text-ink-2">
               Web address (leave empty to remove the link)
             </label>
-            <input id="link-href" type="url" value={linkValue} onChange={(e) => setLinkValue(e.target.value)} placeholder="https://" className={inputClass} autoFocus />
+            <input id="link-href" type="url" value={linkValue} onChange={(e) => setLinkValue(e.target.value)} onKeyDown={onEnter(submitLink)} placeholder="https://" className={inputClass} autoFocus />
             <div className="flex gap-3">
-              <Button type="submit">Apply</Button>
+              <Button type="button" onClick={submitLink}>
+                Apply
+              </Button>
               <Button type="button" variant="line" onClick={() => linkDialog.current?.close()}>
                 Cancel
               </Button>
             </div>
-          </form>
+          </div>
         </dialog>
 
         <dialog ref={filmDialog} className="ask" aria-labelledby="film-title">
-          <form onSubmit={submitFilm} className="grid gap-4" noValidate>
+          <div className="grid gap-4">
             <p id="film-title" className="text-xl">
               Film
             </p>
             <label htmlFor="film-url" className="font-sans text-sm text-ink-2">
               YouTube link
             </label>
-            <input id="film-url" type="url" value={filmValue} onChange={(e) => setFilmValue(e.target.value)} placeholder="https://youtu.be/" className={inputClass} aria-invalid={Boolean(filmError)} aria-describedby={filmError ? "film-error" : undefined} autoFocus />
+            <input id="film-url" type="url" value={filmValue} onChange={(e) => setFilmValue(e.target.value)} onKeyDown={onEnter(submitFilm)} placeholder="https://youtu.be/" className={inputClass} aria-invalid={Boolean(filmError)} aria-describedby={filmError ? "film-error" : undefined} autoFocus />
             {filmError ? (
               <p id="film-error" role="alert" className="font-sans text-sm text-sutra">
                 {filmError}
               </p>
             ) : null}
             <div className="flex gap-3">
-              <Button type="submit">Place the film</Button>
+              <Button type="button" onClick={submitFilm}>
+                Place the film
+              </Button>
               <Button type="button" variant="line" onClick={() => filmDialog.current?.close()}>
                 Cancel
               </Button>
             </div>
-          </form>
+          </div>
         </dialog>
 
         <dialog ref={photoDialog} className="ask" aria-labelledby="photo-title">

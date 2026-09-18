@@ -14,12 +14,21 @@ const HI = "बीज बम मानसून से पहले बनते
 /** Shows the text the editor writes back, so a test can read the saved format. */
 export function EditorDemo() {
   const [text, setText] = useState<Record<Locale, string>>({ en: EN, hi: HI });
+  const [submits, setSubmits] = useState(0);
   return (
     <main id="content" className="page py-16">
       <h1 className="text-[2.5rem] leading-tight">Editor demo</h1>
-      <div className="mt-10">
+      {/* The editor sits inside the post form on the real page; nothing inside it may submit that form. */}
+      <form
+        className="mt-10"
+        data-outer-submits={submits}
+        onSubmit={(e) => {
+          e.preventDefault();
+          setSubmits((n) => n + 1);
+        }}
+      >
         <StoryEditor en={EN} hi={HI} media={MEDIA} onChange={(lang, t) => setText((s) => ({ ...s, [lang]: t }))} />
-      </div>
+      </form>
       <pre data-saved-en className="mt-8 whitespace-pre-wrap font-sans text-sm text-ink-2">{text.en}</pre>
       <pre data-saved-hi className="mt-4 whitespace-pre-wrap font-sans text-sm text-ink-2" lang="hi">{text.hi}</pre>
     </main>

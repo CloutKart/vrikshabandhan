@@ -156,6 +156,36 @@ test.describe("the story editor", () => {
     expect(await hint()).toBe("कहानी लिखें। हर अनुच्छेद में एक बात।");
   });
 
+  test("nothing inside the editor submits the post form around it", async ({ page }) => {
+    const box = await open(page);
+    const outer = page.locator("form[data-outer-submits]");
+    await box.locator("p").first().click();
+    await page.keyboard.press("End");
+    await page.getByRole("button", { name: "Film", exact: true }).click();
+    await page.locator("dialog[open] #film-url").fill("https://youtu.be/XTmHXvDXcI0");
+    await page.locator("dialog[open] #film-url").press("Enter");
+    await expect(box.locator("[data-story-film]")).toHaveCount(1);
+    await expect(outer).toHaveAttribute("data-outer-submits", "0");
+    await page.getByRole("button", { name: "Film", exact: true }).click();
+    await page.locator("dialog[open] #film-url").fill("https://youtu.be/XTmHXvDXcI0");
+    await page.locator("dialog[open]").getByRole("button", { name: "Place the film" }).click();
+    await expect(box.locator("[data-story-film]")).toHaveCount(2);
+    await expect(outer).toHaveAttribute("data-outer-submits", "0");
+    await box.locator("h2").click();
+    await page.keyboard.press("Home");
+    await page.keyboard.press("Shift+End");
+    await page.keyboard.press("Control+k");
+    await page.locator("dialog[open] #link-href").fill("https://example.org/x");
+    await page.locator("dialog[open]").getByRole("button", { name: "Apply" }).click();
+    await expect(box.locator("h2 a")).toHaveCount(1);
+    await expect(outer).toHaveAttribute("data-outer-submits", "0");
+    const caption = box.locator("[data-story-figure]").first().getByLabel("Caption");
+    await caption.fill("A caption");
+    await caption.press("Enter");
+    await expect(outer).toHaveAttribute("data-outer-submits", "0");
+    await expect.poll(() => savedEn(page)).toContain("![A caption](media:images/seed-bombers-2023.jpg)");
+  });
+
   test("a film needs a YouTube link and lands in the text as a film line", async ({ page }) => {
     const box = await open(page);
     await box.locator("p").first().click();
