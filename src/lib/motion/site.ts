@@ -111,6 +111,9 @@ function heroSequence(): Cleanup {
     done = true;
     split?.revert();
     unname();
+    // The tween leaves an inline opacity behind; cleared, so the stylesheet decides again (the still tree must be
+    // able to disappear under the moving one, and an inline "1" would outrank that rule).
+    cutout.forEach((el) => el.style.removeProperty("opacity"));
     try {
       sessionStorage.setItem(HERO_SESSION_KEY, "1");
     } catch {

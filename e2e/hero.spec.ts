@@ -315,3 +315,16 @@ test("a pinch zoom redraws the tree at the zoomed density instead of stretching 
   await cdp.send("Emulation.setPageScaleFactor", { pageScaleFactor: 1 });
   await expect.poll(() => canvas.evaluate((el: HTMLCanvasElement) => el.width), { timeout: 3000 }).toBe(before);
 });
+
+test("after the entrance the still tree is gone under the moving one, with no inline opacity left behind", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, storageState: { cookies: [], origins: [] } });
+  const page = await context.newPage();
+  await page.goto("/en");
+  await expect(page.locator("html")).toHaveAttribute("data-hero", "pending");
+  await expect(page.locator("html")).not.toHaveAttribute("data-hero", /.+/, { timeout: 5000 });
+  await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
+  const tree = page.locator('img.hero-tree[data-variant="light"]');
+  await expect.poll(() => tree.evaluate((el) => el.style.opacity)).toBe("");
+  await expect(tree).toHaveCSS("opacity", "0");
+  await context.close();
+});

@@ -363,7 +363,11 @@ export function treeSway(): Cleanup {
       }
       verified = true;
     }
-    if (!art.dataset.sway) art.dataset.sway = "";
+    if (!art.dataset.sway) {
+      art.dataset.sway = "";
+      // Whatever the entrance left inline, the still tree now yields to the canvas.
+      images.forEach((img) => img.style.removeProperty("opacity"));
+    }
   };
   raf = requestAnimationFrame(frame);
 
