@@ -84,7 +84,8 @@ export default function StoryEditor({ en, hi, media, version = 0, onChange }: Pr
       Placeholder.configure({
         showOnlyCurrent: false,
         includeChildren: true,
-        placeholder: ({ node, editor: ed }) => (node.type.name === "citation" ? "Who said this" : PLACEHOLDER[(ed.view.dom.getAttribute("lang") as Locale) || "en"]),
+        // Read from the ref, not the sheet's lang attribute: decorations are computed before the view applies new attributes.
+        placeholder: ({ node }) => (node.type.name === "citation" ? "Who said this" : PLACEHOLDER[langRef.current]),
       }),
     ],
     content: initial.en,
@@ -115,9 +116,11 @@ export default function StoryEditor({ en, hi, media, version = 0, onChange }: Pr
     },
     onUpdate: ({ editor: ed }) => {
       if (pending.current) clearTimeout(pending.current);
+      // The language from the ref, never from a render's closure: a switch changes it before React re-renders.
+      const target = langRef.current;
       pending.current = setTimeout(() => {
         pending.current = null;
-        onChange(lang, toText(ed));
+        onChange(target, toText(ed));
       }, 300);
     },
   });
@@ -125,12 +128,13 @@ export default function StoryEditor({ en, hi, media, version = 0, onChange }: Pr
   /** Write the current language back now, ahead of a switch or a reload. */
   function flush() {
     if (!editor) return;
+    const current = langRef.current;
     if (pending.current) {
       clearTimeout(pending.current);
       pending.current = null;
-      onChange(lang, toText(editor));
+      onChange(current, toText(editor));
     }
-    docs.current[lang] = editor.getJSON() as DocNode;
+    docs.current[current] = editor.getJSON() as DocNode;
   }
 
   function switchTo(next: Locale) {

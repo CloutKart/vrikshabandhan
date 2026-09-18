@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { parseBody, parseInline, plainText, serializeBody, serializeInline } from "@/lib/content/markup";
 import type { Block, Inline } from "@/lib/content/types";
@@ -139,5 +140,29 @@ describe("serialize", () => {
 describe("plainText", () => {
   it("joins runs and drops marks", () => {
     expect(plainText([{ text: "a " }, { text: "b", bold: true, href: "https://x.in" }])).toBe("a b");
+  });
+});
+
+describe("what the editor wrote in a full walk-through is what the site reads", () => {
+  // tests/fixtures/editor-walkthrough.en.txt is the text the document editor saved after a scripted session:
+  // paste, subheadings, bold, a link, bullets, a quote with its source, a photo with a caption, a film.
+  const text = readFileSync("tests/fixtures/editor-walkthrough.en.txt", "utf8");
+  const blocks = parseBody(text);
+  it("has every block kind in the order the writer made them", () => {
+    expect(blocks.map((b) => b.kind)).toEqual(["paragraph", "heading", "paragraph", "heading", "list", "heading", "paragraph", "image", "heading", "paragraph", "quote", "heading", "paragraph", "paragraph", "youtube"]);
+  });
+  it("keeps the marks, the link, the list items, the caption, the source and the film", () => {
+    const runs = blocks.flatMap((b) => ("inlines" in b ? b.inlines : []));
+    expect(runs.find((r) => r.bold)?.text).toBe("mahua, neem, banyan or peepal");
+    expect(runs.find((r) => r.href === "https://vrikshabandhanabhiyan.in/en/thread")?.text).toBe("three monsoons later");
+    const list = blocks.find((b) => b.kind === "list");
+    expect(list && list.kind === "list" ? list.items.length : 0).toBe(3);
+    expect(blocks.find((b) => b.kind === "image")).toEqual({ kind: "image", path: "images/seed-bombers-2023.jpg", caption: "The thread goes round the trunk with a plain knot" });
+    const quote = blocks.find((b) => b.kind === "quote");
+    expect(quote && quote.kind === "quote" ? quote.cite : "").toBe("Manoj Dhyani");
+    expect(blocks[blocks.length - 1]).toEqual({ kind: "youtube", url: "https://youtu.be/XTmHXvDXcI0", id: "XTmHXvDXcI0" });
+  });
+  it("survives a round trip through the serializer unchanged", () => {
+    expect(serializeBody(blocks)).toBe(text.trim());
   });
 });

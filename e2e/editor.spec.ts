@@ -91,6 +91,24 @@ test.describe("the story editor", () => {
     expect(await savedEn(page)).toContain("## What is a seed bomb");
   });
 
+  test("the empty-line hint follows the language switch both ways", async ({ page }) => {
+    const box = await open(page);
+    const hint = async () => {
+      await page.keyboard.press("Control+End");
+      await page.keyboard.press("Enter");
+      return box.locator("p").last().getAttribute("data-placeholder");
+    };
+    await page.getByRole("tab", { name: "हिंदी" }).click();
+    await box.locator("p").first().click();
+    expect(await hint()).toBe("कहानी लिखें। हर अनुच्छेद में एक बात।");
+    await page.getByRole("tab", { name: "English" }).click();
+    await box.locator("p").first().click();
+    expect(await hint()).toBe("Write the story. One idea per paragraph.");
+    await page.getByRole("tab", { name: "हिंदी" }).click();
+    await box.locator("p").first().click();
+    expect(await hint()).toBe("कहानी लिखें। हर अनुच्छेद में एक बात।");
+  });
+
   test("a film needs a YouTube link and lands in the text as a film line", async ({ page }) => {
     const box = await open(page);
     await box.locator("p").first().click();
