@@ -55,7 +55,7 @@ The film of the 2023 seed-bombing campaign by Vrikshabandhan Abhiyan follows.$vb
   $vb$Uttarakhand$vb$,
   array[$vb$Seed bombing$vb$, $vb$Campaign$vb$]::text[],
   $vb$https://youtu.be/XTmHXvDXcI0$vb$,
-  $vb$[{"path":"images/seed-bombers-2023.jpg","url":"/images/seed-bombers-2023.jpg","type":"image","alt_en":"Volunteers of Vrikshabandhan Abhiyan 2023 seated on a grassy hillside with the campaign banner, Manoj Dhyani among them","alt_hi":"वृक्षबंधन अभियान 2023 के स्वयंसेवक घास की ढलान पर अभियान के बैनर के साथ बैठे हुए, बीच में मनोज ध्यानी","width":1280,"height":720}]$vb$::jsonb,
+  $vb$[{"path":"images/seed-bombers-2023.jpg","url":"/images/seed-bombers-2023.jpg","type":"image","alt_en":"Volunteers of Vrikshabandhan Abhiyan 2023 seated on a grassy hillside with the campaign banner, Manoj Dhyani among them","alt_hi":"वृक्षाबंधन अभियान 2023 के स्वयंसेवक घास की ढलान पर अभियान के बैनर के साथ बैठे हुए, बीच में मनोज ध्यानी","width":1280,"height":720}]$vb$::jsonb,
   true,
   now()
 )

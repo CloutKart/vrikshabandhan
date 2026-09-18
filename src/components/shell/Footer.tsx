@@ -12,7 +12,7 @@ export function Footer() {
   const link =
     "inline-block py-2 underline decoration-transparent decoration-2 underline-offset-4 transition-colors duration-200 ease-enter hover:decoration-sutra focus-visible:decoration-sutra";
   const other = otherLocale(locale);
-  const otherName = other === "hi" ? "वृक्षबंधन अभियान" : "Vrikshabandhan Abhiyan";
+  const otherName = other === "hi" ? "वृक्षाबंधन अभियान" : "Vrikshabandhan Abhiyan";
   return (
     <footer className="page mt-[var(--section)] pb-12 font-sans text-sm text-ink-2">
       <hr className="rule" />

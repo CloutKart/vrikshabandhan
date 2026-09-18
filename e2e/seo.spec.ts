@@ -36,7 +36,7 @@ test("the story page is an article with structured data and its cover as the sha
 test("the home page describes the organisation in both names", async ({ page }) => {
   await page.goto("/hi");
   const org = (await page.locator('script[type="application/ld+json"]').evaluateAll((els) => els.map((e) => JSON.parse(e.textContent || "{}")))).find((s) => s["@type"] === "Organization");
-  expect(org.name).toBe("वृक्षबंधन अभियान");
+  expect(org.name).toBe("वृक्षाबंधन अभियान");
   expect(org.alternateName).toContain("Vrikshabandhan Abhiyan");
   expect(org.email).toContain("@");
 });
