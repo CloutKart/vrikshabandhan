@@ -112,7 +112,7 @@ export default async function StoryPage({ params }: Props) {
             {t("onlyEnglish")}
           </p>
         ) : null}
-        <StoryBody body={body.text} lang={body.lang} />
+        <StoryBody body={body.text} lang={body.lang} media={post.media} filmTitle={`${t("video")}: ${title.text}`} />
         <YouTubeEmbed url={post.yt} title={`${t("video")}: ${title.text}`} />
         <StoryGallery items={rest} locale={locale} title={t("gallery")} />
         <div data-newsletter-end aria-hidden="true" />

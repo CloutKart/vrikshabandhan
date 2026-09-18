@@ -1,7 +1,7 @@
 import { otherLocale, type Locale } from "@/i18n/routing";
-import { parseBody } from "@/lib/content/markup";
+import { parseBody, plainText } from "@/lib/content/markup";
 import { mediaUrl, pick } from "@/lib/content/posts";
-import type { MediaItem, Post } from "@/lib/content/types";
+import type { Block, Inline, MediaItem, Post } from "@/lib/content/types";
 import { ytId } from "@/lib/content/youtube";
 import { formatStoryDate } from "@/lib/i18n/format";
 import { absolutise, escapeHtml as esc, withVars } from "./html";
@@ -90,19 +90,67 @@ function button(href: string, label: string): string {
   return `<a href="${esc(href)}" style="display:inline-block;background:${C.sutra};color:#FFFFFF;font-family:${SANS};font-size:16px;line-height:20px;padding:12px 20px;border-radius:2px;text-decoration:none;">${esc(label)}</a>`;
 }
 
-function blocks(text: string, lang: Locale): string {
-  return parseBody(text)
-    .map((b) => {
-      if (b.kind === "heading") return `<h2 style="margin:1.4em 0 0.5em;font-weight:400;font-size:1.6em;line-height:1.2;">${esc(b.text)}</h2>`;
-      if (b.kind === "quote")
-        return `<blockquote style="margin:1.5em 0;padding:0 0 0 16px;border-left:3px solid ${C.sutra};font-style:italic;"><p style="margin:0;">${esc(b.text)}</p>${
-          b.cite ? `<cite style="display:block;margin-top:0.5em;font-family:${SANS};font-style:normal;font-size:0.8em;color:${C.paperInk2};">${esc(b.cite)}</cite>` : ""
-        }</blockquote>`;
-      return `<p style="margin:0 0 1em;">${esc(b.text)}</p>`;
+/** A line's runs with their marks, every run escaped. */
+function inline(runs: Inline[]): string {
+  return runs
+    .map((r) => {
+      let t = esc(r.text);
+      if (r.bold) t = `<strong>${t}</strong>`;
+      if (r.italic) t = `<em>${t}</em>`;
+      if (r.href) t = `<a href="${esc(r.href)}" style="color:${C.sutra};">${t}</a>`;
+      return t;
     })
+    .join("");
+}
+
+type BodyCtx = { siteUrl: string; locale: Locale; media: MediaItem[]; watch: string };
+
+/** One block of the story as mail HTML. A photo comes from the story's uploads; a film is its thumbnail, linked. */
+function block(b: Block, ctx: BodyCtx): string {
+  if (b.kind === "heading") return `<h2 style="margin:1.4em 0 0.5em;font-weight:400;font-size:1.6em;line-height:1.2;">${inline(b.inlines)}</h2>`;
+  if (b.kind === "quote")
+    return `<blockquote style="margin:1.5em 0;padding:0 0 0 16px;border-left:3px solid ${C.sutra};font-style:italic;"><p style="margin:0;">${inline(b.inlines)}</p>${
+      b.cite ? `<cite style="display:block;margin-top:0.5em;font-family:${SANS};font-style:normal;font-size:0.8em;color:${C.paperInk2};">${esc(b.cite)}</cite>` : ""
+    }</blockquote>`;
+  if (b.kind === "list") {
+    const tag = b.ordered ? "ol" : "ul";
+    return `<${tag} style="margin:0 0 1em;padding-left:1.4em;">${b.items.map((item) => `<li style="margin:0 0 0.35em;">${inline(item)}</li>`).join("")}</${tag}>`;
+  }
+  if (b.kind === "image") {
+    const m = ctx.media.find((x) => x.path === b.path);
+    if (!m) return "";
+    return `<figure style="margin:1.5em 0;">${image(absolutise(ctx.siteUrl, mediaUrl(m)), altFor(m, ctx.locale), m)}${
+      b.caption ? `<figcaption style="margin-top:8px;font-family:${SANS};font-size:14px;color:${C.paperInk2};">${esc(b.caption)}</figcaption>` : ""
+    }</figure>`;
+  }
+  if (b.kind === "youtube") {
+    const href = `https://youtu.be/${esc(b.id)}`;
+    return `<figure style="margin:1.5em 0;"><a href="${href}" style="text-decoration:none;"><img src="https://img.youtube.com/vi/${esc(b.id)}/hqdefault.jpg" alt="" width="528" height="396" style="display:block;width:100%;height:auto;background:${C.ground};border-radius:4px;"></a><figcaption style="margin-top:8px;font-family:${SANS};font-size:14px;"><a href="${href}" style="color:${C.sutra};">${esc(ctx.watch)}</a></figcaption></figure>`;
+  }
+  return `<p style="margin:0 0 1em;">${inline(b.inlines)}</p>`;
+}
+
+function blocks(text: string, lang: Locale, ctx: BodyCtx): string {
+  return parseBody(text)
+    .map((b) => block(b, ctx))
+    .filter(Boolean)
     .join("\n")
     .replace(/^/, `<div lang="${lang}" style="line-height:${lineHeight(lang)};">`)
     .concat("</div>");
+}
+
+/** One block as the plain-text part: marks dropped, links spelt out, lists as lines. */
+function blockText(b: Block, ctx: BodyCtx): string {
+  const line = (runs: Inline[]) => runs.map((r) => (r.href ? `${r.text} (${r.href})` : r.text)).join("");
+  if (b.kind === "heading") return `\n${line(b.inlines)}\n`;
+  if (b.kind === "quote") return `> ${line(b.inlines)}${b.cite ? `\n  ${b.cite}` : ""}`;
+  if (b.kind === "list") return b.items.map((item, i) => `${b.ordered ? `${i + 1}.` : "-"} ${line(item)}`).join("\n");
+  if (b.kind === "image") {
+    const m = ctx.media.find((x) => x.path === b.path);
+    return m ? `[${b.caption || altFor(m, ctx.locale)}] ${absolutise(ctx.siteUrl, mediaUrl(m))}` : "";
+  }
+  if (b.kind === "youtube") return `${ctx.watch}: https://youtu.be/${b.id}`;
+  return line(b.inlines);
 }
 
 function image(url: string, alt: string, m: MediaItem, href?: string): string {
@@ -127,7 +175,8 @@ export function renderStoryMail(post: Post, locale: Locale, { siteUrl, strings: 
   const video = ytId(post.yt);
   const dateLine = [formatStoryDate(post.date, locale), post.place].filter(Boolean).join(", ");
   const subject = withVars(s.subject, { title: title.text });
-  const preheader = (summary.text || parseBody(body.text)[0]?.text || "").slice(0, 90);
+  const firstProse = parseBody(body.text).find((b) => b.kind === "heading" || b.kind === "paragraph" || b.kind === "quote");
+  const preheader = (summary.text || (firstProse && "inlines" in firstProse ? plainText(firstProse.inlines) : "") || "").slice(0, 90);
 
   const parts: string[] = [];
   parts.push(`<p style="margin:0 0 8px;font-family:${SANS};font-size:14px;color:${C.gold};">${esc(dateLine)}</p>`);
@@ -135,7 +184,8 @@ export function renderStoryMail(post: Post, locale: Locale, { siteUrl, strings: 
   if (otherTitle) parts.push(`<p lang="${other}" style="margin:6px 0 0;font-size:18px;line-height:1.3;color:${C.paperInk2};">${esc(otherTitle)}</p>`);
   if (cover) parts.push(`<div style="margin:20px 0;">${image(absolutise(siteUrl, mediaUrl(cover)), altFor(cover, locale), cover, storyUrl)}</div>`);
   if (locale === "hi" && body.lang === "en") parts.push(`<p lang="hi" style="margin:16px 0;font-family:${SANS};font-size:14px;color:${C.paperInk2};">${esc(s.onlyEnglish)}</p>`);
-  parts.push(`<div style="margin-top:20px;">${blocks(body.text, body.lang)}</div>`);
+  const bodyCtx: BodyCtx = { siteUrl, locale, media: post.media, watch: s.watch };
+  parts.push(`<div style="margin-top:20px;">${blocks(body.text, body.lang, bodyCtx)}</div>`);
   if (video) parts.push(`<p style="margin:16px 0 0;"><a href="https://youtu.be/${esc(video)}" style="color:${C.sutra};">${esc(s.watch)}</a></p>`);
   if (gallery.length) {
     parts.push(`<p style="margin:28px 0 8px;font-family:${SANS};font-size:14px;color:${C.paperInk2};">${esc(s.gallery)}</p>`);
@@ -157,7 +207,7 @@ export function renderStoryMail(post: Post, locale: Locale, { siteUrl, strings: 
     otherTitle,
     dateLine,
     "",
-    ...parseBody(body.text).map((b) => (b.kind === "heading" ? `\n${b.text}\n` : b.kind === "quote" ? `> ${b.text}${b.cite ? `\n  ${b.cite}` : ""}` : b.text)),
+    ...parseBody(body.text).map((b) => blockText(b, bodyCtx)).filter(Boolean),
     "",
     video ? `${s.watch}: https://youtu.be/${video}` : "",
     `${s.read}: ${storyUrl}`,

@@ -39,6 +39,25 @@ describe("renderStoryMail", () => {
     expect(en.html).toContain("https://youtu.be/XTmHXvDXcI0");
     expect(en.html).not.toContain("<iframe");
   });
+  it("renders marks, links, lists, photos and films placed in the text", () => {
+    expect(en.html).toContain("<strong>2,00,000 seeds</strong>");
+    expect(en.html).toContain('href="https://www.un.org/en/observances/environment-day"');
+    expect(en.html).toContain("https://img.youtube.com/vi/XTmHXvDXcI0/hqdefault.jpg");
+    expect(en.text).toContain("World Environment Day (https://www.un.org/en/observances/environment-day)");
+    expect(en.text).toContain("https://youtu.be/XTmHXvDXcI0");
+    const rich = {
+      ...seed,
+      body_en: "Intro with _italic_.\n- One\n- Two\n1. First\n![Tying](media:posts/x/a.jpg)\n![Gone](media:posts/x/missing.jpg)",
+      media: [{ path: "posts/x/a.jpg", type: "image" as const, alt_en: "A thread", alt_hi: "", width: 800, height: 600 }],
+    };
+    const r = renderStoryMail(rich, "en", { siteUrl, strings: mailStrings("en") });
+    expect(r.html).toContain("<em>italic</em>");
+    expect(count(r.html, "<li ")).toBe(3);
+    expect(r.html).toContain("<ol ");
+    expect(r.html).toContain("Tying</figcaption>");
+    expect(r.html).not.toContain("missing.jpg");
+    expect(r.text).toContain("- One\n- Two\n1. First");
+  });
   it("keeps the placeholders exactly once each and the headers one-click", () => {
     for (const r of [en, hi]) {
       expect(count(r.html, UNSUBSCRIBE_URL)).toBe(1);

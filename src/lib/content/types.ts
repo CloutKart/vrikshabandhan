@@ -30,10 +30,17 @@ export type Post = {
   deleted_at?: string | null;
 };
 
+/** One run of a line's text with its marks. */
+export type Inline = { text: string; bold?: boolean; italic?: boolean; href?: string };
+
+/** A block of story text; `text` is the plain words of a prose block, `inlines` the same words with marks. */
 export type Block =
-  | { kind: "heading"; text: string }
-  | { kind: "paragraph"; text: string }
-  | { kind: "quote"; text: string; cite?: string };
+  | { kind: "heading"; text: string; inlines: Inline[] }
+  | { kind: "paragraph"; text: string; inlines: Inline[] }
+  | { kind: "quote"; text: string; inlines: Inline[]; cite?: string }
+  | { kind: "list"; ordered: boolean; items: Inline[][] }
+  | { kind: "image"; path: string; caption: string }
+  | { kind: "youtube"; url: string; id: string };
 
 export type LocalisedField = "title" | "summary" | "body";
 export type Picked = { text: string; lang: Locale };

@@ -72,6 +72,8 @@ test.describe("story page", () => {
     await expect(frame).toHaveAttribute("src", /youtube-nocookie\.com\/embed\/XTmHXvDXcI0/);
     await expect(frame).toHaveAttribute("title", /Video/);
     await expect(page.getByRole("heading", { level: 2, name: "What is a seed bomb" })).toBeVisible();
+    await expect(page.locator("[data-body] strong")).toHaveText("2,00,000 seeds");
+    await expect(page.locator("[data-body] a[href='https://www.un.org/en/observances/environment-day']")).toHaveAttribute("rel", "noopener");
     await expect(page.locator("[data-paper] time")).toHaveText("20 June 2023");
   });
 
