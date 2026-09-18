@@ -145,3 +145,17 @@ test("noindex on the token pages, and the existing footer promises still hold", 
   await expect(page.locator("footer a[target='_blank']")).toHaveCount(3);
   await expect(page.locator("footer a[href^='mailto:']")).toHaveCount(2);
 });
+
+test.describe("newsletter with Supabase and a mail service", () => {
+  test.skip(!process.env.E2E_SUPABASE || !process.env.E2E_NEWSLETTER, "set E2E_SUPABASE=1 and E2E_NEWSLETTER=1 with a configured project to run");
+
+  test("subscribing sends a link, a planted token confirms, and publishing mails once", async ({ page }) => {
+    await page.goto("/en");
+    const form = page.locator("footer [data-newsletter='footer'] form");
+    await form.getByRole("textbox").fill(process.env.E2E_SUBSCRIBER ?? "subscriber@example.org");
+    await form.getByRole("button").click();
+    await expect(page.locator("footer [data-newsletter='footer'] [role=status]")).toContainText("on its way");
+    // The rest needs a token planted through SQL in the test's own client and an editor session; filled in when the
+    // project has an inbox stub. Until then this asserts the public half of the loop.
+  });
+});

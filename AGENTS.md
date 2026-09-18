@@ -19,4 +19,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Motion lives in `src/lib/motion/site.ts`, loaded only through `MotionRoot`; markup opts in with data attributes
   (`data-reveal`, `data-title-reveal`, `data-hero-title`, `data-story-row`, `data-flip-id`, `data-site-header`). Initial hidden states exist
   only under `html[data-motion="full"]`.
+- The newsletter lives in `src/lib/newsletter/` (pure renderer, sending, strings) with its migration in
+  `supabase/migrations/0004_newsletter.sql`; `docs/superpowers/specs/2026-09-18-newsletter-design.md` records the
+  design. It is off without `RESEND_API_KEY`, `NEWSLETTER_SECRET` and `NEWSLETTER_FROM`, and tests run without them.
 - Checks before pushing: `npm run lint`, `npm run typecheck`, `npm run test`, `npm run e2e`, `npm run check:bundle`.
