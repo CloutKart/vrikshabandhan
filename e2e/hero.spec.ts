@@ -16,7 +16,7 @@ test("the Hindi home page leads with the Hindi line", async ({ page }) => {
 
 test("the tree is the priority image and describes itself; the canvas behind it is bare", async ({ page }) => {
   await page.goto("/en");
-  const tree = page.locator('img.hero-tree[data-variant="dark"]');
+  const tree = page.locator('img.hero-tree[data-variant="light"]');
   // next/image "priority": never lazy, and either a preload link or fetchpriority=high.
   expect(await tree.getAttribute("loading")).not.toBe("lazy");
   const preloads = await page.locator('link[rel="preload"][as="image"][imagesrcset*="tree-cutout"]').count();
@@ -24,23 +24,23 @@ test("the tree is the priority image and describes itself; the canvas behind it 
   expect(preloads > 0 || fetchPriority === "high").toBe(true);
   await expect(tree).toHaveAttribute("alt", /raksha sutra/);
   // The background is the bare canvas, so nothing is ever painted twice behind the moving tree.
-  const canvas = page.locator('img.hero-painting[data-variant="dark"]');
+  const canvas = page.locator('img.hero-painting[data-variant="light"]');
   await expect(canvas).toHaveAttribute("alt", "");
   expect(await canvas.getAttribute("src")).toContain("canvas");
-  // The light variants exist for the light theme but are never fetched while hidden.
-  await expect(page.locator('img.hero-painting[data-variant="light"]')).toHaveAttribute("loading", "lazy");
-  await expect(page.locator('img.hero-painting[data-variant="light"]')).toBeHidden();
-  await expect(page.locator('img.hero-tree[data-variant="light"]')).toBeHidden();
+  // The dark variants exist for the dark theme but are never fetched while hidden.
+  await expect(page.locator('img.hero-painting[data-variant="dark"]')).toHaveAttribute("loading", "lazy");
+  await expect(page.locator('img.hero-painting[data-variant="dark"]')).toBeHidden();
+  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toBeHidden();
 });
 
-test("the light theme shows the cream painting and its cut-out, and keeps the depth", async ({ page }) => {
+test("the dark theme shows the grey painting and its cut-out, and keeps the depth", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.addInitScript(() => localStorage.setItem("va-theme", "light"));
+  await page.addInitScript(() => localStorage.setItem("va-theme", "dark"));
   await page.goto("/en");
-  await expect(page.locator('img.hero-painting[data-variant="light"]')).toBeVisible();
-  await expect(page.locator('img.hero-painting[data-variant="dark"]')).toBeHidden();
-  await expect(page.locator('img.hero-tree[data-variant="light"]')).toBeVisible();
-  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toBeHidden();
+  await expect(page.locator('img.hero-painting[data-variant="dark"]')).toBeVisible();
+  await expect(page.locator('img.hero-painting[data-variant="light"]')).toBeHidden();
+  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toBeVisible();
+  await expect(page.locator('img.hero-tree[data-variant="light"]')).toBeHidden();
   // The headline sits under the leaves: its top is above the canopy's lower edge (about 72% of the art height).
   const art = await page.locator(".hero-art").boundingBox();
   const title = await page.locator("h1").boundingBox();
@@ -52,9 +52,9 @@ test("the thread's loose ends are their own layer and drift only with full motio
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/en");
   await expect(page.locator("img.hero-tassel")).toHaveCount(2);
-  await expect(page.locator('img.hero-tassel[data-variant="dark"]')).toHaveAttribute("alt", "");
-  await expect(page.locator('img.hero-tassel[data-variant="light"]')).toBeHidden();
-  const tassel = page.locator('img.hero-tassel[data-variant="dark"]');
+  await expect(page.locator('img.hero-tassel[data-variant="light"]')).toHaveAttribute("alt", "");
+  await expect(page.locator('img.hero-tassel[data-variant="dark"]')).toBeHidden();
+  const tassel = page.locator('img.hero-tassel[data-variant="light"]');
   await expect(tassel).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
   await expect.poll(() => tassel.evaluate((el) => getComputedStyle(el).animationName)).toBe("tassel-sway");
@@ -77,7 +77,7 @@ test("leaves fall across the headline with full motion, and do not exist under r
   expect(await leaves.first().evaluate((el) => getComputedStyle(el).animationName)).toBe("leaf-fall");
   // In front of the headline, behind the cut-out (so they come out of the canopy and pass behind the trunk).
   const z = await page.locator("[data-hero-leaves]").evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
-  const cutoutZ = await page.locator('img.hero-tree[data-variant="dark"]').evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
+  const cutoutZ = await page.locator('img.hero-tree[data-variant="light"]').evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
   expect(z).toBeGreaterThan(1);
   expect(z).toBeLessThan(cutoutZ);
   expect(new Set(await leaves.evaluateAll((els) => els.map((e) => e.getAttribute("data-shape")))).size).toBeGreaterThanOrEqual(5);
@@ -97,9 +97,9 @@ test("the branches move in the wind with full motion, and the tips move more tha
   await page.goto("/en");
   await expect(page.locator(".hero-art canvas.hero-sway")).toHaveCount(1);
   await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
-  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toHaveCSS("opacity", "0");
+  await expect(page.locator('img.hero-tree[data-variant="light"]')).toHaveCSS("opacity", "0");
   const art = (await page.locator(".hero-art").boundingBox())!;
-  const cutoutZ = await page.locator('img.hero-tree[data-variant="dark"]').evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
+  const cutoutZ = await page.locator('img.hero-tree[data-variant="light"]').evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
   const region = (x: number, y: number, w: number, h: number) => ({ x: art.x + art.width * x, y: art.y + art.height * y, width: art.width * w, height: art.height * h });
   const tips = region(0.03, 0.25, 0.22, 0.4);
   // The trunk base, below the knot and the moving thread ends.
@@ -122,17 +122,17 @@ test("the branches move in the wind with full motion, and the tips move more tha
   expect(tipChange, "tips move").toBeGreaterThan(2);
   expect(trunkChange, "trunk stays").toBeLessThan(1);
   // The thread: the band round the trunk is still; the knot and its ends are a springy layer above the tree.
-  const band = page.locator('img.hero-thread-band[data-variant="dark"]');
+  const band = page.locator('img.hero-thread-band[data-variant="light"]');
   await expect(band).toBeVisible();
   expect(await band.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
-  expect(await page.locator('img.hero-tassel[data-variant="dark"]').evaluate((el) => getComputedStyle(el).animationName)).toBe("tassel-sway");
+  expect(await page.locator('img.hero-tassel[data-variant="light"]').evaluate((el) => getComputedStyle(el).animationName)).toBe("tassel-sway");
   expect(await band.evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10))).toBeGreaterThan(cutoutZ);
   // Phones get the same moving tree and thread.
   await page.setViewportSize({ width: 390, height: 800 });
   await expect(page.locator(".hero-art canvas.hero-sway")).toBeVisible();
   await expect(band).toBeVisible();
   expect(await band.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
-  expect(await page.locator('img.hero-tassel[data-variant="dark"]').evaluate((el) => getComputedStyle(el).animationName)).toBe("tassel-sway");
+  expect(await page.locator('img.hero-tassel[data-variant="light"]').evaluate((el) => getComputedStyle(el).animationName)).toBe("tassel-sway");
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
   const quiet = await context.newPage();
   await quiet.goto("/en");
@@ -145,7 +145,7 @@ test("with reduced motion the loose ends hold still", async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
   await page.goto("/en");
-  expect(await page.locator('img.hero-tassel[data-variant="dark"]').evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+  expect(await page.locator('img.hero-tassel[data-variant="light"]').evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
   await context.close();
 });
 
@@ -214,10 +214,10 @@ test("a frame that reads wrong (a black texture, as Safari has produced) keeps t
   const page = await context.newPage();
   await page.goto("/en");
   await expect(page.locator("html")).toHaveAttribute("data-motion-ready", "");
-  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toBeVisible();
+  await expect(page.locator('img.hero-tree[data-variant="light"]')).toBeVisible();
   await expect.poll(() => page.locator("canvas.hero-sway").count(), { timeout: 5000 }).toBe(0);
   await expect(page.locator(".hero-art")).not.toHaveAttribute("data-sway", "");
-  await expect(page.locator('img.hero-tree[data-variant="dark"]')).toHaveCSS("opacity", "1");
+  await expect(page.locator('img.hero-tree[data-variant="light"]')).toHaveCSS("opacity", "1");
   await context.close();
 });
 
@@ -228,10 +228,10 @@ test("on phones the hero is the square painting with its own tree and thread; on
   expect(Math.abs(art.width - art.height)).toBeLessThanOrEqual(1);
   expect(art.x).toBeGreaterThanOrEqual(0);
   expect(art.x + art.width).toBeLessThanOrEqual(390);
-  const tree = page.locator('img.hero-tree[data-variant="dark"]');
+  const tree = page.locator('img.hero-tree[data-variant="light"]');
   await expect.poll(() => tree.evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("tree-cutout-sq");
-  await expect.poll(() => page.locator('img.hero-painting[data-variant="dark"]').evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("canvas-sq");
-  const band = page.locator('img.hero-thread-band[data-variant="dark"]');
+  await expect.poll(() => page.locator('img.hero-painting[data-variant="light"]').evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("canvas-sq");
+  const band = page.locator('img.hero-thread-band[data-variant="light"]');
   await expect.poll(() => band.evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("thread-band-sq");
   const box = (await band.boundingBox())!;
   expect(box.x).toBeGreaterThan(art.x + art.width / 2);
@@ -252,7 +252,7 @@ test("on phones the hero is the square painting with its own tree and thread; on
   const treeZ = await tree.evaluate((el) => parseInt(getComputedStyle(el).zIndex, 10));
   expect(titleZ).toBeLessThan(treeZ);
   await page.setViewportSize({ width: 1440, height: 900 });
-  await expect.poll(() => tree.evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("tree-cutout.");
+  await expect.poll(() => tree.evaluate((el: HTMLImageElement) => el.currentSrc)).toContain("tree-cutout-light.webp");
   await expect(page.locator(".hero-art")).toHaveAttribute("data-sway", "", { timeout: 5000 });
   await expect(page.locator("canvas.hero-sway")).toHaveAttribute("data-texture", "1672x941");
 });
@@ -273,7 +273,7 @@ test("on a 3x phone the tree is drawn at full pixel density", async ({ browser }
   });
   expect(drawn).toBe(Math.round(art.width * (software ? 1 : 3)));
   // The candidate above the screen's 1170 device px: Next serves the painting at its full 1254 px for it.
-  const src = await page.locator('img.hero-tree[data-variant="dark"]').evaluate((el: HTMLImageElement) => el.currentSrc);
+  const src = await page.locator('img.hero-tree[data-variant="light"]').evaluate((el: HTMLImageElement) => el.currentSrc);
   expect(src).toMatch(/w=1920/);
   expect(src).toMatch(/q=85/);
   // The texture is the painting's own size, not the density-divided naturalWidth (305 here).

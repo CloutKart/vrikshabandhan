@@ -29,7 +29,7 @@ Decisions made with the owner in this session:
 | Direction | Deep green, typographic, painting-led. No cards. Red thread as the only line device. Full-bleed photos. |
 | Imagery | Drop the two AI stock photos. Real assets only: the painting, the founder portrait, event photos when supplied. |
 | Typography | Tiro Devanagari Hindi (one serif for both scripts, regular weight, size-driven hierarchy) + Mukta for UI |
-| Theme | Dark green default AND a light theme, with a toggle like v2 |
+| Theme | A light theme (the cream canvas) as the default AND the dark green theme, with a toggle like v2 |
 | Motion | Rich but concentrated: one orchestrated load moment, the thread and knot, purposeful feedback everywhere |
 
 Intended outcome: a site that reads as designed for this movement, in both scripts, with motion that answers the
@@ -39,14 +39,14 @@ visitor, that the NGO can edit itself, and that passes an accessibility audit.
 
 ### Palette (primitive → semantic tokens; components never use hex)
 
-Dark (default): ground `#0C1710`, ground-2 `#14201A`, ink `#EDEFE8`, ink-2 `#AAB2AB`, sutra red `#C8322B` (thread,
+Dark: ground `#0C1710`, ground-2 `#14201A`, ink `#EDEFE8`, ink-2 `#AAB2AB`, sutra red `#C8322B` (thread,
 knots, underlines, primary action; never body text), gold `#E0B347` (dates, numerals, focus ring), moss `#2E3A32`
 rules, paper `#F3EEE2` reading sheets with paper-ink `#1D231E`.
 Light: ground `#E4EAE1` (pale sage, deliberately not cream), ground-2/moss `#D5DDD1`, ink `#10231A`, ink-2 `#3E4F45`,
 sutra `#B4231D`, gold `#9C7414`, paper `#F7F4EA`, paper-ink `#10231A`. A unit test parses `tokens.css` and asserts
 the pairs: ink/ground ≥ 7:1, ink-2/ground ≥ 4.5:1, gold/ground ≥ 3:1 (focus), sutra/ground ≥ 3:1, paper-ink/paper
 ≥ 7:1, in both themes. Grain overlay at 0.06 opacity on both grounds.
-Theme: `data-theme` on `<html>`, defaults to dark, honours a stored choice, `color-scheme` and `theme-color` set.
+Theme: `data-theme` on `<html>`, defaults to light, honours a stored choice, `color-scheme` and `theme-color` set.
 
 ### Typography
 

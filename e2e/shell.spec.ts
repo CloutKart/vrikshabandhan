@@ -11,9 +11,9 @@ test("the Hindi locale sets the document language", async ({ page }) => {
   await expect(page.locator("html")).toHaveAttribute("lang", "hi");
 });
 
-test("the dark theme is the default and is declared before paint", async ({ page }) => {
+test("the light theme is the default and is declared before paint", async ({ page }) => {
   await page.goto("/en");
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", /^#/);
 });
 
@@ -43,21 +43,22 @@ test.describe("layout shell", () => {
   test("the theme toggle shows the theme it would switch to: a moon while light is on", async ({ page }) => {
     await page.goto("/en");
     const toggle = page.locator("header nav button[aria-pressed]");
-    await expect(toggle.locator("[data-glyph='sun']")).toHaveCSS("opacity", "1");
-    await expect(toggle.locator("[data-glyph='moon']")).toHaveCSS("opacity", "0");
-    await toggle.click();
     await expect(toggle).toHaveAttribute("aria-pressed", "true");
     await expect(toggle.locator("[data-glyph='moon']")).toHaveCSS("opacity", "1");
     await expect(toggle.locator("[data-glyph='sun']")).toHaveCSS("opacity", "0");
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    await expect(toggle.locator("[data-glyph='sun']")).toHaveCSS("opacity", "1");
+    await expect(toggle.locator("[data-glyph='moon']")).toHaveCSS("opacity", "0");
   });
 
-  test("the theme switch is a daybreak from the sun, and instant under reduced motion", async ({ page, browser }) => {
+  test("the theme switch is a dusk to the moon and a daybreak back, and instant under reduced motion", async ({ page, browser }) => {
     await page.goto("/en");
     await expect(page.locator("html")).toHaveAttribute("data-motion", "full");
     const toggle = page.locator("header nav button[aria-pressed]");
     const box = (await toggle.boundingBox())!;
     await toggle.click();
-    await expect(page.locator("html")).toHaveAttribute("data-theme-switching", "to-light");
+    await expect(page.locator("html")).toHaveAttribute("data-theme-switching", "to-dark");
     const centre = await page.evaluate(() => {
       const s = document.documentElement.style;
       return [parseFloat(s.getPropertyValue("--vt-x")), parseFloat(s.getPropertyValue("--vt-y"))];
@@ -66,14 +67,14 @@ test.describe("layout shell", () => {
     expect(centre[0]).toBeLessThan(box.x + box.width);
     expect(centre[1]).toBeGreaterThan(box.y);
     expect(centre[1]).toBeLessThan(box.y + box.height);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect(page.locator("html")).not.toHaveAttribute("data-theme-switching", /.+/, { timeout: 3000 });
+    // Back to light: daybreak from the sun.
+    await toggle.click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme-switching", "to-light");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     await expect(page.locator("html")).not.toHaveAttribute("data-theme-switching", /.+/, { timeout: 3000 });
     await expect(page.locator(".dawn-rim")).toHaveCount(0);
-    // Back to dark: dusk.
-    await toggle.click();
-    await expect(page.locator("html")).toHaveAttribute("data-theme-switching", "to-dark");
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    await expect(page.locator("html")).not.toHaveAttribute("data-theme-switching", /.+/, { timeout: 3000 });
     const context = await browser.newContext({ reducedMotion: "reduce" });
     const quiet = await context.newPage();
     await quiet.goto("/en");
@@ -89,18 +90,18 @@ test.describe("layout shell", () => {
       quiet.locator("header nav button[aria-pressed]").click(),
     ]);
     expect(switching).toBeNull();
-    await expect(quiet.locator("html")).toHaveAttribute("data-theme", "light");
+    await expect(quiet.locator("html")).toHaveAttribute("data-theme", "dark");
     await context.close();
   });
 
-  test("the theme toggle switches to light, persists across reload and updates theme-color", async ({ page }) => {
+  test("the theme toggle switches to dark, persists across reload and updates theme-color", async ({ page }) => {
     await page.goto("/en");
-    await page.getByRole("button", { name: "Switch to the light theme" }).click();
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#E4EAE1");
+    await page.getByRole("button", { name: "Switch to the dark theme" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#0C1710");
     await page.reload();
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-    await expect(page.getByRole("button", { name: "Switch to the dark theme" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect(page.getByRole("button", { name: "Switch to the light theme" })).toHaveAttribute("aria-pressed", "false");
   });
 
   test("the locale switch goes to the same page in the other language", async ({ page }) => {

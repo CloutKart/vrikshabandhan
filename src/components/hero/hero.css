@@ -180,17 +180,18 @@ html[data-motion="full"] .hero-leaves {
     opacity: 0;
   }
 }
-/* One canvas, one tree and one thread per theme; the other variant is never displayed, so it is never fetched. */
-[data-variant="light"].hero-painting,
-[data-variant="light"].hero-cutout {
+/* One canvas, one tree and one thread per theme; the other variant is never displayed, so it is never fetched.
+   Light is the default, so its layers show unless the dark theme is on. */
+[data-variant="dark"].hero-painting,
+[data-variant="dark"].hero-cutout {
   display: none;
 }
-[data-theme="light"] [data-variant="dark"].hero-painting,
-[data-theme="light"] [data-variant="dark"].hero-cutout {
+[data-theme="dark"] [data-variant="light"].hero-painting,
+[data-theme="dark"] [data-variant="light"].hero-cutout {
   display: none;
 }
-[data-theme="light"] [data-variant="light"].hero-painting,
-[data-theme="light"] [data-variant="light"].hero-cutout {
+[data-theme="dark"] [data-variant="dark"].hero-painting,
+[data-theme="dark"] [data-variant="dark"].hero-cutout {
   display: block;
 }
 .hero-title {

@@ -67,18 +67,18 @@ export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNod
 
   return (
     <section className="hero page" aria-labelledby="hero-title">
-      <Preload wide="/images/canvas.jpg" square="/images/canvas-sq.jpg" quality={55} squareQuality={55} />
-      <Preload wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" quality={70} squareQuality={85} />
+      <Preload wide="/images/canvas-light.jpg" square="/images/canvas-sq-light.jpg" quality={55} squareQuality={55} />
+      <Preload wide="/images/tree-cutout-light.webp" square="/images/tree-cutout-sq-light.webp" quality={70} squareQuality={85} />
       <div className="hero-grid">
       <div className="hero-canvas">
         <div className="hero-art">
           {/* Layers, back to front: the bare canvas (one per theme), the headline, the falling leaves, the tree (a still
               image, or the WebGL canvas that moves it), then the thread in two parts: the band with the knot, and the
-              loose ends. The band and knot never move; the loose ends swing. Hidden variants are lazy, so they are never fetched. */}
-          <Painting wide="/images/canvas.jpg" square="/images/canvas-sq.jpg" alt="" variant="dark" priority quality={55} squareQuality={55} className="hero-painting" />
-          <Painting wide="/images/canvas-light.jpg" square="/images/canvas-sq-light.jpg" alt="" variant="light" quality={55} squareQuality={55} className="hero-painting" />
-          <Painting wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" alt={paintingAlt} variant="dark" priority quality={70} squareQuality={85} className="hero-cutout hero-tree" />
-          <Painting wide="/images/tree-cutout-light.webp" square="/images/tree-cutout-sq-light.webp" alt={paintingAlt} variant="light" quality={70} squareQuality={85} className="hero-cutout hero-tree" />
+              loose ends. The band and knot never move; the loose ends swing. The light theme is the default, so its layers load first; the dark ones are lazy and hidden until chosen. */}
+          <Painting wide="/images/canvas-light.jpg" square="/images/canvas-sq-light.jpg" alt="" variant="light" priority quality={55} squareQuality={55} className="hero-painting" />
+          <Painting wide="/images/canvas.jpg" square="/images/canvas-sq.jpg" alt="" variant="dark" quality={55} squareQuality={55} className="hero-painting" />
+          <Painting wide="/images/tree-cutout-light.webp" square="/images/tree-cutout-sq-light.webp" alt={paintingAlt} variant="light" priority quality={70} squareQuality={85} className="hero-cutout hero-tree" />
+          <Painting wide="/images/tree-cutout.webp" square="/images/tree-cutout-sq.webp" alt={paintingAlt} variant="dark" quality={70} squareQuality={85} className="hero-cutout hero-tree" />
           <Patch wide="/images/thread-band.png" square="/images/thread-band-sq.png" variant="dark" className="hero-cutout hero-thread-band" size={{ width: 160, height: 56 }} />
           <Patch wide="/images/thread-band-light.png" square="/images/thread-band-sq-light.png" variant="light" className="hero-cutout hero-thread-band" size={{ width: 160, height: 56 }} />
           <Patch wide="/images/tassel.png" square="/images/tassel-sq.png" variant="dark" className="hero-cutout hero-tassel" size={{ width: 150, height: 102 }} />
