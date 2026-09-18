@@ -13,16 +13,9 @@ import { slugify } from "@/lib/content/slug";
 import { ytId } from "@/lib/content/youtube";
 import { browserClient } from "@/lib/supabase/browser";
 import { MediaUploader } from "./MediaUploader";
+import { explain } from "@/lib/supabase/explain";
 
 type Props = { id?: string; initial?: Draft; deletedAt?: string | null };
-
-/** Turn a Supabase error into a sentence an editor can act on. */
-function explain(e: unknown): string {
-  const code = typeof e === "object" && e && "code" in e ? String((e as { code: unknown }).code) : "";
-  if (code === "23505") return "another post already uses this address; change the address field.";
-  if (code === "PGRST116") return "the post was not found, or your session has ended. Sign in again and retry.";
-  return e instanceof Error ? e.message : "error";
-}
 
 /**
  * Create or edit a post. Saves go straight to Supabase under row-level

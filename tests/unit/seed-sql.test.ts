@@ -13,5 +13,6 @@ describe("seedSql", () => {
     expect(sql).toContain("seed-bombers-2023.jpg");
     expect(sql).toContain("https://youtu.be/XTmHXvDXcI0");
     expect(sql).toContain("::jsonb,\n  true");
+    expect(sql).toContain("true,\n  now()");
   });
 });

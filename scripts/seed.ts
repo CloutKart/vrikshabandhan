@@ -24,6 +24,7 @@ function toRow(p: Post): PostInsert {
     yt: p.yt,
     media: p.media,
     live: p.live,
+    newsletter_sent_at: new Date().toISOString(),
   };
 }
 

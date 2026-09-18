@@ -7,7 +7,7 @@ function q(value: string): string {
   return `${tag}${value}${tag}`;
 }
 
-const columns = ["slug", "title_en", "title_hi", "summary_en", "summary_hi", "body_en", "body_hi", "date", "place", "tags", "yt", "media", "live"] as const;
+const columns = ["slug", "title_en", "title_hi", "summary_en", "summary_hi", "body_en", "body_hi", "date", "place", "tags", "yt", "media", "live", "newsletter_sent_at"] as const;
 
 /**
  * One insert per built-in story, for pasting into the Supabase SQL editor.
@@ -29,6 +29,8 @@ export function seedSql(posts: Post[]): string {
       q(p.yt),
       `${q(JSON.stringify(p.media))}::jsonb`,
       p.live ? "true" : "false",
+      // A seeded story was public before the newsletter existed: it is never mailed when an editor first saves it.
+      "now()",
     ];
     return `insert into public.posts (${columns.join(", ")})\nvalues (\n  ${values.join(",\n  ")}\n)\non conflict (slug) do nothing;`;
   });
