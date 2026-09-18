@@ -160,6 +160,11 @@
     background: color-mix(in srgb, var(--moss) 70%, transparent);
     margin: 0;
   }
+  /* A photograph is a mounted print: the same moss hairline as the rules, drawn inside the panel so it follows the
+     corner radius and never changes the box the reveal clips. */
+  .framed {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--moss) 55%, transparent);
+  }
   .display-xl {
     font-size: clamp(2.5rem, 5vw, 4.75rem);
     line-height: 1.06;

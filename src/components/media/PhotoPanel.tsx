@@ -33,7 +33,7 @@ export function PhotoPanel({
     <div
       data-photo={name}
       data-reveal="mask"
-      className={`painting-detail relative overflow-hidden rounded-[var(--radius-panel)] bg-stone ${className}`}
+      className={`painting-detail framed relative overflow-hidden rounded-[var(--radius-panel)] bg-stone ${className}`}
       style={{ "--ratio": RATIO[ratio], "--ratio-phone": RATIO[phoneRatio] } as CSSProperties}
     >
       <Image src={src} alt={alt} fill sizes={sizes} quality={quality} className="object-cover" style={{ objectPosition: position }} />

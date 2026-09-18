@@ -34,7 +34,7 @@ export async function FeaturedStory({ locale, post }: { locale: Locale; post: Po
       </p>
       <article data-cover={cover ? "true" : "false"} className="mt-5 grid gap-6 min-[820px]:gap-12 min-[820px]:items-center min-[820px]:data-[cover=true]:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         {cover ? (
-          <div data-flip-id={post.slug} data-reveal="mask" className="painting-detail relative overflow-hidden rounded-[var(--radius-panel)] bg-ground-2" style={{ "--ratio": "4 / 3", "--ratio-phone": "16 / 9" } as CSSProperties}>
+          <div data-flip-id={post.slug} data-reveal="mask" className="painting-detail framed relative overflow-hidden rounded-[var(--radius-panel)] bg-ground-2" style={{ "--ratio": "4 / 3", "--ratio-phone": "16 / 9" } as CSSProperties}>
             <Image src={mediaUrl(cover)} alt={coverAlt ?? ""} fill sizes="(min-width: 820px) 42vw, 100vw" quality={75} className="object-cover" />
           </div>
         ) : null}

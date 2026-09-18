@@ -27,7 +27,7 @@ export default async function FounderPage({ params }: { params: Promise<{ locale
     <main id="content" className="pb-12">
       <PageHeader pair={pair} />
       <div className="page grid gap-12 min-[820px]:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] min-[820px]:grid-rows-[auto_1fr] min-[820px]:gap-x-16 min-[820px]:gap-y-8">
-        <div data-reveal="mask" className="overflow-hidden rounded-[var(--radius-panel)] min-[820px]:col-start-1 min-[820px]:row-start-1">
+        <div data-reveal="mask" className="framed overflow-hidden rounded-[var(--radius-panel)] min-[820px]:col-start-1 min-[820px]:row-start-1">
             <Image
               src="/images/founder.jpg"
               alt={t("portraitAlt")}
