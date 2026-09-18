@@ -84,18 +84,20 @@ export async function Hero({ locale, aside }: { locale: Locale; aside?: ReactNod
           <Patch wide="/images/tassel.png" square="/images/tassel-sq.png" variant="dark" className="hero-cutout hero-tassel" size={{ width: 150, height: 102 }} />
           <Patch wide="/images/tassel-light.png" square="/images/tassel-sq-light.png" variant="light" className="hero-cutout hero-tassel" size={{ width: 150, height: 102 }} />
           <HeroLeaves />
+          {/* The headline is a layer of the painting itself, so it is placed by the painting's box at every width,
+              never by the column beside it (which can be taller than the painting on wide screens). */}
+          <BilingualHeading
+            as="h1"
+            primary={t("title")}
+            primaryLang={locale}
+            secondary={tOther("title")}
+            secondaryLang={other}
+            accent={t("accent")}
+            secondaryAccent={tOther("accent")}
+            className="hero-title"
+            reveal="hero"
+          />
         </div>
-        <BilingualHeading
-          as="h1"
-          primary={t("title")}
-          primaryLang={locale}
-          secondary={tOther("title")}
-          secondaryLang={other}
-          accent={t("accent")}
-          secondaryAccent={tOther("accent")}
-          className="hero-title"
-          reveal="hero"
-        />
       </div>
       <div className="hero-copy">
         <p className="max-w-[52ch] text-xl leading-relaxed">{t("lede")}</p>
