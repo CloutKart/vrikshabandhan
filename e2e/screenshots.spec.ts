@@ -4,7 +4,7 @@ import { test } from "@playwright/test";
  * Review artifacts, not assertions: full-page captures of every route in both
  * locales, both themes and three widths, written to e2e/__screenshots__ (ignored by git).
  */
-const routes = ["/", "/stories", "/stories/silkyara-open-letter", "/stories/seed-bombers-2023", "/founder", "/thread", "/get-involved"];
+const routes = ["/", "/stories", "/stories/silkyara-open-letter", "/stories/seed-bombers-2023", "/founder", "/thread", "/get-involved", "/newsletter/confirm"];
 const locales = ["en", "hi"] as const;
 const themes = ["dark", "light"] as const;
 const widths = [1920, 1440, 1024, 390];

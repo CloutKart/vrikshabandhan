@@ -187,6 +187,37 @@
   .sheet::backdrop {
     background: var(--ground);
   }
+  /* The subscribe invitation: a panel on desktop, a bottom sheet on phones; the ground colour, a thread on top. */
+  .ask {
+    margin: auto;
+    width: min(100% - 2rem, 28rem);
+    border: 0;
+    border-top: 2px solid var(--sutra);
+    border-radius: var(--radius-panel);
+    padding: clamp(1.25rem, 4vw, 2rem);
+    background: var(--ground);
+    color: var(--ink);
+  }
+  .ask::backdrop {
+    background: color-mix(in srgb, var(--ground) 72%, transparent);
+  }
+  @media (max-width: 819px) {
+    .ask {
+      margin: auto 0 0;
+      width: 100%;
+      max-width: none;
+      border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+    }
+  }
+  html[data-motion="full"] .ask[open] {
+    animation: ask-in var(--motion-enter) var(--ease-enter);
+  }
+  @keyframes ask-in {
+    from {
+      opacity: 0;
+      transform: translateY(var(--move-reveal));
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const pages = ["", "/stories", "/stories?tag=Open%20letter", "/stories/silkyara-open-letter", "/founder", "/thread", "/get-involved"];
+const pages = ["", "/stories", "/stories?tag=Open%20letter", "/stories/silkyara-open-letter", "/founder", "/thread", "/get-involved", "/newsletter/confirm?t=bad", "/newsletter/unsubscribe"];
 const routes = ["en", "hi"].flatMap((l) => pages.map((p) => `/${l}${p}`));
 
 // The audit measures the settled page: with motion on, axe would sample colours mid-fade.

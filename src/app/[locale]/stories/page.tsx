@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PhotoPanel } from "@/components/media/PhotoPanel";
 import { StoryList } from "@/components/stories/StoryList";
 import { TagFilter } from "@/components/stories/TagFilter";
+import { NewsletterBlock } from "@/components/newsletter/NewsletterBlock";
 import { PageHeader } from "@/components/typography/PageHeader";
 import type { Locale } from "@/i18n/routing";
 import { getPosts, getTags } from "@/lib/content/posts";
@@ -43,6 +44,7 @@ export default async function StoriesPage({ params, searchParams }: Props) {
         <div className="mt-6">
           <StoryList posts={posts} locale={locale} />
         </div>
+        <NewsletterBlock locale={locale} variant="panel" />
       </div>
     </main>
   );

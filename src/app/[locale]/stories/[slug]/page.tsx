@@ -10,7 +10,10 @@ import { otherLocale, routing, type Locale } from "@/i18n/routing";
 import { builtinPosts } from "@/lib/content/builtin";
 import { getPost, mediaUrl, pick } from "@/lib/content/posts";
 import { formatStoryDate } from "@/lib/i18n/format";
+import { NewsletterAsk } from "@/components/newsletter/NewsletterAsk";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { newsletterLabels } from "@/lib/newsletter/strings";
+import { subscribe } from "@/app/[locale]/newsletter/actions";
 import { pageMeta } from "@/lib/seo";
 import { absoluteUrl, siteUrl } from "@/lib/site";
 
@@ -65,7 +68,7 @@ export default async function StoryPage({ params }: Props) {
   setRequestLocale(locale);
   const post = await getPost(slug);
   if (!post) notFound();
-  const t = await getTranslations({ locale, namespace: "stories" });
+  const [t, n] = await Promise.all([getTranslations({ locale, namespace: "stories" }), getTranslations({ locale, namespace: "newsletter" })]);
   const other = otherLocale(locale);
   const title = pick(post, "title", locale);
   const otherTitle = other === "hi" ? post.title_hi : post.title_en;
@@ -112,7 +115,9 @@ export default async function StoryPage({ params }: Props) {
         <StoryBody body={body.text} lang={body.lang} />
         <YouTubeEmbed url={post.yt} title={`${t("video")}: ${title.text}`} />
         <StoryGallery items={rest} locale={locale} title={t("gallery")} />
+        <div data-newsletter-end aria-hidden="true" />
       </PaperSheet>
+      <NewsletterAsk labels={newsletterLabels(n)} locale={locale} action={subscribe} />
     </main>
   );
 }

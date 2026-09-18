@@ -1,5 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
 import { otherLocale, type Locale } from "@/i18n/routing";
+import { NewsletterBlock } from "@/components/newsletter/NewsletterBlock";
 import { Mark } from "./Wordmark";
 
 export function Footer() {
@@ -71,6 +72,7 @@ export function Footer() {
           <p className="mt-2">{t("blog")}</p>
           <p className="mt-6">{f("rights")}</p>
         </div>
+        <NewsletterBlock locale={locale} variant="footer" />
       </div>
     </footer>
   );
