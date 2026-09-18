@@ -60,7 +60,18 @@ editor, new stories and the newsletter once a Supabase project and a mail servic
   own every 60 seconds.
 - Deleting is soft: the post gets a `deleted_at`, the toast offers Undo, and the "Deleted" filter lists it for
   restoring later. Photos stay in storage.
-- Before publishing, every photo needs an English description; the editor refuses to publish without one.
+- Writing a story. The text is a document editor: a page-like sheet with a toolbar (Bold, Italic, Subheading,
+  Quote and its Source, Bullets, Numbers, Link, Photo, Film, Undo, Redo) and the usual shortcuts (Ctrl+B, Ctrl+I,
+  Ctrl+K for a link, Ctrl+Z). One language shows at a time; the English / हिंदी switch above the sheet keeps both.
+  Pasting from Word or Google Docs keeps headings, bold, italic, links and lists and drops fonts, colours and
+  sizes. Photos are placed in the text from the story's uploads (upload first, under "Photos and videos", so each
+  has a description), with an optional caption; films are placed from a YouTube link. What is saved is plain text
+  in the story format described in `docs/superpowers/specs/2026-09-18-story-editor-design.md`, so older stories
+  need no change and the newsletter renders the same text.
+- Unsaved work is copied to the browser every two seconds. Reopening a story on the same device after a closed tab
+  or a dropped connection offers "Restore them" or "Discard"; a successful save clears the copy.
+- Before publishing, every photo needs an English description, and a photo placed in the text must still be among
+  the uploads; the editor refuses to publish otherwise.
 - The first time a story goes live, every confirmed subscriber gets it by e-mail in their language, once. Editing a
   live story, unpublishing and republishing it, or saving it again never mails it again. The toast after saving
   says how many were reached; the story page shows the send state, lists any address that failed, and offers
